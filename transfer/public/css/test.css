@@ -1,0 +1,12 @@
+/* Define the font with @font-face */
+@font-face {
+    font-family: 'Tajawal-Regular';
+    src: url('/assets/transfer/transfer/public/asset/fonts/taj/Tajawal-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Apply the font globally */
+body, .page-container {
+    font-family: 'Tajawal-Regular', sans-serif !important;
+}

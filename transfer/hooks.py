@@ -25,7 +25,7 @@ app_license = "mit"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/transfer/css/transfer.css"
+app_include_css = "/assets/transfer/css/test.css"
 # app_include_js = "/assets/transfer/js/transfer.js"
 
 # include js, css files in header of web template
@@ -138,13 +138,12 @@ app_license = "mit"
 # Hook on document methods and events
 
 # doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
+# 	"transfer between branches": {
+# 	    "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
+# 		# "on_cancel": "method",
+# 		"on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_status_change"
 # 	}
-# }
-
+# } 
 # Scheduled Tasks
 # ---------------
 
