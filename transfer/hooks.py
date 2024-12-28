@@ -137,13 +137,13 @@ app_include_css = "/assets/transfer/css/test.css"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"transfer between branches": {
-# 	    "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
-# 		# "on_cancel": "method",
-# 		"on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_status_change"
-# 	}
-# } 
+doc_events = {
+	"transfer between branches": {
+	    # "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
+	    # "on_cancel": "method",
+		#"on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc",
+	}
+} 
 # Scheduled Tasks
 # ---------------
 
