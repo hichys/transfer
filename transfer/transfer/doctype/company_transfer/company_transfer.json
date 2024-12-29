@@ -2,44 +2,43 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "format:BRTR-{DD}-{MM}-{YY}-{from_branch}-to-{to_branch}.{#####}",
- "creation": "2024-12-25 17:37:12.404320",
+ "creation": "2024-12-29 19:14:56.674172",
+ "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_baym",
-  "amended_from",
   "section_break_qfcp",
   "column_break_laau",
-  "from_branch",
+  "column_break_wpec",
   "posting_date",
   "delivery_date",
   "without_profit",
   "amount",
   "profit_per_thousand",
   "profit",
-  "\u0627\u0644\u0639\u0645\u0648\u0644\u0629_\u0645\u0642\u0633\u0648\u0645\u0647_\u0639\u0644\u064a_\u0627\u0644\u0641\u0631\u0648\u0639",
+  "other_patry_profit",
+  "profit_is_splited",
   "whatsapp_desc",
   "handed_account",
-  "to_branch",
+  "from_company",
+  "to_company",
   "debit",
   "credit",
   "journal_entry",
   "notyet",
   "handed",
   "canceld_journal_entry",
-  "journal_entry_link"
+  "journal_entry_link",
+  "section_break_tkcp",
+  "amended_from"
  ],
  "fields": [
-  {
-   "fieldname": "section_break_baym",
-   "fieldtype": "Section Break"
-  },
   {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "transfer between branches",
+   "options": "company transfer",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
@@ -53,18 +52,18 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "from_branch",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "\u0645\u0646 \u0627\u0644\u0641\u0631\u0639",
-   "options": "Branch",
-   "reqd": 1
-  },
-  {
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
    "label": "Posting Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Today",
+   "fieldname": "delivery_date",
+   "fieldtype": "Date",
+   "label": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "reqd": 1
   },
   {
    "default": "0",
@@ -97,17 +96,10 @@
    "depends_on": "eval:!doc.without_profit",
    "fieldname": "profit",
    "fieldtype": "Currency",
-   "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629",
+   "label": "\u0639\u0645\u0648\u0644\u062a\u0646\u0627",
    "non_negative": 1,
    "precision": "2",
    "reqd": 1
-  },
-  {
-   "default": "1",
-   "description": "\u062a\u0646\u062d\u064a \u0627\u0644\u0639\u0644\u0627\u0645\u0629 \u0641\u064a \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0644\u0644\u0641\u0631\u0639 \u0627\u0644\u0645\u0628\u0639\u0648\u062a \u0645\u0646\u0647 \u0641\u0642\u0637",
-   "fieldname": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629_\u0645\u0642\u0633\u0648\u0645\u0647_\u0639\u0644\u064a_\u0627\u0644\u0641\u0631\u0648\u0639",
-   "fieldtype": "Check",
-   "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0645\u0642\u0633\u0648\u0645\u0647 \u0639\u0644\u064a \u0627\u0644\u0641\u0631\u0648\u0639"
   },
   {
    "fieldname": "whatsapp_desc",
@@ -115,12 +107,8 @@
    "label": "\u062a\u0641\u0627\u0635\u064a\u0644 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0648\u0627\u062a\u0633"
   },
   {
-   "fieldname": "to_branch",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "\u0627\u0644\u064a \u0627\u0644\u0641\u0631\u0639",
-   "options": "Branch",
-   "reqd": 1
+   "fieldname": "handed_account",
+   "fieldtype": "Column Break"
   },
   {
    "allow_on_submit": 1,
@@ -141,10 +129,6 @@
    "in_standard_filter": 1,
    "label": "\u0627\u0644\u0642\u064a\u062f \u0627\u0644\u0627\u062e\u064a\u0631",
    "read_only": 1
-  },
-  {
-   "fieldname": "handed_account",
-   "fieldtype": "Column Break"
   },
   {
    "allow_on_submit": 1,
@@ -171,17 +155,62 @@
    "remember_last_selected_value": 1
   },
   {
-   "allow_on_submit": 1,
-   "default": "Today",
-   "fieldname": "delivery_date",
-   "fieldtype": "Date",
-   "label": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
-   "reqd": 1
-  },
-  {
    "fieldname": "journal_entry_link",
    "fieldtype": "HTML",
    "label": "journal_entry_link"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "company transfer",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u0645\u0646 \u0634\u0631\u0643\u0629",
+   "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u0627\u0644\u064a \u0634\u0631\u0643\u0629",
+   "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "columns": 6,
+   "depends_on": "eval:!doc.without_profit",
+   "fieldname": "other_patry_profit",
+   "fieldtype": "Currency",
+   "label": "\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0637\u0631\u0641 \u0627\u0644\u0627\u062e\u0631",
+   "non_negative": 1,
+   "precision": "2",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "description": "\u062a\u0646\u062d\u064a \u0627\u0644\u0639\u0644\u0627\u0645\u0629 \u0641\u064a \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0644\u0644\u0641\u0631\u0639 \u0627\u0644\u0645\u0628\u0639\u0648\u062a \u0645\u0646\u0647 \u0641\u0642\u0637",
+   "fieldname": "profit_is_splited",
+   "fieldtype": "Check",
+   "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0645\u0642\u0633\u0648\u0645\u0647 \u0639\u0644\u064a \u0627\u0644\u0637\u0631\u0641\u064a\u0646"
+  },
+  {
+   "fieldname": "section_break_tkcp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_wpec",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -192,10 +221,10 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2024-12-29 19:09:55.788248",
+ "modified": "2024-12-29 19:39:17.494437",
  "modified_by": "Administrator",
  "module": "transfer",
- "name": "transfer between branches",
+ "name": "company transfer",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
