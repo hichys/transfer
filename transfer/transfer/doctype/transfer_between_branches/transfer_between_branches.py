@@ -12,7 +12,7 @@ class transferbetweenbranches(Document):
         frappe.msgprint("This document has been trashed")
 
     def before_cancel(self):
-        create_journal_entry_from_canceled_transfer(self, method="submit")
+        #create_journal_entry_from_canceled_transfer(self, method="submit")
         #self.docstast = "إلغاء"
         frappe.msgprint("This document has been canceled successfully")
 
@@ -23,10 +23,14 @@ class transferbetweenbranches(Document):
             self.debit = debit
             self.credit = credit
             create_journal_entry_from_pending_transfer(self, method="submit")
+      # Save the previous state when the document is loaded
 
     def on_change(self):
-        frappe.msgprint("on change: " + self.workflow_state)
+        
+        
+         
         if self.workflow_state == "تم التسليم" and not self.handed:
+            frappe.msgprint("تم التسليم *****")
             debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
             credit = get_account_for_branch(branch_name=self.to_branch, account_index=0)
             self.debit = debit
@@ -177,9 +181,59 @@ def cancel_notyet_transaction(docname, method):
         frappe.log_error(frappe.get_traceback(), "Error Cancelling Transaction")
         frappe.throw(str(e))
 
+###
+# إلغاء الحوالة  المسلمة بعد 24 ساعة 
+# يتم عبر عكس القيود المتعلقة بالحوالة
+# ###
 @frappe.whitelist()
-def cancel_trnasfer_after_aday(docname,method):
-    frappe.msgprint("cancel_trnasfer_after_aday")
+def cancel_handed_transfer_after_a_day(docname, method=None):
+    """
+    Reverse journal entries linked to a transfer document and update its workflow state.
+    """
+    frappe.msgprint("cancel_handed_transfer_after_a_day is called")
+    try:
+        # Fetch the transfer document
+        doc = frappe.get_doc('transfer between branches', docname)
+
+        if doc.workflow_state == "إلغاء":
+            frappe.msgprint("This document is already cancelled.")
+            return {"status": "error", "message": "This document is already cancelled."}
+
+        try:
+            # Reverse 'handed' journal entry
+            if doc.handed:
+                frappe.msgprint(f"Reversing Journal Entry: {doc.handed}")
+                reverse_journal_entry(doc.handed)
+
+            # Reverse 'notyet' journal entry
+            if doc.notyet:
+                frappe.msgprint(f"Reversing Journal Entry: {doc.notyet}")
+                reverse_journal_entry(doc.notyet)
+
+            # Update workflow state and status
+            doc.db_set("workflow_state", "تم الإلغاء")
+            doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
+            frappe.msgprint("Transfer document workflow updated successfully.")
+
+            frappe.db.commit()
+
+            return {
+                "status": "success",
+                "message": "Journal Entries reversed and document workflow updated successfully."
+            }
+
+        except frappe.DoesNotExistError as dne_error:
+            frappe.throw("One or more linked Journal Entries do not exist.")
+        except Exception as je_error:
+            frappe.log_error(frappe.get_traceback(), "Error in Reversing Journal Entry")
+            frappe.throw(f"An error occurred while processing journal entries: {je_error}")
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Error in cancel_handed_transfer_after_a_day")
+        frappe.throw(f"An unexpected error occurred: {e}")
+        return {"status": "error", "message": str(e)}
+
+
 
 @frappe.whitelist()
 def create_journal_entry_from_canceled_transfer(docname, method):
@@ -261,57 +315,85 @@ def create_journal_entry_from_handed_transfer(doc, method):
 
     frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
 
-@frappe.whitelist()
-def create_journal_entry_from_handed_transfer(doc, method):
-    debit_to_liabilities = get_account_for_branch(doc.to_branch, 1)
-    credit_to_account = get_account_for_branch(doc.to_branch, 0)
-    journal_entry = frappe.get_doc({
-        "doctype": "Journal Entry",
-        "posting_date": doc.posting_date,
-        "accounts": [
-            {
-                "account": debit_to_liabilities,
-                "debit_in_account_currency": doc.amount,
-                "credit_in_account_currency": 0,
-            },
-            {
-                "account": credit_to_account,
-                "debit_in_account_currency": 0,
-                "credit_in_account_currency": doc.amount,
-            }
-        ]
-    })
+# @frappe.whitelist()
+# def create_journal_entry_from_handed_transfer(doc, method):
+#     debit_to_liabilities = get_account_for_branch(doc.to_branch, 1)
+#     credit_to_account = get_account_for_branch(doc.to_branch, 0)
+#     journal_entry = frappe.get_doc({
+#         "doctype": "Journal Entry",
+#         "posting_date": doc.posting_date,
+#         "accounts": [
+#             {
+#                 "account": debit_to_liabilities,
+#                 "debit_in_account_currency": doc.amount,
+#                 "credit_in_account_currency": 0,
+#             },
+#             {
+#                 "account": credit_to_account,
+#                 "debit_in_account_currency": 0,
+#                 "credit_in_account_currency": doc.amount,
+#             }
+#         ]
+#     })
 
-    journal_entry.custom_state = doc.docstatus
-    journal_entry.insert(ignore_permissions=True)
-    journal_entry.posting_date = doc.delivery_date
-    doc.journal_entry = journal_entry.name
-    doc.handed = journal_entry.name
+#     journal_entry.custom_state = doc.docstatus
+#     journal_entry.insert(ignore_permissions=True)
+#     journal_entry.posting_date = doc.delivery_date
+#     doc.journal_entry = journal_entry.name
+#     doc.handed = journal_entry.name
     
-    doc.save()
-    frappe.db.commit()
-    journal_entry.submit()
+#     doc.save()
+#     frappe.db.commit()
+#     journal_entry.submit()
 
-    frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
+#     frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
 
 @frappe.whitelist()
-def reverse_journal_entry(doc):
-		original_entry = frappe.get_doc("Journal Entry", doc.journal_entry)
-		accounts = []
+def reverse_journal_entry(docname):
+    try:
+        # Fetch the original journal entry
+        original_entry = frappe.get_doc("Journal Entry", docname)
+        
+        # Check if the journal entry has already been reversed
+        if original_entry.custom_reversed_by:
+            frappe.throw(f"This journal entry has already been reversed by {original_entry.custom_reversed_by}.")
 
-		for line in original_entry.accounts:
-			accounts.append({
-				"account": line.account,
-				"debit_in_account_currency": line.credit_in_account_currency,
-				"credit_in_account_currency": line.debit_in_account_currency
-			})
-		
-		reversal_entry = frappe.get_doc({
-			"doctype": "Journal Entry",
-			"posting_date": frappe.utils.nowdate(),
-			"accounts": accounts
-		})
-		reversal_entry.insert(ignore_permissions=True)
-		reversal_entry.submit()
-		doc.reversal_journal_entry = reversal_entry.name
-		doc.save()
+
+        # Prepare reversed accounts
+        accounts = []
+        for line in original_entry.accounts:
+            accounts.append({
+                "account": line.account,
+                "debit_in_account_currency": line.credit_in_account_currency,
+                "credit_in_account_currency": line.debit_in_account_currency,
+                "cost_center": line.cost_center,
+                "party_type": line.party_type,
+                "party": line.party
+                
+            })
+
+        # Create the reversal journal entry
+        reversal_entry = frappe.get_doc({
+            "doctype": "Journal Entry",
+            "voucher_type": original_entry.voucher_type,
+            "posting_date": frappe.utils.nowdate(),
+            "company": original_entry.company,
+            "accounts": accounts,
+            "remark": f"Reversal of Journal Entry {original_entry.name}",
+            "reversal_of": original_entry.name  # Link the reversal to the original
+        })
+        
+        # Insert and submit the reversal entry
+        reversal_entry.insert(ignore_permissions=True)
+        reversal_entry.submit()
+
+        # Update the original journal entry to reference the reversal
+        original_entry.db_set("remark", "تم انعكاسة")
+        original_entry.db_set("custom_reversed_by", reversal_entry.name)
+        frappe.msgprint(f"Reversal Journal Entry {reversal_entry.name} created successfully for {original_entry.name}.")
+        return {"status": "success", "message": f"Reversal Journal Entry {reversal_entry.name} created successfully."}
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Error in Reversing Journal Entry")
+        frappe.throw(f"An error occurred while reversing Journal Entry {docname}: {e}")
+
