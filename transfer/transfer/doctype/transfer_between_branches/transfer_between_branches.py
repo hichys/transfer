@@ -138,42 +138,40 @@ def create_journal_entry_from_pending_transfer(doc, method):
     frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
     frappe.msgprint(doc.journal_entry_link)
     frappe.msgprint(f"Journal Entry {journal_entry.name} created and linked to the Transfer Between Branches document.")
-
 @frappe.whitelist()
-def cancel_notyet_transaction(docname, method):
-    frappe.msgprint("جاري إلغاء الحوالة الغير مستلمة")
+def cancel_notyet_transaction(docname, method="reversal"):
     try:
         # Fetch the document
-        doc = frappe.get_doc('transfer between branches', docname)
-
-        # Check if already canceled by workflow state
-        if doc.workflow_state == "إلغاء":
-            frappe.msgprint("هذه الحوالة ملغية مسبقا")
-            return {"status": "error", "message": "This document is already cancelled."}
-
-        # Check if the document status is already canceled
-        if doc.docstatus == 2:
-            frappe.msgprint("This document is already cancelled.")
-            return {"status": "error", "message": "This document is already cancelled."}
-
-        # Fetch the "notyet" Journal Entry linked to the document
-        if doc.notyet:
-            notyet = frappe.get_doc('Journal Entry', doc.notyet)
-
-            # Cancel the Journal Entry if not already canceled
-            if notyet.docstatus == 2:
-                frappe.msgprint(f"Not Yet Entry {notyet.name} is already canceled.")
-            else:
-                notyet.cancel()
-                frappe.msgprint("Journal Entry canceled successfully.")
+        try :
+            doc = frappe.get_doc('transfer between branches', docname)
+        except frappe.DoesNotExistError:
+            frappe.throw("الرجاء انشاء الحوالة اولا")
+            return
         
-        # Update the workflow state
+        # Check if the 'notyet' journal entry exists
+        if doc.notyet:
+            if method == "reversal":
+                # If method is reversal, reverse the journal entry
+                frappe.msgprint(f"Reversing Journal Entry: {doc.notyet}")
+                reverse_journal_entry(doc.notyet)  # Call the reverse function you already have
+            elif method == "cancel":
+                # If method is cancel, cancel the journal entry directly
+                notyet_entry = frappe.get_doc('Journal Entry', doc.notyet)
+                if notyet_entry.docstatus != 2:  # Check if the journal entry is not already canceled
+                    notyet_entry.cancel()
+                    frappe.msgprint(f"Journal Entry {notyet_entry.name} canceled successfully.")
+                else:
+                    frappe.msgprint(f"Journal Entry {notyet_entry.name} is already canceled.")
+
+        # Update the workflow state to "تم الإلغاء" (Cancelled)
         doc.workflow_state = "تم الإلغاء"
         doc.save()
+        doc.submit()
+        doc.cancel()  # Cancel the transfer between branches document
         frappe.db.commit()
 
         frappe.msgprint("Document has been successfully updated to 'إلغاء'.")
-        return {"status": "success", "message": "Document and linked Journal Entry have been cancelled."}
+        return {"status": "success", "message": "Document and linked Journal Entry have been processed."}
 
     except frappe.DoesNotExistError:
         frappe.throw("Journal Entry does not exist.")
@@ -390,6 +388,8 @@ def reverse_journal_entry(docname):
         # Update the original journal entry to reference the reversal
         original_entry.db_set("remark", "تم انعكاسة")
         original_entry.db_set("custom_reversed_by", reversal_entry.name)
+
+        
         frappe.msgprint(f"Reversal Journal Entry {reversal_entry.name} created successfully for {original_entry.name}.")
         return {"status": "success", "message": f"Reversal Journal Entry {reversal_entry.name} created successfully."}
 

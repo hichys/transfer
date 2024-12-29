@@ -19,7 +19,7 @@ frappe.ui.form.on("transfer between branches", {
 			// Check if the document was created within 24 hours (86400 seconds)
 			if (9999999999 <= 86400) {
 				// Add the first button
-				frm.add_custom_button(__('إلغاء الحوالة المسلمة قبل 24 ساعة'), function() {
+				frm.add_custom_button(__('إلغاء الحوالة المستلمة قبل 24 ساعة'), function() {
 					frappe.call({
 						method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.create_journal_entry_from_canceled_transfer',
 						args: {
@@ -81,35 +81,68 @@ frappe.ui.form.on("transfer between branches", {
 		
 	}
 });
+frappe.ui.form.on('transfer between branches', {
+    refresh: function(frm) {
+        // Check if the document is in the "معلقة" workflow state
+		frappe.msgprint(frm.doc.docstatus)
+        if (frm.doc.workflow_state === "معلقة") {
+
+            // Calculate the time difference in hours between document creation and the current time
+            const creation_time = new Date(frm.doc.creation);
+            const current_time = new Date();
+            const time_diff = (current_time - creation_time) / (1000 * 3600); // Convert to hours
+
+            // If the document was created more than 24 hours ago, add the reverse button
+            if (1 >= 24) {
+                // Add "Reverse" button
+                frm.add_custom_button(__('عكس الحوالــة'), function() {
+                    // Call the server-side method to reverse the journal entry
+                    frappe.call({
+                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.cancel_notyet_transaction',  // Server-side function to reverse the journal entry
+                        args: {
+                            docname: frm.docname,
+							method: "reversal"  // Pass the 'notyet' journal entry's docname (this is the document that you want to reverse)
+                        },
+                        callback: function(r) {
+                            if (!r.exc) {
+                                frappe.msgprint(__('Document has been reversed successfully.'));
+                                frm.reload_doc();  // Reload the document to reflect changes
+                            }
+                        }
+                    });
+                });
+
+                // Disable the "إلغاء الحوالة" button if it's there
+                frm.fields_dict['workflow_state'].grid.get_field('workflow_state').$wrapper.find('.btn-primary').prop('disabled', true);
+            } else {
+                // Add "إلغاء الحوالة" button if not already there and time is less than 24 hours
+                frm.add_custom_button(__('إلغاء الحوالة'), function() {
+                    // Call the server-side method to cancel the document
+                    frappe.call({
+                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.cancel_notyet_transaction',
+                        args: {
+                            docname: frm.doc.name,
+                            method: "submit"
+                        },
+                        callback: function(r) {
+                            if (!r.exc) {
+                                frappe.msgprint(__('Document has been canceled successfully.'));
+                                frm.reload_doc();  // Reload the document to reflect changes
+                            }
+                        }
+                    });
+                });
+            }
+        }
+    }
+});
 
 frappe.ui.form.on('transfer between branches', {
 	refresh: function(frm) {
-        // Add a custom button for workflow_state "معلقة"
-        if (frm.doc.workflow_state === "معلقة") {
-            frm.add_custom_button(__('الحوالة ملغية'), function() {
-                // Call the server-side method
-                frappe.call({
-                    method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.cancel_notyet_transaction',
-                    args: {
-                        docname: frm.doc.name,
-                        method: "submit"
-                    },
-                    callback: function(r) {
-                        if (!r.exc) {
-                            frappe.msgprint(__('Document has been canceled successfully.'));
-                            frm.reload_doc();
-                        }
-                    }
-                });
-            });
-        }
-
+    
         // Add a custom button for workflow_state "تم التسليم"
       
 
-
-
-		//
 			frm.add_custom_button(__('حــذف نهائي'), function () {
 				frappe.confirm(
 					'هل انت متاكد ?',
