@@ -93,7 +93,7 @@ frappe.ui.form.on('transfer between branches', {
             const time_diff = (current_time - creation_time) / (1000 * 3600); // Convert to hours
 
             // If the document was created more than 24 hours ago, add the reverse button
-            if (1 >= 24) {
+            if (time_diff >= 24) {
                 // Add "Reverse" button
                 frm.add_custom_button(__('عكس الحوالــة'), function() {
                     // Call the server-side method to reverse the journal entry

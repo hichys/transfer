@@ -154,7 +154,7 @@ def cancel_notyet_transaction(docname, method="reversal"):
                 # If method is reversal, reverse the journal entry
                 frappe.msgprint(f"Reversing Journal Entry: {doc.notyet}")
                 reverse_journal_entry(doc.notyet)  # Call the reverse function you already have
-            elif method == "cancel":
+            elif method == "submit":
                 # If method is cancel, cancel the journal entry directly
                 notyet_entry = frappe.get_doc('Journal Entry', doc.notyet)
                 if notyet_entry.docstatus != 2:  # Check if the journal entry is not already canceled
