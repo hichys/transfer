@@ -2,30 +2,82 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("transfer between branches", {
-	
+	refresh: function(frm){
+		if (frm.doc.workflow_state === "تم التسليم") {
+			// Get the document's creation date
+			var creation_time = new Date(frm.doc.creation);
+			var current_time = new Date();
+			var time_difference = (current_time - creation_time) / 1000; // Convert milliseconds to seconds
+		
+			// Check if the document was created within 24 hours (86400 seconds)
+			if (time_difference <= 86400) {
+				// Add the first button
+				frm.add_custom_button(__('إلغاء الحوالة المسلمة قبل 24 ساعة'), function() {
+					frappe.call({
+						method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.create_journal_entry_from_canceled_transfer',
+						args: {
+							docname: frm.doc.name,
+							method: "submit"
+						},
+						callback: function(r) {
+							if (!r.exc) {
+								frappe.msgprint(__('Document has been canceled successfully.'));
+								frm.reload_doc();
+							}
+						}
+					});
+				});
+		
+				// Calculate remaining time until 24 hours
+				var remaining_time = (86400 - time_difference) * 1000; // Convert seconds to milliseconds
+		
+				setTimeout(function() {
+					// Refresh the form to update buttons after 24 hours
+					frm.refresh();
+					frm.add_custom_button(__('Button after 24 hours'), function() {
+						frappe.msgprint(__('This is the button that appears after 24 hours.'));
+					});
+				}, remaining_time);
+		
+			} else {
+				// If more than 24 hours have passed, add the second button directly
+				frm.add_custom_button(__('Button after 24 hours'), function() {
+					frappe.msgprint(__('This is the button that appears after 24 hours.'));
+				});
+			}
+		}
+		
+	}
 });
 
 frappe.ui.form.on('transfer between branches', {
-		refresh: function(frm) {
-			// Add a custom button
-			if (frm.doc.workflow_state === "معلقة"){
-			frm.add_custom_button(__('الحوالة ملغية'), function() {
-				// Call the server-side method
-				frappe.call({
-					method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.cancel_notyet_transaction',
-					args: {
-						docname: frm.doc.name,
-						method : "submit"
-					},
-					callback: function(r) {
-						if (!r.exc) {
-							frappe.msgprint(__('Document has been canceled successfully.'));
-							frm.reload_doc();
-						}
-					}
-				});
-			});
-		},
+	refresh: function(frm) {
+        // Add a custom button for workflow_state "معلقة"
+        if (frm.doc.workflow_state === "معلقة") {
+            frm.add_custom_button(__('الحوالة ملغية'), function() {
+                // Call the server-side method
+                frappe.call({
+                    method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.cancel_notyet_transaction',
+                    args: {
+                        docname: frm.doc.name,
+                        method: "submit"
+                    },
+                    callback: function(r) {
+                        if (!r.exc) {
+                            frappe.msgprint(__('Document has been canceled successfully.'));
+                            frm.reload_doc();
+                        }
+                    }
+                });
+            });
+        }
+
+        // Add a custom button for workflow_state "تم التسليم"
+      
+
+
+
+		//
 			frm.add_custom_button(__('حــذف نهائي'), function () {
 				frappe.confirm(
 					'هل انت متاكد ?',

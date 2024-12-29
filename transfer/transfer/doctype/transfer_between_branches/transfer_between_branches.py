@@ -178,6 +178,10 @@ def cancel_notyet_transaction(docname, method):
         frappe.throw(str(e))
 
 @frappe.whitelist()
+def cancel_trnasfer_after_aday(docname,method):
+    frappe.msgprint("cancel_trnasfer_after_aday")
+
+@frappe.whitelist()
 def create_journal_entry_from_canceled_transfer(docname, method):
     frappe.msgprint("create_journal_entry_from_canceled_transfer is called")
     try:
@@ -191,19 +195,17 @@ def create_journal_entry_from_canceled_transfer(docname, method):
         
         try:
             handed = frappe.get_doc('Journal Entry', doc.handed)
-            if doc.handed:
-                handed.cancel()
-                doc.workflow_state = "إلغاء"
+            
+            handed.cancel()
                     
                 
             notyet = frappe.get_doc('Journal Entry', doc.notyet)        
-            if notyet:
-                notyet.cancel()
-                doc.workflow_state = "إلغاء"
-            
-             
+           
+            notyet.cancel()
+                
+                
+            doc.workflow_state = "تم الإلغاء"
             doc.save()
-            doc.submit()
             frappe.db.commit()
             
             
@@ -225,6 +227,39 @@ def create_journal_entry_from_canceled_transfer(docname, method):
         frappe.log_error(frappe.get_traceback(), "Error in on_trash_handler")
         return {"status": "error", "message": str(e)}
     
+
+@frappe.whitelist()
+def create_journal_entry_from_handed_transfer(doc, method):
+    debit_to_liabilities = get_account_for_branch(doc.to_branch, 1)
+    credit_to_account = get_account_for_branch(doc.to_branch, 0)
+    journal_entry = frappe.get_doc({
+        "doctype": "Journal Entry",
+        "posting_date": doc.posting_date,
+        "accounts": [
+            {
+                "account": debit_to_liabilities,
+                "debit_in_account_currency": doc.amount,
+                "credit_in_account_currency": 0,
+            },
+            {
+                "account": credit_to_account,
+                "debit_in_account_currency": 0,
+                "credit_in_account_currency": doc.amount,
+            }
+        ]
+    })
+
+    journal_entry.custom_state = doc.docstatus
+    journal_entry.insert(ignore_permissions=True)
+    journal_entry.posting_date = doc.delivery_date
+    doc.journal_entry = journal_entry.name
+    doc.handed = journal_entry.name
+    
+    doc.save()
+    frappe.db.commit()
+    journal_entry.submit()
+
+    frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
 
 @frappe.whitelist()
 def create_journal_entry_from_handed_transfer(doc, method):
