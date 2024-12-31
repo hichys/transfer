@@ -362,6 +362,7 @@ def reverse_journal_entry(docname):
         for line in original_entry.accounts:
             accounts.append({
                 "account": line.account,
+                "branch" : line.branch,
                 "debit_in_account_currency": line.credit_in_account_currency,
                 "credit_in_account_currency": line.debit_in_account_currency,
                 "cost_center": line.cost_center,

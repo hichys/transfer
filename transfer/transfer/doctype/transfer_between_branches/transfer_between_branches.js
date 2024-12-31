@@ -340,9 +340,16 @@ frappe.ui.form.on('transfer between branches', {
 			if (frm.doc.without_profit) {
 				frm.set_value('profit',0); // Clear the amount field when checkbox is checked
 				//frappe.msgprint(__('Amount field value: {0}', [frm.doc.profit]));
-				frm.set_value('profit_per_thousand',0);
+				frm.set_value('check_without_profit',0);
+			}
+		}, 
+		check_without_profit: function(frm) {
+			if (frm.doc.check_without_profit) {
+				//frappe.msgprint(__('Amount field value: {0}', [frm.doc.profit]));
+				frm.set_value('without_profit',0);
 			}
 		}
+
 	});
 
 //profit calcualtion
