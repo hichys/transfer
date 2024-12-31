@@ -2,16 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('company transfer', {
-    validate: function(frm) {
-        if (frm.doc.docstatus === 0) {
-            frm.set_value('status', 'غير مستلمة'); // Replace 'Draft' with custom status
-            frappe.show_alert(frm.doc.status)
-        }
-        if (frm.doc.docstatus === 2) {
-            frm.set_value('status', 'ملغية'); // Replace 'Cancelled' with custom status
-            frappe.show_alert(frm.doc.status)
-        }
-    },
+    
     profit_is_splited: function (frm) {
         //make our_profit and other_party_profit same
         if (frm.doc.profit_is_splited) {
@@ -157,3 +148,84 @@ function adjust_profits(frm, changed_field) {
     // Refresh fields to reflect changes
     frm.refresh_fields();
 }
+
+
+//buttons 
+
+
+// لم يضغط علي تم التسليم في الدوكيومتت غير مستلمة
+frappe.ui.form.on('company transfer', {
+    refresh: function(frm) {
+        if(frm.doc.docstatus == 0)
+        {
+            frm.add_custom_button(__('تم التسليم'), function() {
+                frappe.confirm(
+                    'هل انت متاكد من ان الحوالة من ان الحوالة سلمت  ؟',
+                    function() {
+                        // Confirmed action
+                        frappe.call({
+                            method: "transfer.transfer.doctype.company_transfer.company_transfer.handle_recived_transfer",
+                            args: {
+                                    docname: frm.doc.name,
+                                    method : "submit"
+                                 },
+                            callback: function(r) {
+                                if (!r.exc) {
+                                    frappe.msgprint("Update successful!");
+                                    frm.reload_doc();
+                                }
+                            }
+                        });
+                    },
+                    function() {
+                        // Cancelled action
+                        frappe.msgprint(__('Action cancelled.'));
+                    }
+                );
+            });
+        }
+    }
+});
+
+// إلغاء الحوالة سواء كانت مسلمة او غير مسلمة
+// يتم إلغاءها وإلغاء القيود اذا تم الإلغاء في نفس اليوم
+// غير ذالك يتم ارجاعها
+frappe.ui.form.on('company transfer', {
+    refresh: function(frm) {
+        if(frm.doc.docstatus ==1  )
+        {
+            frm.add_custom_button(__('إلغاء الحوالة'), function() {
+                frappe.confirm(
+                    'هل انت متاكد من ان الحوالة سلمت ؟',
+                    function() {
+                        
+                        // Confirmed action
+                        frappe.call({
+                            method: "transfer.transfer.doctype.company_transfer.company_transfer.handle_cancel_transfer",
+                            args: {
+                                    docname: frm.doc.name,
+                                    method : "cancel"
+                                 },
+                            callback: function(r) {
+                                if (!r.exc) {
+                                    
+                                    frappe.msgprint("Update successful!");
+                                    frm.reload_doc();
+                                }
+                            }
+                        });
+
+                       
+                    },
+                    function() {
+                        // Cancelled action
+                        frappe.msgprint(__('الحوالة مسلمة مسبقا'));
+                    }
+                );
+            });
+        }
+        else{
+             
+        }
+    }
+});

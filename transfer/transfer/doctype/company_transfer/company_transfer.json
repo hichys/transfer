@@ -9,6 +9,7 @@
  "field_order": [
   "section_break_qfcp",
   "column_break_laau",
+  "status",
   "column_break_wpec",
   "posting_date",
   "delivery_date",
@@ -20,7 +21,6 @@
   "other_party_profit",
   "profit_is_splited",
   "whatsapp_desc",
-  "status",
   "handed_account",
   "checkbox_external_transfer",
   "checkbox_internal_transfer",
@@ -114,11 +114,11 @@
    "label": "debit"
   },
   {
-   "allow_on_submit": 1,
    "fieldname": "journal_entry",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "\u0627\u0644\u0642\u064a\u062f \u0627\u0644\u0627\u062e\u064a\u0631",
+   "options": "Journal Entry",
    "read_only": 1
   },
   {
@@ -275,7 +275,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2024-12-31 04:07:17.433619",
+ "modified": "2024-12-31 06:32:30.906889",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",
