@@ -7,12 +7,37 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_qfcp",
-  "column_break_laau",
+  "section10",
+  "column_break_zmuk",
   "status",
-  "column_break_wpec",
+  "column_break_meef",
   "posting_date",
+  "column_break_onwu",
   "delivery_date",
+  "go_to",
+  "column_break_efom",
+  "checkbox_external_transfer",
+  "column_break_bhuq",
+  "checkbox_internal_transfer",
+  "section_break_bvpg",
+  "column_break_ohdp",
+  "column_break_bmgv",
+  "select_internal",
+  "select_external",
+  "section_break_flul",
+  "column_break_vakh",
+  "column_break_dfrt",
+  "to_company",
+  "credit",
+  "column_break_aeer",
+  "from_company",
+  "debit",
+  "column_break_lups",
+  "branch",
+  "profit_account",
+  "section_break_tzha",
+  "column_break_laau",
+  "column_break_wpec",
   "without_profit",
   "amount",
   "execution_amount",
@@ -22,14 +47,6 @@
   "profit_is_splited",
   "whatsapp_desc",
   "handed_account",
-  "checkbox_external_transfer",
-  "checkbox_internal_transfer",
-  "branch",
-  "from_company",
-  "to_company",
-  "debit",
-  "credit",
-  "profit_account",
   "journal_entry",
   "notyet",
   "handed",
@@ -50,10 +67,6 @@
    "search_index": 1
   },
   {
-   "fieldname": "section_break_qfcp",
-   "fieldtype": "Section Break"
-  },
-  {
    "columns": 10,
    "fieldname": "column_break_laau",
    "fieldtype": "Column Break"
@@ -62,7 +75,7 @@
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date"
+   "label": "\u0627\u0644\u062a\u0627\u0631\u064a\u062e"
   },
   {
    "allow_on_submit": 1,
@@ -166,6 +179,7 @@
    "in_list_view": 1,
    "label": "\u0645\u0646 \u0634\u0631\u0643\u0629",
    "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
+   "mandatory_depends_on": "eval:doc.select_external == \"\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629\"",
    "options": "Customer",
    "reqd": 1
   },
@@ -205,7 +219,6 @@
   },
   {
    "default": "0",
-   "depends_on": "eval:!doc.checkbox_internal_transfer",
    "fieldname": "checkbox_external_transfer",
    "fieldtype": "Check",
    "label": "\u062e\u0627\u0631\u062c\u064a\u0629"
@@ -239,7 +252,6 @@
   },
   {
    "default": "0",
-   "depends_on": "eval:!doc.checkbox_external_transfer",
    "fieldname": "checkbox_internal_transfer",
    "fieldtype": "Check",
    "label": "\u062f\u0627\u062e\u0644\u064a\u0629"
@@ -265,6 +277,87 @@
    "fieldname": "credit",
    "fieldtype": "Data",
    "label": "credit"
+  },
+  {
+   "default": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629",
+   "depends_on": "eval:doc.checkbox_external_transfer",
+   "fieldname": "select_external",
+   "fieldtype": "Select",
+   "label": "\u062e\u0627\u0631\u062c\u064a - \u0646\u0648\u0639\u0647\u0627",
+   "options": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629\n\u062e\u0627\u0631\u062c\u064a"
+  },
+  {
+   "default": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0641\u0631\u0639",
+   "depends_on": "eval:doc.checkbox_internal_transfer",
+   "fieldname": "select_internal",
+   "fieldtype": "Select",
+   "label": "\u062f\u0627\u062e\u0644\u064a - \u0646\u0648\u0639\u0647\u0627",
+   "options": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0641\u0631\u0639\n\u0645\u0646 \u0641\u0631\u0639 \u0627\u0644\u064a \u0634\u0631\u0643\u0629"
+  },
+  {
+   "fieldname": "column_break_zmuk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_meef",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_efom",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_tzha",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_bhuq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_onwu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "go_to",
+   "fieldtype": "Button",
+   "label": "go to"
+  },
+  {
+   "fieldname": "section_break_bvpg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ohdp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_lups",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_flul",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_vakh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_dfrt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_aeer",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_bmgv",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -275,7 +368,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2024-12-31 06:32:30.906889",
+ "modified": "2025-01-02 19:10:54.912690",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",
@@ -283,6 +376,8 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -292,6 +387,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
@@ -310,5 +406,8 @@
    "color": "Red",
    "title": "\u0645\u0644\u063a\u064a\u0629"
   }
- ]
+ ],
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }

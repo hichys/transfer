@@ -19,6 +19,11 @@ class companytransfer(Document):
 			create_journal_entry(self)
   
   
+	def validate_amended_from(self):
+		#reset journal_entry field
+		self.journal_entry = None			
+		return super().validate_amended_from()
+	
 	def after_cancel(self):
 		self.status = "ملغية"
 		frappe.msgprint("تم الغاء العملية")
@@ -257,3 +262,19 @@ def handle_cancel_transfer(docname,method="cancel"):
 	else:
 		if method == "cancel" :
 			frappe.throw("The document is not submitted.")
+
+
+#wrapper to call api function and get branch account
+
+#الحساب الرئيسي
+@frappe.whitelist()
+def get_main_account(branch):
+	return get_account_for_branch(branch,0);
+@frappe.whitelist()
+#معلقات
+def get_profit_account(branch):
+	return get_account_for_branch(branch,1);
+#ارباح
+@frappe.whitelist()
+def get_temp_account(branch):
+	return get_account_for_branch(branch,2);

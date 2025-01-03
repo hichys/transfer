@@ -2,7 +2,22 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('company transfer', {
-    
+            onload: function(frm) {
+                if (frm.doc.amended_from) {
+                    frappe.show_alert("تم تعديل الحوالة");
+                    frm.set_value("profit_account", ""); // Replace with your fieldname
+                    frm.set_value("journal_entry", ""); // Replace with your fieldname
+                    frm.set_value("status", "غير مستلمة");
+                }
+            },
+    select_internal: function (frm) {
+        
+    }, 
+    select_external: function (frm) {
+        
+    },
+
+
     profit_is_splited: function (frm) {
         //make our_profit and other_party_profit same
         if (frm.doc.profit_is_splited) {
@@ -31,16 +46,64 @@ frappe.ui.form.on('company transfer', {
         frm.set_value('other_party_profit', 0);
     },
     checkbox_external_transfer: function (frm) {
-        if (frm.doc.checkbox_external_transfer) {
+        if (frm.doc.checkbox_external_transfer  ) {
             frappe.show_alert("تحويلة خارجية");
-
+            frm.set_value("checkbox_internal_transfer", 0);
             frm.set_value('branch', 'الفرناج').then(() => {
-                frm.set_df_property('branch', 'read_only', 1);
+                
             });
-        } else {
-            frappe.show_alert("تحويلة داخلية");
-            frm.set_df_property('branch', 'read_only', 0);
+
+                frm.set_df_property("branch", "read_only", 0);
+                frm.set_df_property("to_company", "read_only", 0);
+            
+            
+        }  
+    },
+    select_external:function (frm){
+        if(frm.doc.select_external == "خارجي"){
+            frm.set_value('from_company','');
+            frm.set_value('branch','');
+            frm.set_df_property("from_company", "read_only", 1);
+            frm.set_df_property("to_company", "read_only", 0);;
         }
+        else
+        {
+            if(frm.doc.select_external == "من شركة الي شركة"){
+                frappe.show_alert("من شركة الي شركة");
+                frm.set_df_property("from_company", "read_only", 0);
+                frm.set_df_property("to_company", "read_only", 0);
+            }
+        }
+    },
+    select_internal:function (frm){
+        if(frm.doc.select_internal == "من شركة الي فرع"){
+            frappe.show_alert("من شركة الي فرع 2525");
+        }
+        else
+        {
+            if(frm.doc.select_internal == "من فرع الي شركة"){
+                frappe.show_alert("من فرع69 الي شركة");
+            }
+        }
+    },
+    checkbox_internal_transfer: function (frm) {
+        if (frm.doc.checkbox_internal_transfer) {
+            frappe.show_alert("تحويلة داخلية");
+            frm.set_value("checkbox_external_transfer", 0);
+            frm.set_value('branch', 'الفرناج').then(() => {
+                
+            });
+
+            // set branch title to : الي فرع 
+            frm.set_df_property("branch", "label", "من فرع ؟");
+        
+            // Make the field read-only (disabled)
+            frm.set_df_property("branch", "read_only", 1);
+            frm.set_df_property("to_company", "read_only", 1);
+
+            // Refresh the field to apply the changes
+            frm.refresh_field("branch");
+        } 
     },
     from_company: function (frm) {
        if(frm.doc.checkbox_external_transfer)
@@ -54,12 +117,27 @@ frappe.ui.form.on('company transfer', {
     },
     branch:function(frm){
         if(frm.doc.branch){
-            frm.set_value('profit_account','0099 - عمولات الفرناج - A' );
+            frappe.call({
+                method: 'transfer.transfer.doctype.company_transfer.company_transfer.get_profit_account', // Specify your server-side method here
+                args: {
+                    branch: frm.doc.branch,
+                    
+                },
+                callback: function(r) {
+                    if (r.message) {
+                        // check if the account is found
+                        frm.set_value('profit_account', r.message);
+                        
+                    }
+                },
+                error: function(error) {
+                    frappe.msgprint(__('لا يوجد حساب لهذا الفرع'));
+                }
+            });
+            
         }
     },
-    refresh: function (frm) {
-        // Refresh logic if needed
-    }
+    
 });
 
 // Utility Functions
@@ -156,6 +234,16 @@ function adjust_profits(frm, changed_field) {
 // لم يضغط علي تم التسليم في الدوكيومتت غير مستلمة
 frappe.ui.form.on('company transfer', {
     refresh: function(frm) {
+        const button = frm.fields_dict['go_to']?.$wrapper.find('button');
+
+        if (button) {
+            // Add custom HTML or attributes to the button
+            button.html('<i class="fa fa-check"></i> Custom Button');
+            button.css({
+                'background-color': '#4CAF50', // Custom styling
+                'color': 'white'
+            });
+        }
         if(frm.doc.docstatus == 0)
         {
             frm.add_custom_button(__('تم التسليم'), function() {
