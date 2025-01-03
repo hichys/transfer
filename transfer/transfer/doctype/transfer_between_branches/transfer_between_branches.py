@@ -73,7 +73,7 @@ def handel_cancelation(docname, method):
     if method == "reversal":
         cancel_notyet_transaction(docname, method="reversal")
     elif method == "cancel":
-        cancel_notyet_transaction(docname, method="submit")
+        create_journal_entry_from_canceled_transfer(docname, method="cancel")
     else:
         frappe.throw("Invalid method. Please provide a valid method.")
 
@@ -186,7 +186,9 @@ def cancel_notyet_transaction(docname, method ):
                 doc.save()
                 frappe.db.commit()
                 reverse_journal_entry(notyet)  # Call the reverse function you already have
-
+        if method == "cancel":
+            # If method is cancel, cancel the document
+            cancel_transfer(docname)    
         # Update the workflow state to "تم الإلغاء" (Cancelled)
       
         doc.cancel()  # Cancel the transfer between branches document

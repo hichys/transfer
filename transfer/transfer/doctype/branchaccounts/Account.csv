@@ -1,0 +1,93 @@
+Column Labels:,ID,Account Name,Company,Parent Account,Created On,Created By,Disable,Account Number,Is Group,Root Type,Report Type,Currency,Account Type,Tax Rate,Frozen,Balance must be,Include in gross
+,"""Application of Funds (Assets) - A""",Application of Funds (Assets),alalmia,,2025-01-02 04:59:23.841489,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Current Assets - A""",Current Assets,alalmia,Application of Funds (Assets) - A,2025-01-02 04:59:23.866087,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Accounts Receivable - A""",Accounts Receivable,alalmia,Current Assets - A,2025-01-02 04:59:23.875276,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Debtors - A""",Debtors,alalmia,Accounts Receivable - A,2025-01-02 04:59:23.887230,Administrator,0,,0,Asset,Balance Sheet,LYD,Receivable,0,No,,0
+,"""Bank Accounts - A""",Bank Accounts,alalmia,Current Assets - A,2025-01-02 04:59:23.895065,Administrator,0,,1,Asset,Balance Sheet,LYD,Bank,0,No,,0
+,"""Bank Account - A""",Bank Account,alalmia,Bank Accounts - A,2025-01-02 04:59:33.820140,Administrator,0,,0,Asset,Balance Sheet,LYD,Bank,0,No,,0
+,"""Cash In Hand - A""",Cash In Hand,alalmia,Current Assets - A,2025-01-02 04:59:23.901670,Administrator,0,,1,Asset,Balance Sheet,LYD,Cash,0,No,,0
+,"""Cash - A""",Cash,alalmia,Cash In Hand - A,2025-01-02 04:59:23.907821,Administrator,0,,0,Asset,Balance Sheet,LYD,Cash,0,No,,0
+,"""0003 - الفروع - A""",الفروع,alalmia,Cash In Hand - A,2025-01-02 14:03:45.425203,awd@hotmail.it,0,3,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""00031 - خزنة الفرناج - A""",خزنة الفرناج,alalmia,0003 - الفروع - A,2025-01-02 14:04:08.351719,awd@hotmail.it,0,31,0,Asset,Balance Sheet,LYD,Cash,0,No,,0
+,"""00032 - خزنة ابوسليم - A""",خزنة ابوسليم,alalmia,0003 - الفروع - A,2025-01-02 14:04:26.937455,awd@hotmail.it,0,32,0,Asset,Balance Sheet,LYD,Cash,0,No,,0
+,"""00034 - خزنة الزاجل - A""",خزنة الزاجل,alalmia,0003 - الفروع - A,2025-01-02 14:04:48.299420,awd@hotmail.it,0,34,0,Asset,Balance Sheet,LYD,Cash,0,No,,0
+,"""Loans and Advances (Assets) - A""",Loans and Advances (Assets),alalmia,Current Assets - A,2025-01-02 04:59:23.916024,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Employee Advances - A""",Employee Advances,alalmia,Loans and Advances (Assets) - A,2025-01-02 04:59:23.923012,Administrator,0,,0,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Securities and Deposits - A""",Securities and Deposits,alalmia,Current Assets - A,2025-01-02 04:59:23.931193,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Earnest Money - A""",Earnest Money,alalmia,Securities and Deposits - A,2025-01-02 04:59:23.938779,Administrator,0,,0,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Stock Assets - A""",Stock Assets,alalmia,Current Assets - A,2025-01-02 04:59:23.947097,Administrator,0,,1,Asset,Balance Sheet,LYD,Stock,0,No,,0
+,"""Stock In Hand - A""",Stock In Hand,alalmia,Stock Assets - A,2025-01-02 04:59:23.954293,Administrator,0,,0,Asset,Balance Sheet,LYD,Stock,0,No,,0
+,"""Tax Assets - A""",Tax Assets,alalmia,Current Assets - A,2025-01-02 04:59:23.962444,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Fixed Assets - A""",Fixed Assets,alalmia,Application of Funds (Assets) - A,2025-01-02 04:59:23.969625,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Accumulated Depreciation - A""",Accumulated Depreciation,alalmia,Fixed Assets - A,2025-01-02 04:59:24.024519,Administrator,0,,0,Asset,Balance Sheet,LYD,Accumulated Depreciation,0,No,,0
+,"""Buildings - A""",Buildings,alalmia,Fixed Assets - A,2025-01-02 04:59:24.011368,Administrator,0,,0,Asset,Balance Sheet,LYD,Fixed Asset,0,No,,0
+,"""Capital Equipment - A""",Capital Equipment,alalmia,Fixed Assets - A,2025-01-02 04:59:23.976191,Administrator,0,,0,Asset,Balance Sheet,LYD,Fixed Asset,0,No,,0
+,"""CWIP Account - A""",CWIP Account,alalmia,Fixed Assets - A,2025-01-02 04:59:24.030503,Administrator,0,,0,Asset,Balance Sheet,LYD,Capital Work in Progress,0,No,,0
+,"""Electronic Equipment - A""",Electronic Equipment,alalmia,Fixed Assets - A,2025-01-02 04:59:23.986910,Administrator,0,,0,Asset,Balance Sheet,LYD,Fixed Asset,0,No,,0
+,"""Furniture and Fixtures - A""",Furniture and Fixtures,alalmia,Fixed Assets - A,2025-01-02 04:59:23.992952,Administrator,0,,0,Asset,Balance Sheet,LYD,Fixed Asset,0,No,,0
+,"""Office Equipment - A""",Office Equipment,alalmia,Fixed Assets - A,2025-01-02 04:59:23.998973,Administrator,0,,0,Asset,Balance Sheet,LYD,Fixed Asset,0,No,,0
+,"""Plants and Machineries - A""",Plants and Machineries,alalmia,Fixed Assets - A,2025-01-02 04:59:24.005782,Administrator,0,,0,Asset,Balance Sheet,LYD,Fixed Asset,0,No,,0
+,"""Software - A""",Software,alalmia,Fixed Assets - A,2025-01-02 04:59:24.018103,Administrator,0,,0,Asset,Balance Sheet,LYD,Fixed Asset,0,No,,0
+,"""Investments - A""",Investments,alalmia,Application of Funds (Assets) - A,2025-01-02 04:59:24.038572,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Temporary Accounts - A""",Temporary Accounts,alalmia,Application of Funds (Assets) - A,2025-01-02 04:59:24.044468,Administrator,0,,1,Asset,Balance Sheet,LYD,,0,No,,0
+,"""Temporary Opening - A""",Temporary Opening,alalmia,Temporary Accounts - A,2025-01-02 04:59:24.050566,Administrator,0,,0,Asset,Balance Sheet,LYD,Temporary,0,No,,0
+,"""Equity - A""",Equity,alalmia,,2025-01-02 04:59:24.388456,Administrator,0,,1,Equity,Balance Sheet,LYD,,0,No,,0
+,"""Capital Stock - A""",Capital Stock,alalmia,Equity - A,2025-01-02 04:59:24.393912,Administrator,0,,0,Equity,Balance Sheet,LYD,Equity,0,No,,0
+,"""Dividends Paid - A""",Dividends Paid,alalmia,Equity - A,2025-01-02 04:59:24.401555,Administrator,0,,0,Equity,Balance Sheet,LYD,Equity,0,No,,0
+,"""Opening Balance Equity - A""",Opening Balance Equity,alalmia,Equity - A,2025-01-02 04:59:24.407025,Administrator,0,,0,Equity,Balance Sheet,LYD,Equity,0,No,,0
+,"""Retained Earnings - A""",Retained Earnings,alalmia,Equity - A,2025-01-02 04:59:24.412519,Administrator,0,,0,Equity,Balance Sheet,LYD,Equity,0,No,,0
+,"""Revaluation Surplus - A""",Revaluation Surplus,alalmia,Equity - A,2025-01-02 04:59:24.417957,Administrator,0,,0,Equity,Balance Sheet,LYD,Equity,0,No,,0
+,"""Expenses - A""",Expenses,alalmia,,2025-01-02 04:59:24.059710,Administrator,0,,1,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Direct Expenses - A""",Direct Expenses,alalmia,Expenses - A,2025-01-02 04:59:24.065429,Administrator,0,,1,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Stock Expenses - A""",Stock Expenses,alalmia,Direct Expenses - A,2025-01-02 04:59:24.074901,Administrator,0,,1,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Cost of Goods Sold - A""",Cost of Goods Sold,alalmia,Stock Expenses - A,2025-01-02 04:59:24.083450,Administrator,0,,0,Expense,Profit and Loss,LYD,Cost of Goods Sold,0,No,,0
+,"""Expenses Included In Asset Valuation - A""",Expenses Included In Asset Valuation,alalmia,Stock Expenses - A,2025-01-02 04:59:24.093103,Administrator,0,,0,Expense,Profit and Loss,LYD,Expenses Included In Asset Valuation,0,No,,0
+,"""Expenses Included In Valuation - A""",Expenses Included In Valuation,alalmia,Stock Expenses - A,2025-01-02 04:59:24.099082,Administrator,0,,0,Expense,Profit and Loss,LYD,Expenses Included In Valuation,0,No,,0
+,"""Stock Adjustment - A""",Stock Adjustment,alalmia,Stock Expenses - A,2025-01-02 04:59:24.105915,Administrator,0,,0,Expense,Profit and Loss,LYD,Stock Adjustment,0,No,,0
+,"""Indirect Expenses - A""",Indirect Expenses,alalmia,Expenses - A,2025-01-02 04:59:24.111707,Administrator,0,,1,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Administrative Expenses - A""",Administrative Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.118237,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Commission on Sales - A""",Commission on Sales,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.126835,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Depreciation - A""",Depreciation,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.133113,Administrator,0,,0,Expense,Profit and Loss,LYD,Depreciation,0,No,,0
+,"""Entertainment Expenses - A""",Entertainment Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.140114,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Exchange Gain/Loss - A""",Exchange Gain/Loss,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.240404,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Freight and Forwarding Charges - A""",Freight and Forwarding Charges,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.145720,Administrator,0,,0,Expense,Profit and Loss,LYD,Chargeable,0,No,,0
+,"""Gain/Loss on Asset Disposal - A""",Gain/Loss on Asset Disposal,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.246075,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Impairment - A""",Impairment,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.253071,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Legal Expenses - A""",Legal Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.152428,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Marketing Expenses - A""",Marketing Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.158623,Administrator,0,,0,Expense,Profit and Loss,LYD,Chargeable,0,No,,0
+,"""Miscellaneous Expenses - A""",Miscellaneous Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.164078,Administrator,0,,0,Expense,Profit and Loss,LYD,Chargeable,0,No,,0
+,"""Office Maintenance Expenses - A""",Office Maintenance Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.171032,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Office Rent - A""",Office Rent,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.177048,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Postal Expenses - A""",Postal Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.183392,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Print and Stationery - A""",Print and Stationery,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.190313,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Round Off - A""",Round Off,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.195848,Administrator,0,,0,Expense,Profit and Loss,LYD,Round Off,0,No,,0
+,"""Salary - A""",Salary,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.202443,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Sales Expenses - A""",Sales Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.208559,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Telephone Expenses - A""",Telephone Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.214078,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Travel Expenses - A""",Travel Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.221459,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Utility Expenses - A""",Utility Expenses,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.227718,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Write Off - A""",Write Off,alalmia,Indirect Expenses - A,2025-01-02 04:59:24.233612,Administrator,0,,0,Expense,Profit and Loss,LYD,,0,No,,0
+,"""Income - A""",Income,alalmia,,2025-01-02 04:59:24.259315,Administrator,0,,1,Income,Profit and Loss,LYD,,0,No,,0
+,"""0001 - عمولات - A""",عمولات,alalmia,Income - A,2025-01-02 13:53:54.966249,awd@hotmail.it,0,1,1,Income,Profit and Loss,LYD,Cash,0,No,,0
+,"""Direct Income - A""",Direct Income,alalmia,Income - A,2025-01-02 04:59:24.264911,Administrator,0,,1,Income,Profit and Loss,LYD,,0,No,,0
+,"""Sales - A""",Sales,alalmia,Direct Income - A,2025-01-02 04:59:24.274243,Administrator,0,,0,Income,Profit and Loss,LYD,,0,No,,0
+,"""Service - A""",Service,alalmia,Direct Income - A,2025-01-02 04:59:24.281738,Administrator,0,,0,Income,Profit and Loss,LYD,,0,No,,0
+,"""Indirect Income - A""",Indirect Income,alalmia,Income - A,2025-01-02 04:59:24.288863,Administrator,0,,1,Income,Profit and Loss,LYD,,0,No,,0
+,"""Source of Funds (Liabilities) - A""",Source of Funds (Liabilities),alalmia,,2025-01-02 04:59:24.294734,Administrator,0,,1,Liability,Balance Sheet,LYD,,0,No,,0
+,"""Current Liabilities - A""",Current Liabilities,alalmia,Source of Funds (Liabilities) - A,2025-01-02 04:59:24.300725,Administrator,0,,1,Liability,Balance Sheet,LYD,,0,No,,0
+,"""0002 - معلقات - A""",معلقات,alalmia,Current Liabilities - A,2025-01-02 13:58:11.833693,awd@hotmail.it,0,2,1,Liability,Balance Sheet,LYD,,0,No,,0
+,"""00021 - معلقات الفرناج - A""",معلقات الفرناج,alalmia,0002 - معلقات - A,2025-01-02 13:58:34.935742,awd@hotmail.it,0,21,0,Liability,Balance Sheet,LYD,Cash,0,No,,0
+,"""00022 - معلقات الزاجل - A""",معلقات الزاجل,alalmia,0002 - معلقات - A,2025-01-02 13:59:38.676648,awd@hotmail.it,0,22,0,Liability,Balance Sheet,LYD,Cash,0,No,,0
+,"""00023 - معلقات ابوسليم - A""",معلقات ابوسليم,alalmia,0002 - معلقات - A,2025-01-02 14:00:05.445665,awd@hotmail.it,0,23,0,Liability,Balance Sheet,LYD,Cash,0,No,,0
+,"""معلقات الزاجل - A""",معلقات الزاجل,alalmia,0002 - معلقات - A,2025-01-02 14:00:23.820649,awd@hotmail.it,0,,0,Liability,Balance Sheet,LYD,Cash,0,No,,0
+,"""Accounts Payable - A""",Accounts Payable,alalmia,Current Liabilities - A,2025-01-02 04:59:24.310750,Administrator,0,,1,Liability,Balance Sheet,LYD,Cash,0,No,,0
+,"""Creditors - A""",Creditors,alalmia,Accounts Payable - A,2025-01-02 04:59:24.319907,Administrator,0,,0,Liability,Balance Sheet,LYD,Payable,0,No,,0
+,"""Payroll Payable - A""",Payroll Payable,alalmia,Accounts Payable - A,2025-01-02 04:59:24.328582,Administrator,0,,0,Liability,Balance Sheet,LYD,,0,No,,0
+,"""Duties and Taxes - A""",Duties and Taxes,alalmia,Current Liabilities - A,2025-01-02 04:59:24.355563,Administrator,0,,1,Liability,Balance Sheet,LYD,Tax,0,No,,0
+,"""Loans (Liabilities) - A""",Loans (Liabilities),alalmia,Current Liabilities - A,2025-01-02 04:59:24.361087,Administrator,0,,1,Liability,Balance Sheet,LYD,,0,No,,0
+,"""Bank Overdraft Account - A""",Bank Overdraft Account,alalmia,Loans (Liabilities) - A,2025-01-02 04:59:24.382475,Administrator,0,,0,Liability,Balance Sheet,LYD,,0,No,,0
+,"""Secured Loans - A""",Secured Loans,alalmia,Loans (Liabilities) - A,2025-01-02 04:59:24.366533,Administrator,0,,0,Liability,Balance Sheet,LYD,,0,No,,0
+,"""Unsecured Loans - A""",Unsecured Loans,alalmia,Loans (Liabilities) - A,2025-01-02 04:59:24.376135,Administrator,0,,0,Liability,Balance Sheet,LYD,,0,No,,0
+,"""Stock Liabilities - A""",Stock Liabilities,alalmia,Current Liabilities - A,2025-01-02 04:59:24.335005,Administrator,0,,1,Liability,Balance Sheet,LYD,,0,No,,0
+,"""Asset Received But Not Billed - A""",Asset Received But Not Billed,alalmia,Stock Liabilities - A,2025-01-02 04:59:24.349479,Administrator,0,,0,Liability,Balance Sheet,LYD,Asset Received But Not Billed,0,No,,0
+,"""Stock Received But Not Billed - A""",Stock Received But Not Billed,alalmia,Stock Liabilities - A,2025-01-02 04:59:24.341586,Administrator,0,,0,Liability,Balance Sheet,LYD,Stock Received But Not Billed,0,No,,0
