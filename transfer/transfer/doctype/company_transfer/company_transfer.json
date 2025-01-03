@@ -7,22 +7,24 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section10",
+  "custom_section_1_section",
   "column_break_zmuk",
-  "status",
   "column_break_meef",
-  "posting_date",
   "column_break_onwu",
-  "delivery_date",
+  "status",
   "go_to",
   "column_break_efom",
-  "checkbox_external_transfer",
+  "delivery_date",
   "column_break_bhuq",
+  "posting_date",
+  "section_break_wfug",
+  "column_break_dqec",
+  "column_break_fzdm",
+  "column_break_glph",
   "checkbox_internal_transfer",
-  "section_break_bvpg",
-  "column_break_ohdp",
-  "column_break_bmgv",
   "select_internal",
+  "column_break_pcyw",
+  "checkbox_external_transfer",
   "select_external",
   "section_break_flul",
   "column_break_vakh",
@@ -36,22 +38,24 @@
   "branch",
   "profit_account",
   "section_break_tzha",
-  "column_break_laau",
   "column_break_wpec",
-  "without_profit",
-  "amount",
-  "execution_amount",
-  "profit",
-  "our_profit",
-  "other_party_profit",
-  "profit_is_splited",
-  "whatsapp_desc",
   "handed_account",
   "journal_entry",
   "notyet",
   "handed",
   "canceld_journal_entry",
   "journal_entry_link",
+  "column_break_pkny",
+  "whatsapp_desc",
+  "column_break_nnoi",
+  "execution_amount",
+  "our_profit",
+  "other_party_profit",
+  "profit_is_splited",
+  "column_break_laau",
+  "amount",
+  "without_profit",
+  "profit",
   "section_break_tkcp",
   "amended_from"
  ],
@@ -224,6 +228,7 @@
    "label": "\u062e\u0627\u0631\u062c\u064a\u0629"
   },
   {
+   "columns": 1,
    "fieldname": "execution_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -299,10 +304,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "section10",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "column_break_meef",
    "fieldtype": "Column Break"
   },
@@ -325,15 +326,8 @@
   {
    "fieldname": "go_to",
    "fieldtype": "Button",
+   "hidden": 1,
    "label": "go to"
-  },
-  {
-   "fieldname": "section_break_bvpg",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_ohdp",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "column_break_lups",
@@ -356,7 +350,36 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_bmgv",
+   "fieldname": "section_break_wfug",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_dqec",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_fzdm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_glph",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_pcyw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_pkny",
+   "fieldtype": "Column Break",
+   "placeholder": "\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0648\u0627\u062a\u0633"
+  },
+  {
+   "fieldname": "custom_section_1_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_nnoi",
    "fieldtype": "Column Break"
   }
  ],
@@ -368,7 +391,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-02 19:10:54.912690",
+ "modified": "2025-01-03 03:41:46.926222",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",

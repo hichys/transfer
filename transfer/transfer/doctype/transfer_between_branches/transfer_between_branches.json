@@ -1,7 +1,6 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "format:BRTR-{DD}-{MM}-{YY}-{from_branch}-to-{to_branch}.{#####}",
+ "autoname": "format:TRBR-{DD}-{MM}-{YY}-{#####}",
  "creation": "2024-12-25 17:37:12.404320",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -130,9 +129,10 @@
   {
    "allow_on_submit": 1,
    "fieldname": "journal_entry",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "\u0627\u0644\u0642\u064a\u062f \u0627\u0644\u0627\u062e\u064a\u0631",
+   "options": "Journal Entry",
    "read_only": 1
   },
   {
@@ -142,24 +142,27 @@
   {
    "allow_on_submit": 1,
    "fieldname": "notyet",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "\u0642\u064a\u062f - \u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "options": "Journal Entry",
    "read_only": 1,
    "remember_last_selected_value": 1
   },
   {
    "allow_on_submit": 1,
    "fieldname": "handed",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "\u0642\u064a\u062f - \u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "options": "Journal Entry",
    "read_only": 1,
    "remember_last_selected_value": 1
   },
   {
    "allow_on_submit": 1,
    "fieldname": "canceld_journal_entry",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "\u0642\u064a\u062f - \u0627\u0644\u0625\u0644\u063a\u0627\u0621",
+   "options": "Journal Entry",
    "read_only": 1,
    "remember_last_selected_value": 1
   },
@@ -189,10 +192,10 @@
  "links": [
   {
    "link_doctype": "Journal Entry",
-   "link_fieldname": "name"
+   "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2024-12-30 00:00:33.196925",
+ "modified": "2025-01-03 06:46:22.082524",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",
@@ -216,5 +219,8 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }

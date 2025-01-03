@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import get_account_for_branch
+from transfer.transfer.api import get_account_for_branch,get_main_account,get_temp_account,get_profit_account
 from .create_journal_entery import *
 
 class transferbetweenbranches(Document):
@@ -12,43 +12,43 @@ class transferbetweenbranches(Document):
         frappe.msgprint("This document has been trashed")
 
     def before_cancel(self):
-        #create_journal_entry_from_canceled_transfer(self, method="submit")
-        #self.docstast = "إلغاء"
-        frappe.msgprint("This document has been canceled successfully")
+        
+
+  
+        # frappe.msgprint("This document has been canceled successfully")
+        self.workflow_state = "ملغية"
 
     def after_insert(self):
-        if self.workflow_state == "معلقة" and not self.notyet:
-            debit = get_account_for_branch(branch_name=self.from_branch, account_index=0)
-            credit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
-            self.debit = debit
-            self.credit = credit
-            create_journal_entry_from_pending_transfer(self, method="submit")
+        pass
       # Save the previous state when the document is loaded
 
     def on_change(self):
         
-        
-         
-        if self.workflow_state == "تم التسليم" and not self.handed:
-            frappe.msgprint("تم التسليم *****")
+        if self.workflow_state == "مستلمة" and not self.handed:
+            frappe.msgprint("تم التسليم **3434***")
             debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
             credit = get_account_for_branch(branch_name=self.to_branch, account_index=0)
             self.debit = debit
             self.credit = credit
             create_journal_entry_from_handed_transfer(self, method="submit")
-        elif self.workflow_state == "إلغاء" and not self.canceld_journal_entry:
-            debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
-            credit = get_account_for_branch(branch_name=self.from_branch, account_index=0)
-            self.debit = debit
-            self.credit = credit
-            create_journal_entry_from_canceled_transfer(self, method="submit")
+        # elif self.workflow_state == "إلغاء الحوالة" and not self.canceld_journal_entry:
+        #     debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
+        #     credit = get_account_for_branch(branch_name=self.from_branch, account_index=0)
+        #     self.debit = debit
+        #     self.credit = credit
+        #     create_journal_entry_from_canceled_transfer(self, method="submit")
 
     def on_update(self):
         print("on update called")
         self.transfer()
 
     def on_submit(self):
-        print("on submit called")
+        if self.workflow_state == "غير مستلمة" and not self.notyet:
+            debit = get_main_account(self.from_branch)
+            credit = get_temp_account(self.to_branch)
+            self.debit = debit
+            self.credit = credit
+            create_journal_entry_from_pending_transfer(self, method="submit")
 
     def on_save(self):
         frappe.msgprint("تم تسجيل الحوالة في المنظومة بنجاح")
@@ -77,15 +77,12 @@ def delete_current_doc(docname,method="submit"):
         frappe.msgprint(f"Error occurred while deleting the document: {str(e)}")
         return {"status": "error", "message": str(e)}
 
-@frappe.whitelist()
-def on_status_change(doc, method):
-    pass
-
+ 
 def create_journal_entry_from_pending_transfer(doc, method):
     commision = doc.profit / 2
     debit_with_commision = doc.amount + doc.profit
-    to_profit_account = get_account_for_branch(doc.from_branch, 2)
-    from_profit_account = get_account_for_branch(doc.to_branch, 2)
+    to_profit_account = get_profit_account(doc.from_branch)
+    from_profit_account = get_profit_account(doc.to_branch)
 
     accounts = [
         {
@@ -122,7 +119,9 @@ def create_journal_entry_from_pending_transfer(doc, method):
         "doctype": "Journal Entry",
         "posting_date": doc.posting_date,
         "mode_of_payment": "Cash",
-        "accounts": accounts
+        "accounts": accounts,
+        "cheque_no" : doc.name,
+        "cheque_date" : doc.posting_date
     })
 
     
@@ -138,8 +137,23 @@ def create_journal_entry_from_pending_transfer(doc, method):
     frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
     frappe.msgprint(doc.journal_entry_link)
     frappe.msgprint(f"Journal Entry {journal_entry.name} created and linked to the Transfer Between Branches document.")
+
 @frappe.whitelist()
-def cancel_notyet_transaction(docname, method="reversal"):
+def handel_cancelation(docname, method):
+    # if method == "reversal": revese it
+    # else if method == cancel then cancel it
+
+    if method == "reversal":
+        cancel_notyet_transaction(docname, method="reversal")
+    elif method == "cancel":
+        cancel_notyet_transaction(docname, method="submit")
+    else:
+        frappe.throw("Invalid method. Please provide a valid method.")
+
+
+
+@frappe.whitelist()
+def cancel_notyet_transaction(docname, method ):
     try:
         # Fetch the document
         try :
@@ -148,25 +162,30 @@ def cancel_notyet_transaction(docname, method="reversal"):
             frappe.throw("الرجاء انشاء الحوالة اولا")
             return
         
+        # Check if the 'handed' journal entry exists
+        if doc.handed:
+            if method == "reversal":
+                # If method is reversal, reverse the journal entry
+                frappe.msgprint(f"Reversing Journal Entry: {doc.handed}")
+                handed = doc.handed
+                doc.handed = ""
+                doc.save()
+                frappe.db.commit()
+                reverse_journal_entry(handed)
+
         # Check if the 'notyet' journal entry exists
         if doc.notyet:
             if method == "reversal":
                 # If method is reversal, reverse the journal entry
                 frappe.msgprint(f"Reversing Journal Entry: {doc.notyet}")
-                reverse_journal_entry(doc.notyet)  # Call the reverse function you already have
-            elif method == "submit":
-                # If method is cancel, cancel the journal entry directly
-                notyet_entry = frappe.get_doc('Journal Entry', doc.notyet)
-                if notyet_entry.docstatus != 2:  # Check if the journal entry is not already canceled
-                    notyet_entry.cancel()
-                    frappe.msgprint(f"Journal Entry {notyet_entry.name} canceled successfully.")
-                else:
-                    frappe.msgprint(f"Journal Entry {notyet_entry.name} is already canceled.")
+                notyet = doc.notyet 
+                doc.notyet = ""
+                doc.save()
+                frappe.db.commit()
+                reverse_journal_entry(notyet)  # Call the reverse function you already have
 
         # Update the workflow state to "تم الإلغاء" (Cancelled)
-        doc.workflow_state = "تم الإلغاء"
-        doc.save()
-        doc.submit()
+      
         doc.cancel()  # Cancel the transfer between branches document
         frappe.db.commit()
 
@@ -193,7 +212,7 @@ def cancel_handed_transfer_after_a_day(docname, method=None):
         # Fetch the transfer document
         doc = frappe.get_doc('transfer between branches', docname)
 
-        if doc.workflow_state == "إلغاء":
+        if doc.workflow_state == "ملغية":
             frappe.msgprint("This document is already cancelled.")
             return {"status": "error", "message": "This document is already cancelled."}
 
@@ -209,7 +228,7 @@ def cancel_handed_transfer_after_a_day(docname, method=None):
                 reverse_journal_entry(doc.notyet)
 
             # Update workflow state and status
-            doc.db_set("workflow_state", "تم الإلغاء")
+            doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
             doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
             frappe.msgprint("Transfer document workflow updated successfully.")
 
@@ -239,24 +258,34 @@ def create_journal_entry_from_canceled_transfer(docname, method):
     try:
         doc = frappe.get_doc('transfer between branches', docname)
 
-        if(doc.workflow_state == "إلغاء"):
-            doc.workflow_state  = "إلغاء"
+        if(doc.workflow_state == "ملغية"):
+            doc.workflow_state  = "ملغية"
             doc.save()
             frappe.msgprint("This document is already cancelled.")
             return {"status": "error", "message": "This document is already cancelled."}
         
         try:
-            handed = frappe.get_doc('Journal Entry', doc.handed)
+            doc.journal_entry = ""   
+            if(doc.workflow_state == "غير مستلمة" and doc.notyet):
+                notyet = frappe.get_doc('Journal Entry', doc.notyet)
+                doc.notyet = ""
+                doc.save()
+                notyet.cancel()
+                frappe.msgprint(f"Journal Entry {notyet.name} canceled successfully.")
             
-            handed.cancel()
-                    
+            
+            elif(doc.workflow_state == "مستلمة" and doc.handed and doc.notyet):
+                handed = frappe.get_doc('Journal Entry', doc.handed)
+                notyet = frappe.get_doc('Journal Entry', doc.notyet)
+                doc.notyet = ""
+                doc.handed = ""
+                doc.save()
+                notyet.cancel()
+                handed.cancel()
+                frappe.msgprint(f"Journal Entry(2) 1-{notyet.name} 2-{handed.name} canceled successfully.")
                 
-            notyet = frappe.get_doc('Journal Entry', doc.notyet)        
-           
-            notyet.cancel()
                 
-                
-            doc.workflow_state = "تم الإلغاء"
+            doc.workflow_state = "ملغية"
             doc.save()
             frappe.db.commit()
             
@@ -282,11 +311,13 @@ def create_journal_entry_from_canceled_transfer(docname, method):
 
 @frappe.whitelist()
 def create_journal_entry_from_handed_transfer(doc, method):
-    debit_to_liabilities = get_account_for_branch(doc.to_branch, 1)
-    credit_to_account = get_account_for_branch(doc.to_branch, 0)
+    debit_to_liabilities = get_temp_account(doc.to_branch) #معلقات الفرع
+    credit_to_account = get_main_account(doc.to_branch)# حساب الفرع الرئيسي
     journal_entry = frappe.get_doc({
         "doctype": "Journal Entry",
         "posting_date": doc.posting_date,
+        "cheque_no" : doc.name,
+        "cheque_date" : doc.posting_date,
         "accounts": [
             {
                 "account": debit_to_liabilities,
@@ -379,7 +410,9 @@ def reverse_journal_entry(docname):
             "company": original_entry.company,
             "accounts": accounts,
             "remark": f"Reversal of Journal Entry {original_entry.name}",
-            "reversal_of": original_entry.name  # Link the reversal to the original
+            "reversal_of": original_entry.name,  # Link the reversal to the original
+            "cheque_no" : original_entry.cheque_no,
+            "cheque_date" : original_entry.posting_date
         })
         
         # Insert and submit the reversal entry

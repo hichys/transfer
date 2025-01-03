@@ -5,7 +5,7 @@ frappe.ui.form.on("transfer between branches", {
 	refresh: function(frm){
 		setTimeout(function() {
             // Hide the specific action button by matching its text, e.g., "Submit"
-            frm.$wrapper.find('.actions-btn-group .dropdown-menu li a:contains("إلغاء")').parent().addClass('hidden');
+            //frm.$wrapper.find('.actions-btn-group .dropdown-menu li a:contains("إلغاء")').parent().addClass('hidden');
             //frm.$wrapper.find('.actions-btn-group .dropdown-menu li a:contains("تم التسليم")').parent().addClass('hidden');
             // Add more actions as necessary
         }, 1000); // Timeout duration in milliseconds (1 second)
@@ -83,43 +83,36 @@ frappe.ui.form.on("transfer between branches", {
 });
 frappe.ui.form.on('transfer between branches', {
     refresh: function(frm) {
-        // Check if the document is in the "معلقة" workflow state
-		frappe.msgprint(frm.doc.docstatus)
-        if (frm.doc.workflow_state === "معلقة") {
+        // Check if the document is in the "غير مستلمة" workflow state
+        if (frm.doc.docstatus === 1  ) {
 
             // Calculate the time difference in hours between document creation and the current time
             const creation_time = new Date(frm.doc.creation);
             const current_time = new Date();
-            const time_diff = (current_time - creation_time) / (1000 * 3600); // Convert to hours
+            const time_diff = (current_time - creation_time) / (1000 * 3600); // Convert milliseconds to hours
 
-            // If the document was created more than 24 hours ago, add the reverse button
-            if (time_diff >= 24) {
-                // Add "Reverse" button
+            if (true) {
+                // Add "Reverse" button for documents created more than 24 hours ago
                 frm.add_custom_button(__('عكس الحوالــة'), function() {
-                    // Call the server-side method to reverse the journal entry
                     frappe.call({
-                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.cancel_notyet_transaction',  // Server-side function to reverse the journal entry
+                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
                         args: {
-                            docname: frm.docname,
-							method: "reversal"  // Pass the 'notyet' journal entry's docname (this is the document that you want to reverse)
+                            docname: frm.doc.name,
+                            method: "reversal"
                         },
                         callback: function(r) {
                             if (!r.exc) {
                                 frappe.msgprint(__('Document has been reversed successfully.'));
-                                frm.reload_doc();  // Reload the document to reflect changes
+                                frm.reload_doc(); // Reload to reflect changes
                             }
                         }
                     });
                 });
-
-                // Disable the "إلغاء الحوالة" button if it's there
-                frm.fields_dict['workflow_state'].grid.get_field('workflow_state').$wrapper.find('.btn-primary').prop('disabled', true);
             } else {
-                // Add "إلغاء الحوالة" button if not already there and time is less than 24 hours
+                // Add "إلغاء الحوالة" button for documents created less than 24 hours ago
                 frm.add_custom_button(__('إلغاء الحوالة'), function() {
-                    // Call the server-side method to cancel the document
                     frappe.call({
-                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.cancel_notyet_transaction',
+                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
                         args: {
                             docname: frm.doc.name,
                             method: "submit"
@@ -127,7 +120,7 @@ frappe.ui.form.on('transfer between branches', {
                         callback: function(r) {
                             if (!r.exc) {
                                 frappe.msgprint(__('Document has been canceled successfully.'));
-                                frm.reload_doc();  // Reload the document to reflect changes
+                                frm.reload_doc(); // Reload to reflect changes
                             }
                         }
                     });
@@ -277,11 +270,12 @@ frappe.ui.form.on('transfer between branches', {
 		// },
 		after_save: function (frm) {
 			// Reload the document to reflect changes
-			frm.reload_doc();
+			 
 		},
 		on_submit:function (frm) {
+			frappe.show_alert({ message: __("Document has been submitted successfully"), indicator: "green" });
 			// Reload the document to reflect changes
-			custom_action_on_status_change(frm);
+			//custom_action_on_status_change(frm);
 			
 		}
 	});
