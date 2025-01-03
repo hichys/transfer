@@ -10,6 +10,7 @@
   "section_break_qfcp",
   "column_break_laau",
   "from_branch",
+  "to_branch",
   "posting_date",
   "delivery_date",
   "without_profit",
@@ -19,7 +20,6 @@
   "check_without_profit",
   "whatsapp_desc",
   "handed_account",
-  "to_branch",
   "debit",
   "credit",
   "journal_entry",
@@ -63,7 +63,7 @@
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date"
+   "label": "\u0627\u0644\u062a\u0627\u0631\u064a\u062e"
   },
   {
    "default": "0",
@@ -195,7 +195,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-03 06:46:22.082524",
+ "modified": "2025-01-03 08:10:11.002346",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",

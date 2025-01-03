@@ -23,14 +23,17 @@ class transferbetweenbranches(Document):
       # Save the previous state when the document is loaded
 
     def on_change(self):
-        
-        if self.workflow_state == "مستلمة" and not self.handed:
-            frappe.msgprint("تم التسليم **3434***")
-            debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
-            credit = get_account_for_branch(branch_name=self.to_branch, account_index=0)
-            self.debit = debit
-            self.credit = credit
-            create_journal_entry_from_handed_transfer(self, method="submit")
+        # check previous state
+        if(self.get_doc_before_save() and not self.get_doc_before_save().workflow_state == "مستلمة"):
+            
+
+            if self.workflow_state == "مستلمة" and not self.handed:
+                frappe.msgprint("تم التسليم **3434***")
+                debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
+                credit = get_account_for_branch(branch_name=self.to_branch, account_index=0)
+                self.debit = debit
+                self.credit = credit
+                create_journal_entry_from_handed_transfer(self, method="submit")
         # elif self.workflow_state == "إلغاء الحوالة" and not self.canceld_journal_entry:
         #     debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
         #     credit = get_account_for_branch(branch_name=self.from_branch, account_index=0)
@@ -62,6 +65,17 @@ class transferbetweenbranches(Document):
 @frappe.whitelist()
 def test(docname):
     frappe.msgprint("This document has been trashed")
+@frappe.whitelist()
+def handel_cancelation(docname, method):
+    # if method == "reversal": revese it
+    # else if method == cancel then cancel it
+
+    if method == "reversal":
+        cancel_notyet_transaction(docname, method="reversal")
+    elif method == "cancel":
+        cancel_notyet_transaction(docname, method="submit")
+    else:
+        frappe.throw("Invalid method. Please provide a valid method.")
 
 @frappe.whitelist()
 def delete_current_doc(docname,method="submit"):
@@ -138,17 +152,6 @@ def create_journal_entry_from_pending_transfer(doc, method):
     frappe.msgprint(doc.journal_entry_link)
     frappe.msgprint(f"Journal Entry {journal_entry.name} created and linked to the Transfer Between Branches document.")
 
-@frappe.whitelist()
-def handel_cancelation(docname, method):
-    # if method == "reversal": revese it
-    # else if method == cancel then cancel it
-
-    if method == "reversal":
-        cancel_notyet_transaction(docname, method="reversal")
-    elif method == "cancel":
-        cancel_notyet_transaction(docname, method="submit")
-    else:
-        frappe.throw("Invalid method. Please provide a valid method.")
 
 
 
