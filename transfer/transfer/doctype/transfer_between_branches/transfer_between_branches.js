@@ -1,9 +1,34 @@
 // Copyright (c) 2024, a and contributors
 // For license information, please see license.txt
-
-
+ 
 frappe.ui.form.on('transfer between branches', {
+	validate: function(frm) {
+        // Example: Ensure "to_profit" is a number and less than 100
+        if (!$.isNumeric(frm.doc.to_profit)) {
+            frappe.msgprint(__('To Profit must be a valid number.'));
+            frappe.validated = false; // Prevent form submission
+        }
+		if (!$.isNumeric(frm.doc.from_profit)) {
+            frappe.msgprint(__('To Profit must be a valid number.'));
+            frappe.validated = false; // Prevent form submission
+        }
+
+
+    },
     refresh: function(frm) {
+
+		if(frm.doc.to_branch && frm.doc.from_branch && frm.doc.to_branch != null && frm.doc.from_branch != null){
+			if(frm.doc.to_branch === frm.doc.from_branch){
+				frappe.msgprint({
+					title: __('خطا'), 
+					message: __('لا يمكن نقل الحوالة الى نفس الفرع'),
+					indicator: 'red'
+				});	
+				frm.set_value('to_branch', null);
+				frm.refresh_field('to_branch');
+			}
+		}
+
         // Check if the document is in the "غير مستلمة" workflow state
         if (frm.doc.docstatus === 1  ) {
 
@@ -129,7 +154,9 @@ frappe.ui.form.on('transfer between branches', {
 			}
 		},
 		to_branch: function(frm) {
+			
 			if (frm.doc.to_branch) {
+
 				console.log('Selected branch:', frm.doc.to_branch); // Log the selected branch
 	
 				// Define the account index you want to fetch
@@ -249,37 +276,82 @@ frappe.ui.form.on('transfer between branches', {
 //         }
 //     }
 
-//disable profit amount
-frappe.ui.form.on('transfer between branches', {
-		without_profit: function(frm) {
-			if (frm.doc.without_profit) {
-				frm.set_value('profit',0); // Clear the amount field when checkbox is checked
-				//frappe.msgprint(__('Amount field value: {0}', [frm.doc.profit]));
-				frm.set_value('check_without_profit',0);
-			}
-		}, 
-		check_without_profit: function(frm) {
-			if (frm.doc.check_without_profit) {
-				//frappe.msgprint(__('Amount field value: {0}', [frm.doc.profit]));
-				frm.set_value('without_profit',0);
-			}
-		}
-
-	});
-
-//profit calcualtion
-
-
 frappe.ui.form.on('transfer between branches', {
 		amount: function(frm) {
-			calculate_profit(frm);
+			var valid = validate_float_fields(frm.doc.amount);
+			if(valid){
+				calculate_profit(frm);
+			}
+				
+			 
+		},
+		our_profit: function(frm) {
+			var valid = validate_float_fields(frm.doc.our_profit);
+			if (valid) {
+				adjust_profits(frm, 'our_profit');
+			}	
+		},
+		other_party_profit: function(frm) {
+			var valid = validate_float_fields(frm.doc.other_party_profit);
+			if (valid) {
+				adjust_profits(frm, 'other_party_profit');
+			}	
 		},
 		profit_per_thousand: function(frm) {
+			var valid = validate_float_fields(frm.doc.profit_per_thousand);
+			if(!valid){
+				profit_per_thousand = 0;
+				frm.doc.set_value('profit_per_thousand',0); 
+				frm.refresh_field('profit_per_thousand');
+			}
 			calculate_profit(frm);
+			
+		},
+		without_profit: function(frm) {
+			// 0 the profit fields if without_profit is checked
+			// uncheck split profit
+			// check without profit
+			if(frm.doc.without_profit){
+				frm.set_value('our_profit',0);
+				frm.set_value('other_party_profit',0);
+				frm.set_value('total_profit',0);
+				frm.set_value('profit_per_thousand',0);
+				frm.set_value('split_profit',0);
+			}
+
+		},
+		split_profit: function(frm){
+			if(frm.doc.split_profit){
+			
+				frm.set_value('without_profit',0);
+			//split profit
+			if(frm.doc.split_profit && frm.doc.total_profit >= 0){
+				
+				//recalculate profit
+				var original_profit = calculate_profit(frm);
+				frm.set_value('our_profit',original_profit/2);
+				frm.set_value('other_party_profit',original_profit/2);
+				frappe.show_alert({message: 'العمولة مقسومة' + ': '+frm.doc.our_profit, indicator: 'green'});
+				
+			}
+			else{
+				if(frm.doc.split_profit && frm.doc.profit < 0){
+					frappe.show_alert({message: 'Profit must be greater than 0', indicator: 'red'});
+				}
+			}
+			
+			}
 		}
 	});
 	
 	function calculate_profit(frm) {
+
+		if(frm.doc.profit_per_thousand === 0 && frm.doc.amount === 0){
+			frm.set_value('without_profit',1);
+			frm.set_value('split_profit',0);
+			return 0;
+		}
+
 		if (frm.doc.amount && frm.doc.profit_per_thousand) {
 			let profit = 0;
 	
@@ -292,9 +364,98 @@ frappe.ui.form.on('transfer between branches', {
 			}
 	
 			// Set the calculated profit in the profit field
-			frm.set_value('profit', profit);
-			console.log('Calculated Profit:', profit); // Log the calculated profit for debugging
+			console.log('Calculated Profit:', profit); 
+			frm.set_value('total_profit', profit);
+			frm.set_value('other_party_profit',0);
+			return profit;
 		}
+		else
+		{
+			frm.set_value('total_profit',0);
+			
+		}
+	}
+
+function validate_float_fields(value) {
+		// Validate the amount and profit_per_thousand fields
+		
+	const floatRegex = /^-?\d+(\.\d+)?$/;
+	if (!floatRegex.test(value)) {
+		frappe.msgprint({
+					title: __('خطا'), 
+					message: __('الرجاء ادخال قيمة صحيحة'),
+					indicator: 'red'
+				});
+				frm.set_value('amount', 0);
+				return false;
+		}
+
+		if (value < 0) {
+				frappe.msgprint({
+					title: __('خطا'), 
+					message: __('الرجاء ادخال قيمة اكبر من صفر'),
+					indicator: 'red'
+				});
+				frm.set_value('amount', 0);
+				return false;
+			}
+
+		return true;
 	}
 	
 
+	function adjust_profits(frm, changed_field) {
+		const profit = frm.doc.total_profit || 0;
+		let our_profit = frm.doc.our_profit || 0;
+		let other_party_profit = frm.doc.other_party_profit || 0;
+	
+		// Adjust the other field to ensure the total equals profit
+		if (changed_field === 'our_profit') {
+			other_party_profit = profit - our_profit;
+	
+			// Prevent invalid adjustments
+			if (other_party_profit < 0 && profit >= 0) {
+				frappe.msgprint("The other party's profit cannot be negative when total profit is positive.");
+				other_party_profit = 0;
+				our_profit = profit;
+			} else if (other_party_profit > 0 && profit < 0) {
+				frappe.msgprint("The other party's profit cannot be positive when total profit is negative.");
+				other_party_profit = 0;
+				our_profit = profit;
+			}
+		} else if (changed_field === 'other_party_profit') {
+			our_profit = profit - other_party_profit;
+	
+			// Prevent invalid adjustments
+			if (our_profit < 0 && profit >= 0) {
+				frappe.msgprint("Our profit cannot be negative when total profit is positive.");
+				our_profit = 0;
+				other_party_profit = profit;
+			} else if (our_profit > 0 && profit < 0) {
+				frappe.msgprint("Our profit cannot be positive when total profit is negative.");
+				our_profit = 0;
+				other_party_profit = profit;
+			}
+		}
+	
+		// Update the fields
+		frm.set_value('our_profit', our_profit);
+		frm.set_value('other_party_profit', other_party_profit);
+	
+		// Refresh fields to reflect changes
+		frm.refresh_fields();
+	}
+	
+//profit calcualtion
+
+ 
+//whatcher
+// frappe.ui.form.on('transfer between branches', {
+//     setup: function(frm) {
+//         frm.fields_dict['amount'].df.onchange = function() {
+//             if (validate_float_fields(frm.doc.amount)) {
+// 				calculate_profit(frm);
+//             }
+//         };
+//     }
+// });

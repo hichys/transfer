@@ -8,6 +8,7 @@ from .create_journal_entery import *
 
 class transferbetweenbranches(Document):
     # Events triggered when the document is saved or modified
+    
     def on_trash(self):
         frappe.msgprint("This document has been trashed")
 
@@ -58,7 +59,7 @@ class transferbetweenbranches(Document):
 
     def transfer(self):
         amount = self.amount
-        commission_amount = self.profit
+        commission_amount = self.total_profit
         debit = self.debit
         credit = self.credit
 
@@ -93,11 +94,16 @@ def delete_current_doc(docname,method="submit"):
 
  
 def create_journal_entry_from_pending_transfer(doc, method):
-    commision = doc.profit / 2
-    debit_with_commision = doc.amount + doc.profit
+    
+    debit_with_commision = 0
+    #in case its has profit
+    if not doc.without_profit:
+        debit_with_commision = doc.amount + doc.total_profit
+
     to_profit_account = get_profit_account(doc.from_branch)
     from_profit_account = get_profit_account(doc.to_branch)
-
+    
+    
     accounts = [
         {
             "account": doc.debit,
@@ -113,7 +119,11 @@ def create_journal_entry_from_pending_transfer(doc, method):
         }
     ]
 
-    if commision != 0:
+    
+    commision = doc.profit / 2
+    to_profit = doc.to_profit
+    from_profit = doc.profit
+    if commision != 0 and to_profit == 0 :
         accounts.extend([
             {
                 "account": to_profit_account,
@@ -126,6 +136,21 @@ def create_journal_entry_from_pending_transfer(doc, method):
                 "branch": doc.to_branch,
                 "debit_in_account_currency": 0,
                 "credit_in_account_currency": commision,
+            }
+        ])
+    elif to_profit != 0:
+        accounts.extend([
+            {
+                "account": to_profit_account,
+                "branch": doc.from_branch,
+                "debit_in_account_currency": 0,
+                "credit_in_account_currency": to_profit,
+            },
+            {
+                "account": from_profit_account,
+                "branch": doc.to_branch,
+                "debit_in_account_currency": 0,
+                "credit_in_account_currency": from_profit,
             }
         ])
 
