@@ -3,15 +3,29 @@
  
 frappe.ui.form.on('transfer between branches', {
 	validate: function(frm) {
-        // Example: Ensure "to_profit" is a number and less than 100
-        if (!$.isNumeric(frm.doc.to_profit)) {
-            frappe.msgprint(__('To Profit must be a valid number.'));
-            frappe.validated = false; // Prevent form submission
-        }
-		if (!$.isNumeric(frm.doc.from_profit)) {
-            frappe.msgprint(__('To Profit must be a valid number.'));
-            frappe.validated = false; // Prevent form submission
-        }
+        ///ensure that the amount is greater than 0
+		if (frm.doc.amount <= 0) {	
+			frappe.msgprint({
+				title: __('خطا'),
+				message: __('الرجاء ادخال قيمة اكبر من صفر'),
+				indicator: 'red'
+			});
+			frm.set_value('amount', 0);
+			frm.refresh_field('amount');
+			frappe.validated = false;
+		}
+		// Ensure that out_profit and other_party_profit are greater is equal to total_profit
+		if (frm.doc.our_profit + frm.doc.other_party_profit !== frm.doc.total_profit) {
+			frm.set_value('our_profit', 0);
+			frm.set_value('other_party_profit', 0);
+			frm.refresh_field('our_profit');
+			frm.refresh_field('other_party_profit');
+			frappe.throw("الرجاء التأكد من ادخال العمولة بشكل صحيح");
+			
+			frappe.validated = false;
+		}
+		
+
 
 
     },
@@ -285,6 +299,13 @@ frappe.ui.form.on('transfer between branches', {
 				
 			 
 		},
+		total_profit: function(frm) {
+			var valid = validate_float_fields(frm.doc.total_profit);
+			if (valid) {
+				adjust_profits(frm, frm.doc.total_profit);
+			}
+			frm.set_value('our_profit',frm.doc.total_profit);
+		},
 		our_profit: function(frm) {
 			var valid = validate_float_fields(frm.doc.our_profit);
 			if (valid) {
@@ -364,7 +385,7 @@ frappe.ui.form.on('transfer between branches', {
 			}
 	
 			// Set the calculated profit in the profit field
-			console.log('Calculated Profit:', profit); 
+			// console.log('Calculated Profit:', profit); 
 			frm.set_value('total_profit', profit);
 			frm.set_value('other_party_profit',0);
 			return profit;
@@ -412,14 +433,19 @@ function validate_float_fields(value) {
 		// Adjust the other field to ensure the total equals profit
 		if (changed_field === 'our_profit') {
 			other_party_profit = profit - our_profit;
+			if(other_party_profit < 0){
+				other_party_profit = 0;
+				our_profit = profit;
+			}
+			
 	
 			// Prevent invalid adjustments
 			if (other_party_profit < 0 && profit >= 0) {
-				frappe.msgprint("The other party's profit cannot be negative when total profit is positive.");
+				frappe.show_alert("The other party's profit cannot be negative when total profit is positive.");
 				other_party_profit = 0;
 				our_profit = profit;
 			} else if (other_party_profit > 0 && profit < 0) {
-				frappe.msgprint("The other party's profit cannot be positive when total profit is negative.");
+				frappe.show_alert("The other party's profit cannot be positive when total profit is negative.");
 				other_party_profit = 0;
 				our_profit = profit;
 			}
@@ -428,11 +454,11 @@ function validate_float_fields(value) {
 	
 			// Prevent invalid adjustments
 			if (our_profit < 0 && profit >= 0) {
-				frappe.msgprint("Our profit cannot be negative when total profit is positive.");
+				frappe.show_alert("Our profit cannot be negative when total profit is positive.");
 				our_profit = 0;
 				other_party_profit = profit;
 			} else if (our_profit > 0 && profit < 0) {
-				frappe.msgprint("Our profit cannot be positive when total profit is negative.");
+				frappe.show_alert("Our profit cannot be positive when total profit is negative.");
 				our_profit = 0;
 				other_party_profit = profit;
 			}

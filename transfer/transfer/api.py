@@ -67,8 +67,12 @@ def get_account_for_branch(branch_name, account_index=0):
 		frappe.throw(f"An error occurred while fetching the account: {str(e)}")
 
 	return False
-
-
+#canel journal entry
+@frappe.whitelist()
+def cancel_journal_entery(self,docname):
+	# Fetch the original journal entry using the 'cheque_no' as the reference to self.name
+	journal_entry = frappe.get_doc("Journal Entry", self.name)
+	
 
 @frappe.whitelist()
 def reverse_journal_entry(self,docname):

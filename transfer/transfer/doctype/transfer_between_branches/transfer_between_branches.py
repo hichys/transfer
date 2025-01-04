@@ -8,12 +8,24 @@ from .create_journal_entery import *
 
 class transferbetweenbranches(Document):
     # Events triggered when the document is saved or modified
-    
     def on_trash(self):
         frappe.msgprint("This document has been trashed")
 
     def before_cancel(self):
+        #get all journal enteries linked cheque_no to this document make sure its canceled or reversed
         
+        #get jouranl enteries from db thats has the same docname == cheque_no
+
+        doc = frappe.get_doc('transfer between branches', self.name)
+        journal_entries = frappe.get_all("Journal Entry", filters={"cheque_no": doc.name}, fields=["name", "docstatus"])
+        if journal_entries:
+            for entry in journal_entries:
+                #check if reversal_of is not empty meaing this journal entry is reversed
+                if entry.docstatus == 1 and entry.reversal_of and entry.custom_reversed_by:
+                    frappe.throw(f"Journal Entry {entry.name} is not canceled or reversed.")
+                
+        else:
+            frappe.throw("Error code 404")
 
   
         # frappe.msgprint("This document has been canceled successfully")
@@ -78,79 +90,60 @@ def handel_cancelation(docname, method):
     else:
         frappe.throw("Invalid method. Please provide a valid method.")
 
-@frappe.whitelist()
-def delete_current_doc(docname,method="submit"):
-    frappe.msgprint("Deleting Document")
-    try:
-        # Use frappe.delete_doc to delete the document
-        frappe.delete_doc("transfer between branches", docname)
-        frappe.db.commit()
-        frappe.msgprint(f"Document {docname} deleted successfully.")
-        return {"status": "success", "message": f"Document {docname} deleted successfully."}
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Error Deleting Document")
-        frappe.msgprint(f"Error occurred while deleting the document: {str(e)}")
-        return {"status": "error", "message": str(e)}
 
  
 def create_journal_entry_from_pending_transfer(doc, method):
+    # show alert
+    frappe.msgprint("create_journal_entry_from_pending_transfer is called")
     
-    debit_with_commision = 0
-    #in case its has profit
-    if not doc.without_profit:
-        debit_with_commision = doc.amount + doc.total_profit
 
-    to_profit_account = get_profit_account(doc.from_branch)
-    from_profit_account = get_profit_account(doc.to_branch)
+
+
+    debit_with_commision = doc.amount + doc.total_profit
+
+    from_main_account = get_main_account(doc.from_branch)
+    to_main_account = get_main_account(doc.to_branch)
+
+    to_temp_account = get_temp_account(doc.to_branch)
+
+    from_profit_account = get_profit_account(doc.from_branch)
+    to_profit_account = get_profit_account(doc.to_branch)
     
     
     accounts = [
         {
-            "account": doc.debit,
+            "account": from_main_account,
             "branch": doc.from_branch,
             "debit_in_account_currency": debit_with_commision,
             "credit_in_account_currency": 0,
         },
         {
-            "account": doc.credit,
+            "account": to_temp_account,
             "branch": doc.to_branch,
             "debit_in_account_currency": 0,
             "credit_in_account_currency": doc.amount,
         }
     ]
 
-    
-    commision = doc.profit / 2
-    to_profit = doc.to_profit
-    from_profit = doc.profit
-    if commision != 0 and to_profit == 0 :
+  
+    from_profit = doc.our_profit
+    to_profit = doc.other_party_profit
+    if from_profit > 0 :
         accounts.extend([
             {
-                "account": to_profit_account,
-                "branch": doc.from_branch,
-                "debit_in_account_currency": 0,
-                "credit_in_account_currency": commision,
-            },
-            {
                 "account": from_profit_account,
-                "branch": doc.to_branch,
-                "debit_in_account_currency": 0,
-                "credit_in_account_currency": commision,
-            }
-        ])
-    elif to_profit != 0:
-        accounts.extend([
-            {
-                "account": to_profit_account,
                 "branch": doc.from_branch,
-                "debit_in_account_currency": 0,
-                "credit_in_account_currency": to_profit,
-            },
-            {
-                "account": from_profit_account,
-                "branch": doc.to_branch,
                 "debit_in_account_currency": 0,
                 "credit_in_account_currency": from_profit,
+            }
+        ])
+    if to_profit  > 0:
+        accounts.extend([
+            {
+                "account": to_profit_account,
+                "branch": doc.to_branch,
+                "debit_in_account_currency": 0,
+                "credit_in_account_currency": to_profit,
             }
         ])
 
@@ -165,23 +158,27 @@ def create_journal_entry_from_pending_transfer(doc, method):
 
     
     
-    journal_entry.insert(ignore_permissions=True)
-    journal_entry.custom_state = doc.docstatus
-    doc.journal_entry = journal_entry.name
-    doc.notyet = journal_entry.name
-    doc.journal_entry_link = f'<button class="btn btn-primary" onclick="window.open(\'/app/journal-entry/{journal_entry.name}\', \'_blank\')">View Journal Entry</button>'
-    doc.save()
-    frappe.db.commit()
-    journal_entry.submit()
-    frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
-    frappe.msgprint(doc.journal_entry_link)
-    frappe.msgprint(f"Journal Entry {journal_entry.name} created and linked to the Transfer Between Branches document.")
-
+    try:
+        journal_entry.insert(ignore_permissions=True)
+        journal_entry.custom_state = doc.docstatus
+        doc.journal_entry = journal_entry.name
+        doc.notyet = journal_entry.name
+        doc.journal_entry_link = f'<button class="btn btn-primary" onclick="window.open(\'/app/journal-entry/{journal_entry.name}\', \'_blank\')">View Journal Entry</button>'
+        doc.save()
+        frappe.db.commit()
+        journal_entry.submit()
+        frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
+        frappe.msgprint(doc.journal_entry_link)
+        frappe.msgprint(f"Journal Entry {journal_entry.name} created and linked to the Transfer Between Branches document.")
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Error Creating Journal Entry")
+        frappe.throw(f"An error occurred while creating the Journal Entry: {e}")    
 
 
 
 @frappe.whitelist()
 def cancel_notyet_transaction(docname, method ):
+    frappe.msgprint("cancel_notyet_transaction is called")
     try:
         # Fetch the document
         try :
@@ -197,6 +194,7 @@ def cancel_notyet_transaction(docname, method ):
                 frappe.msgprint(f"Reversing Journal Entry: {doc.handed}")
                 handed = doc.handed
                 doc.handed = ""
+                journal_entry = ""
                 doc.save()
                 frappe.db.commit()
                 reverse_journal_entry(handed)
@@ -211,10 +209,14 @@ def cancel_notyet_transaction(docname, method ):
                 doc.save()
                 frappe.db.commit()
                 reverse_journal_entry(notyet)  # Call the reverse function you already have
-        if method == "cancel":
-            # If method is cancel, cancel the document
-            cancel_transfer(docname)    
-        # Update the workflow state to "تم الإلغاء" (Cancelled)
+            if method == "cancel":
+                # If method is cancel, cancel the journal entry
+                frappe.msgprint(f"Cancelling Journal Entry: {doc.notyet}")
+                notyet = doc.notyet
+                doc.notyet = ""
+                doc.save()
+                frappe.db.commit()
+                frappe.get_doc('Journal Entry', notyet).cancel()
       
         doc.cancel()  # Cancel the transfer between branches document
         frappe.db.commit()
@@ -461,3 +463,16 @@ def reverse_journal_entry(docname):
         frappe.log_error(frappe.get_traceback(), "Error in Reversing Journal Entry")
         frappe.throw(f"An error occurred while reversing Journal Entry {docname}: {e}")
 
+@frappe.whitelist()
+def delete_current_doc(docname,method="submit"):
+    frappe.msgprint("Deleting Document")
+    try:
+        # Use frappe.delete_doc to delete the document
+        frappe.delete_doc("transfer between branches", docname)
+        frappe.db.commit()
+        frappe.msgprint(f"Document {docname} deleted successfully.")
+        return {"status": "success", "message": f"Document {docname} deleted successfully."}
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Error Deleting Document")
+        frappe.msgprint(f"Error occurred while deleting the document: {str(e)}")
+        return {"status": "error", "message": str(e)}
