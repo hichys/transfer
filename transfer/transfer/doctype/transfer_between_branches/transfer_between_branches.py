@@ -42,17 +42,11 @@ class transferbetweenbranches(Document):
 
             if self.workflow_state == "مستلمة" and not self.handed:
                 frappe.msgprint("تم التسليم **3434***")
-                debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
-                credit = get_account_for_branch(branch_name=self.to_branch, account_index=0)
-                self.debit = debit
-                self.credit = credit
+                
                 create_journal_entry_from_handed_transfer(self, method="submit")
-        # elif self.workflow_state == "إلغاء الحوالة" and not self.canceld_journal_entry:
-        #     debit = get_account_for_branch(branch_name=self.to_branch, account_index=1)
-        #     credit = get_account_for_branch(branch_name=self.from_branch, account_index=0)
-        #     self.debit = debit
-        #     self.credit = credit
-        #     create_journal_entry_from_canceled_transfer(self, method="submit")
+            elif self.workflow_state == "إلغاء الحوالة" and not self.canceld_journal_entry:
+                
+                create_journal_entry_from_canceled_transfer(self, method="submit")
 
     def on_update(self):
         print("on update called")

@@ -2,6 +2,12 @@
 // For license information, please see license.txt
  
 frappe.ui.form.on('transfer between branches', {
+
+		setup: function(frm) {
+			frm.fields_dict['debit'].df.onchange = function() {
+				frappe.show_alert('Debit account changed');
+			};
+		},
 	validate: function(frm) {
         ///ensure that the amount is greater than 0
 		if (frm.doc.amount <= 0) {	
@@ -263,33 +269,6 @@ frappe.ui.form.on('transfer between branches', {
 			
 		});
 	}
-//toggle select field
-// frappe.ui.form.on('transfer between branches', {
-//         refresh: function(frm) {
-//             // Ensure the state of the select field is correct on form load
-//             toggle_select_field(frm);
-//         },
-//         from_branch: function(frm) {
-//             // Trigger when 'from_branch' is changed
-//             toggle_select_field(frm);
-//         },
-//         to_branch: function(frm) {
-//             // Trigger when 'to_branch' is changed
-//             toggle_select_field(frm);
-//         }
-//     });
-	
-	// Custom function to enable/disable the select field
-//     function toggle_select_field(frm) {
-//         if (frm.doc.from_branch && frm.doc.to_branch) {
-//             // Enable the select field if both are filled
-//             frm.set_df_property('status', 'read_only', 0); // Replace 'status' with your select field name
-//         } else {
-//             // Disable the select field if either is empty
-//             frm.set_df_property('status', 'read_only', 1);
-//         }
-//     }
-
 frappe.ui.form.on('transfer between branches', {
 		amount: function(frm) {
 			var valid = validate_float_fields(frm.doc.amount);
@@ -385,7 +364,6 @@ frappe.ui.form.on('transfer between branches', {
 			}
 	
 			// Set the calculated profit in the profit field
-			// console.log('Calculated Profit:', profit); 
 			frm.set_value('total_profit', profit);
 			frm.set_value('other_party_profit',0);
 			return profit;
@@ -471,17 +449,4 @@ function validate_float_fields(value) {
 		// Refresh fields to reflect changes
 		frm.refresh_fields();
 	}
-	
-//profit calcualtion
-
  
-//whatcher
-// frappe.ui.form.on('transfer between branches', {
-//     setup: function(frm) {
-//         frm.fields_dict['amount'].df.onchange = function() {
-//             if (validate_float_fields(frm.doc.amount)) {
-// 				calculate_profit(frm);
-//             }
-//         };
-//     }
-// });
