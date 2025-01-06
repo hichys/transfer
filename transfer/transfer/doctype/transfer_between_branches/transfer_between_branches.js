@@ -1,13 +1,32 @@
 // Copyright (c) 2024, a and contributors
 // For license information, please see license.txt
- 
+frappe.ui.form.on('transfer between branches', {
+    before_workflow_action:function (frm, action) {
+        if (action === "إلغاء الحوالة") {
+            try {
+                // Proceed with server-side cancellation
+                frappe.call({
+                    method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_cancel",
+                    args: {
+                        docname: frm.doc.name,
+						method:"cancel"
+                    },
+                    callback: function (r) {
+                        if (!r.exc) {
+                            frappe.msgprint("تم إلغاء المستند بنجاح.");
+                            frm.reload_doc();
+                        }
+                    }
+                });
+            } catch (error) {
+                frappe.throw("تم إلغاء الإجراء.");
+            }
+        }
+    }
+});
+
 frappe.ui.form.on('transfer between branches', {
 
-		setup: function(frm) {
-			frm.fields_dict['debit'].df.onchange = function() {
-				frappe.show_alert('Debit account changed');
-			};
-		},
 	validate: function(frm) {
         ///ensure that the amount is greater than 0
 		if (frm.doc.amount <= 0) {	
@@ -48,51 +67,100 @@ frappe.ui.form.on('transfer between branches', {
 				frm.refresh_field('to_branch');
 			}
 		}
-
+		if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
+			frm.add_custom_button(__('تسجيل'), function () {
+				frappe.confirm(
+					"هل أنت متأكد أنك تسجيل؟",
+					() => {
+						frappe.call({
+							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
+							args: {
+								docname: frm.doc.name,
+							},
+							callback: function (r) {
+								if (!r.exc) {
+									frappe.msgprint(__('تم التسجيل'));
+									frm.reload_doc(); // Reload to reflect changes
+								}
+							}
+						});
+					},
+					() => {
+						frappe.msgprint(__('تم إلغاء الإجراء.'));
+					}
+				);
+			});
+		} else {
+			// If the document is saved or in any other workflow state, don't show the button
+			frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
+		}
         // Check if the document is in the "غير مستلمة" workflow state
-        if (frm.doc.docstatus === 1  ) {
-
-            // Calculate the time difference in hours between document creation and the current time
-            const creation_time = new Date(frm.doc.creation);
-            const current_time = new Date();
-            const time_diff = (current_time - creation_time) / (1000 * 3600); // Convert milliseconds to hours
-
-            if (time_diff <= 24) {
-                // Add "Reverse" button for documents created more than 24 hours ago
-                frm.add_custom_button(__('عكس الحوالــة'), function() {
-                    frappe.call({
-                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
-                        args: {
-                            docname: frm.doc.name,
-                            method: "reversal"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                frappe.msgprint(__('Document has been reversed successfully.'));
-                                frm.reload_doc(); // Reload to reflect changes
-                            }
-                        }
-                    });
-                });
-            } else {
-                // Add "إلغاء الحوالة" button for documents created less than 24 hours ago
-                frm.add_custom_button(__('إلغاء الحوالة'), function() {
-                    frappe.call({
-                        method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
-                        args: {
-                            docname: frm.doc.name,
-                            method: "cancel"
-                        },
-                        callback: function(r) {
-                            if (!r.exc) {
-                                frappe.msgprint(__('Document has been canceled successfully.'));
-                                frm.reload_doc(); // Reload to reflect changes
-                            }
-                        }
-                    });
-                });
-            }
-        }
+		if (frm.doc.docstatus === 1) {
+			// Get the creation date (posting_date) and strip the time part
+			const creation_date = new Date(frm.doc.posting_date);
+			const current_date = new Date();
+			
+			// Strip time from both dates by setting the time to midnight (00:00)
+			creation_date.setHours(0, 0, 0, 0);
+			current_date.setHours(0, 0, 0, 0);
+		
+			// Calculate the difference in milliseconds
+			const day_diff = (current_date - creation_date) / (1000 * 3600 * 24); // Convert milliseconds to days
+		
+			// Check if the difference is greater than or equal to 1 day
+			if (day_diff >= 1) {
+				// Add "Reverse" button for documents created more than 24 hours ago
+				frm.add_custom_button(__('عكس الحوالــة'), function () {
+				 	frappe.confirm(
+						"هل أنت متأكد أنك تريد عكس الحوالة؟",
+						() => {
+							frappe.call({
+								method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
+								args: {
+									docname: frm.doc.name,
+									method: "reversal"
+								},
+								callback: function (r) {
+									if (!r.exc) {
+										frappe.msgprint(__('تم عكس الحوالة بنجاح.'));
+										frm.reload_doc(); // Reload to reflect changes
+									}
+								}
+							});
+						},
+						() => {
+							frappe.msgprint(__('تم إلغاء الإجراء.'));
+						}
+					);
+				});
+			} else {
+				// Add "إلغاء الحوالة" button for documents created less than 24 hours ago
+				frm.add_custom_button(__('إلغاء الحوالة'), function () {
+					frappe.confirm(
+						"هل أنت متأكد أنك تريد إلغاء الحوالة؟",
+						() => {
+							frappe.call({
+								method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
+								args: {
+									docname: frm.doc.name,
+									method: "cancel"
+								},
+								callback: function (r) {
+									if (!r.exc) {
+										frappe.msgprint(__('تم إلغاء الحوالة بنجاح.'));
+										frm.reload_doc(); // Reload to reflect changes
+									}
+								}
+							});
+						},
+						() => {
+							frappe.msgprint(__('تم إلغاء الإجراء.'));
+						}
+					);
+				});
+			}
+		}
+		
     }
 });
 
@@ -241,7 +309,6 @@ frappe.ui.form.on('transfer between branches', {
 			 
 		},
 		on_submit:function (frm) {
-			frappe.show_alert({ message: __("Document has been submitted successfully"), indicator: "green" });
 			// Reload the document to reflect changes
 			//custom_action_on_status_change(frm);
 			
