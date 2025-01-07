@@ -18,12 +18,7 @@ class companytransfer(Document):
 		if not self.journal_entry:
 			create_journal_entry(self)
   
-  
-	def validate_amended_from(self):
-		#reset journal_entry field
-		self.journal_entry = None			
-		return super().validate_amended_from()
-	
+   
 	def after_cancel(self):
 		self.status = "ملغية"
 		frappe.msgprint("تم الغاء العملية")

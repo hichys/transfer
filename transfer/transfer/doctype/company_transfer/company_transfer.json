@@ -20,6 +20,8 @@
   "section_break_wfug",
   "column_break_dqec",
   "column_break_fzdm",
+  "from_type",
+  "to_type",
   "column_break_glph",
   "checkbox_internal_transfer",
   "select_internal",
@@ -49,13 +51,13 @@
   "whatsapp_desc",
   "column_break_nnoi",
   "execution_amount",
+  "profit",
   "our_profit",
   "other_party_profit",
   "profit_is_splited",
   "column_break_laau",
   "amount",
   "without_profit",
-  "profit",
   "section_break_tkcp",
   "amended_from"
  ],
@@ -135,6 +137,7 @@
    "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "\u0627\u0644\u0642\u064a\u062f \u0627\u0644\u0627\u062e\u064a\u0631",
+   "no_copy": 1,
    "options": "Journal Entry",
    "read_only": 1
   },
@@ -143,6 +146,7 @@
    "fieldname": "notyet",
    "fieldtype": "Data",
    "label": "\u0642\u064a\u062f - \u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "no_copy": 1,
    "read_only": 1,
    "remember_last_selected_value": 1
   },
@@ -151,6 +155,7 @@
    "fieldname": "handed",
    "fieldtype": "Data",
    "label": "\u0642\u064a\u062f - \u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "no_copy": 1,
    "read_only": 1,
    "remember_last_selected_value": 1
   },
@@ -159,13 +164,15 @@
    "fieldname": "canceld_journal_entry",
    "fieldtype": "Data",
    "label": "\u0642\u064a\u062f - \u0627\u0644\u0625\u0644\u063a\u0627\u0621",
+   "no_copy": 1,
    "read_only": 1,
    "remember_last_selected_value": 1
   },
   {
    "fieldname": "journal_entry_link",
    "fieldtype": "HTML",
-   "label": "journal_entry_link"
+   "label": "journal_entry_link",
+   "no_copy": 1
   },
   {
    "fieldname": "amended_from",
@@ -179,21 +186,19 @@
   },
   {
    "fieldname": "from_company",
-   "fieldtype": "Link",
+   "fieldtype": "Dynamic Link",
    "in_list_view": 1,
    "label": "\u0645\u0646 \u0634\u0631\u0643\u0629",
    "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
-   "mandatory_depends_on": "eval:doc.select_external == \"\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629\"",
-   "options": "Customer",
+   "options": "from_type",
    "reqd": 1
   },
   {
    "fieldname": "to_company",
-   "fieldtype": "Link",
+   "fieldtype": "Dynamic Link",
    "in_list_view": 1,
    "label": "\u0627\u0644\u064a \u0634\u0631\u0643\u0629",
-   "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
-   "options": "Customer",
+   "options": "to_type",
    "reqd": 1
   },
   {
@@ -381,6 +386,18 @@
   {
    "fieldname": "column_break_nnoi",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_type",
+   "fieldtype": "Link",
+   "label": "from_type",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "to_type",
+   "fieldtype": "Link",
+   "label": "to_type",
+   "options": "DocType"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -391,7 +408,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-03 03:41:46.926222",
+ "modified": "2025-01-07 03:44:46.756087",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",

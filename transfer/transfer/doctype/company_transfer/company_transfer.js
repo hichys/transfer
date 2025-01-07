@@ -10,13 +10,6 @@ frappe.ui.form.on('company transfer', {
                     frm.set_value("status", "غير مستلمة");
                 }
             },
-    select_internal: function (frm) {
-        
-    }, 
-    select_external: function (frm) {
-        
-    },
-
 
     profit_is_splited: function (frm) {
         //make our_profit and other_party_profit same
@@ -49,51 +42,63 @@ frappe.ui.form.on('company transfer', {
         if (frm.doc.checkbox_external_transfer  ) {
             frappe.show_alert("تحويلة خارجية");
             frm.set_value("checkbox_internal_transfer", 0);
-            frm.set_value('branch', 'الفرناج').then(() => {
-                
+            frm.set_value('branch', 'العالمية الفرناج').then(() => {
             });
-
-                frm.set_df_property("branch", "read_only", 0);
-                frm.set_df_property("to_company", "read_only", 0);
+            
+            frm.set_df_property("branch", "read_only", 0);
+            frm.set_df_property("to_company", "read_only", 0);
             
             
+            frm.fields_dict['from_type'].set_value("Customer");
+            frm.fields_dict['to_type'].set_value("Customer");
         }  
+        
     },
     select_external:function (frm){
-        if(frm.doc.select_external == "خارجي"){
-            frm.set_value('from_company','');
-            frm.set_value('branch','');
-            frm.set_df_property("from_company", "read_only", 1);
-            frm.set_df_property("to_company", "read_only", 0);;
-        }
-        else
-        {
+
+       
             if(frm.doc.select_external == "من شركة الي شركة"){
-                frappe.show_alert("من شركة الي شركة");
-                frm.set_df_property("from_company", "read_only", 0);
-                frm.set_df_property("to_company", "read_only", 0);
+                frm.fields_dict['from_type'].set_value("Customer");
+                frm.fields_dict['to_type'].set_value("Customer");
             }
-        }
+    
+            if(frm.doc.select_external == "خارجي"){
+                frm.set_value('from_company','');
+                frm.set_value('branch','');
+               
+                frm.fields_dict['from_type'].set_value("Branch");
+                frm.fields_dict['to_type'].set_value("Customer");
+                
+            }
+     
+     
     },
     select_internal:function (frm){
         if(frm.doc.select_internal == "من شركة الي فرع"){
             frappe.show_alert("من شركة الي فرع 2525");
+             
+            frm.fields_dict['from_type'].set_value("Customer");
+            frm.fields_dict['to_type'].set_value("Branch");
+             
         }
-        else
-        {
-            if(frm.doc.select_internal == "من فرع الي شركة"){
-                frappe.show_alert("من فرع69 الي شركة");
-            }
+        if(frm.doc.select_internal == "من فرع الي شركة"){
+            frappe.show_alert("من شركة الي فرع 2525");
+             
+            frm.fields_dict['from_type'].set_value("Branch");
+            frm.fields_dict['to_type'].set_value("Customer");
+             
         }
+         
     },
     checkbox_internal_transfer: function (frm) {
         if (frm.doc.checkbox_internal_transfer) {
             frappe.show_alert("تحويلة داخلية");
             frm.set_value("checkbox_external_transfer", 0);
-            frm.set_value('branch', 'الفرناج').then(() => {
+            frm.set_value('branch', 'العالمية الفرناج').then(() => {
                 
             });
-
+            frm.fields_dict['from_type'].set_value("Customer");
+            frm.fields_dict['to_type'].set_value("Branch");
             // set branch title to : الي فرع 
             frm.set_df_property("branch", "label", "من فرع ؟");
         
@@ -108,12 +113,18 @@ frappe.ui.form.on('company transfer', {
     from_company: function (frm) {
        if(frm.doc.checkbox_external_transfer)
        {
-        frm.set_value('debit',"Debtors - A" );
+            //  frm.set_value('debit',"Debtors - A" );
        }
     },
     to_company: function (frm) {
         // Refresh logic if needed
         frm.set_value('credit',"Debtors - A" );
+    },
+    to_type: function(frm) {
+        frm.refresh_fields(); 
+    },
+    from_type: function(frm){
+        frm.refresh_fields()
     },
     branch:function(frm){
         if(frm.doc.branch){
