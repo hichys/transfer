@@ -57,15 +57,15 @@ frappe.ui.form.on('company transfer', {
     select_external:function (frm){
 
        
+            reset_fields(frm);
             if(frm.doc.select_external == "من شركة الي شركة"){
                 frm.fields_dict['from_type'].set_value("Customer");
                 frm.fields_dict['to_type'].set_value("Customer");
             }
     
             if(frm.doc.select_external == "خارجي"){
-                frm.set_value('from_company','');
-                frm.set_value('branch','');
-               
+                frm.set_value('from_company',frm.branch);
+                frm.reset_fields()
                 frm.fields_dict['from_type'].set_value("Branch");
                 frm.fields_dict['to_type'].set_value("Customer");
                 
@@ -76,7 +76,7 @@ frappe.ui.form.on('company transfer', {
     select_internal:function (frm){
         if(frm.doc.select_internal == "من شركة الي فرع"){
             frappe.show_alert("من شركة الي فرع 2525");
-             
+           
             frm.fields_dict['from_type'].set_value("Customer");
             frm.fields_dict['to_type'].set_value("Branch");
              
@@ -127,7 +127,18 @@ frappe.ui.form.on('company transfer', {
         frm.refresh_fields()
     },
     branch:function(frm){
+        if(frm.select_external === "خارجي"){
+            frappe.msgprint(frm.doc.branch)
+            frm.set_value('from_company',frm.doc.branch)
+            frm.refresh_fields();
+        }
         if(frm.doc.branch){
+            if(frm.doc.from_type == "Branch"){
+                frm.fields_dict['from_company'].set_value(frm.doc.branch);
+                frm.set_df_property("from_company", "read_only", 1);
+            }
+            
+
             frappe.call({
                 method: 'transfer.transfer.doctype.company_transfer.company_transfer.get_profit_account', // Specify your server-side method here
                 args: {
@@ -291,6 +302,7 @@ frappe.ui.form.on('company transfer', {
 // غير ذالك يتم ارجاعها
 frappe.ui.form.on('company transfer', {
     refresh: function(frm) {
+
         if(frm.doc.docstatus ==1  )
         {
             frm.add_custom_button(__('إلغاء الحوالة'), function() {
@@ -328,3 +340,12 @@ frappe.ui.form.on('company transfer', {
         }
     }
 });
+
+
+
+// utils
+
+function reset_fields(frm){
+    frm.set_value('from_company','');
+    frm.set_value('to_company',''); 
+}

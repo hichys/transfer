@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "format:CMTR-{branch}.{#####}",
- "creation": "2024-12-29 19:14:56.674172",
+ "creation": "2025-01-07 12:44:27.837129",
  "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -23,26 +23,20 @@
   "from_type",
   "to_type",
   "column_break_glph",
-  "checkbox_internal_transfer",
   "select_internal",
-  "column_break_pcyw",
-  "checkbox_external_transfer",
-  "select_external",
   "section_break_flul",
   "column_break_vakh",
-  "column_break_dfrt",
   "to_company",
   "credit",
-  "column_break_aeer",
+  "column_break_dfrt",
   "from_company",
   "debit",
-  "column_break_lups",
+  "column_break_aeer",
   "branch",
   "profit_account",
   "section_break_tzha",
   "column_break_wpec",
   "handed_account",
-  "journal_entry",
   "notyet",
   "handed",
   "canceld_journal_entry",
@@ -144,36 +138,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "0",
-   "fieldname": "checkbox_internal_transfer",
-   "fieldtype": "Check",
-   "label": "\u062f\u0627\u062e\u0644\u064a\u0629"
-  },
-  {
-   "default": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0641\u0631\u0639",
-   "depends_on": "eval:doc.checkbox_internal_transfer",
    "fieldname": "select_internal",
    "fieldtype": "Select",
    "label": "\u062f\u0627\u062e\u0644\u064a - \u0646\u0648\u0639\u0647\u0627",
-   "options": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0641\u0631\u0639\n\u0645\u0646 \u0641\u0631\u0639 \u0627\u0644\u064a \u0634\u0631\u0643\u0629"
-  },
-  {
-   "fieldname": "column_break_pcyw",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "checkbox_external_transfer",
-   "fieldtype": "Check",
-   "label": "\u062e\u0627\u0631\u062c\u064a\u0629"
-  },
-  {
-   "default": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629",
-   "depends_on": "eval:doc.checkbox_external_transfer",
-   "fieldname": "select_external",
-   "fieldtype": "Select",
-   "label": "\u062e\u0627\u0631\u062c\u064a - \u0646\u0648\u0639\u0647\u0627",
-   "options": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629\n\u062e\u0627\u0631\u062c\u064a"
+   "options": "\u0645\u0646 \u0641\u0631\u0639 \u0627\u0644\u064a \u0634\u0631\u0643\u0629\n\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0641\u0631\u0639"
   },
   {
    "fieldname": "section_break_flul",
@@ -181,10 +149,6 @@
   },
   {
    "fieldname": "column_break_vakh",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_dfrt",
    "fieldtype": "Column Break"
   },
   {
@@ -202,14 +166,14 @@
    "label": "credit"
   },
   {
-   "fieldname": "column_break_aeer",
+   "fieldname": "column_break_dfrt",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "from_company",
    "fieldtype": "Dynamic Link",
    "in_list_view": 1,
-   "label": "\u0645\u0646 \u0634\u0631\u0643\u0629",
+   "label": "\u0645\u0646 \u0641\u0631\u0639",
    "options": "from_type",
    "reqd": 1
   },
@@ -220,7 +184,7 @@
    "label": "debit"
   },
   {
-   "fieldname": "column_break_lups",
+   "fieldname": "column_break_aeer",
    "fieldtype": "Column Break"
   },
   {
@@ -252,19 +216,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "journal_entry",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "\u0627\u0644\u0642\u064a\u062f \u0627\u0644\u0627\u062e\u064a\u0631",
-   "no_copy": 1,
-   "options": "Journal Entry",
-   "read_only": 1
-  },
-  {
    "allow_on_submit": 1,
    "fieldname": "notyet",
    "fieldtype": "Data",
-   "label": "\u0642\u064a\u062f - \u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "label": "\u0642\u064a\u062f  \u0627\u0644\u062a\u0633\u062c\u064a\u0644",
    "no_copy": 1,
    "read_only": 1,
    "remember_last_selected_value": 1
@@ -383,7 +338,7 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "company transfer",
+   "options": "Internal Transfer",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
@@ -397,10 +352,10 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-07 12:41:02.786674",
+ "modified": "2025-01-07 14:26:05.584558",
  "modified_by": "Administrator",
  "module": "transfer",
- "name": "company transfer",
+ "name": "Internal Transfer",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
@@ -415,7 +370,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1
@@ -436,8 +390,5 @@
    "color": "Red",
    "title": "\u0645\u0644\u063a\u064a\u0629"
   }
- ],
- "track_changes": 1,
- "track_seen": 1,
- "track_views": 1
+ ]
 }
