@@ -189,7 +189,6 @@
    "fieldtype": "Dynamic Link",
    "in_list_view": 1,
    "label": "\u0645\u0646 \u0634\u0631\u0643\u0629",
-   "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
    "options": "from_type",
    "reqd": 1
   },
@@ -408,7 +407,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-07 03:44:46.756087",
+ "modified": "2025-01-07 04:11:09.688461",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",
