@@ -8,7 +8,6 @@
  "field_order": [
   "custom_section_1_section",
   "column_break_zmuk",
-  "column_break_meef",
   "column_break_onwu",
   "status",
   "go_to",
@@ -16,6 +15,7 @@
   "delivery_date",
   "column_break_bhuq",
   "posting_date",
+  "column_break_meef",
   "section_break_wfug",
   "column_break_dqec",
   "to_type",
@@ -34,7 +34,6 @@
   "branch",
   "profit_account",
   "section_break_tzha",
-  "column_break_nnoi",
   "handed_account",
   "notyet",
   "handed",
@@ -42,12 +41,13 @@
   "journal_entry_link",
   "column_break_wpec",
   "whatsapp_desc",
-  "column_break_pkny",
+  "column_break_nnoi",
   "our_profit",
   "other_party_profit",
-  "column_break_laau",
+  "column_break_pkny",
   "amount",
   "without_profit",
+  "column_break_hhmq",
   "section_break_tkcp",
   "amended_from"
  ],
@@ -213,6 +213,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "columns": 4,
    "fieldname": "column_break_wpec",
    "fieldtype": "Column Break"
   },
@@ -286,11 +287,6 @@
    "reqd": 1
   },
   {
-   "columns": 10,
-   "fieldname": "column_break_laau",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -319,6 +315,10 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "column_break_hhmq",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -329,7 +329,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-08 16:01:18.811888",
+ "modified": "2025-01-08 17:32:54.385493",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Internal Transfer",

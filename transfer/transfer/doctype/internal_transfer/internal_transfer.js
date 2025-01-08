@@ -46,7 +46,8 @@ frappe.ui.form.on("Internal Transfer", {
 
         validate = true
     },
-
+    after_save: function(frm) {
+    },
     refresh : function(frm){
         if (frm.doc.docstatus === 1   && frm.doc.status === "غير مسجلة") {
             frm.add_custom_button(__('تسجيل'), function () {
@@ -100,7 +101,7 @@ frappe.ui.form.on("Internal Transfer", {
             });
         }
 
-        if (frm.doc.docstatus === 1 && frm.doc.status === "مستلمة") {
+        if (frm.doc.docstatus === 1 && frm.doc.status === "مستلمة" || frm.doc.status === "غير مستلمة") {
             frm.add_custom_button(__('إلغاء'), function () {
                 frappe.confirm(
                     'هل انت متاكد من الإلغاء ؟',
@@ -124,6 +125,7 @@ frappe.ui.form.on("Internal Transfer", {
                     }
                 );
             });
+           
         }
     },
     without_profit : function(frm){
@@ -277,5 +279,4 @@ function reset_fields(frm){
     frm.set_value('debit','')
     frm.refresh_fields()
 }
-
 

@@ -3,15 +3,18 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import create_journal_entry as cr_j, get_account_for_branch,get_main_account,get_profit_account,get_temp_account
+from transfer.transfer.api import create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
 from frappe.utils import getdate, nowdate
-
+from .it_api import *
 
 class InternalTransfer(Document):
-	pass
+	def before_cancel(self):
+		self.status = "ملغية"
 
 
-
+def getDoc(docname):
+	return frappe.get_doc("Internal Transfer",docname)
+	 
 
 @frappe.whitelist()
 def handel_journal_entries_creation(docname):
@@ -214,9 +217,17 @@ def reverse_journal_entry(self,docname):
 		frappe.throw(f"An error occurred while reversing the Journal Entry: {str(e)}")
 
 @frappe.whitelist()
-def handel_cancellation():
-	pass
-
+def handel_cancellation(docname):
+	# 2 options cancel the journal entrey -> if he cancel during the day
+	# or revese it => if he cancel in another day
+	doc =frappe.get_doc("Internal Transfer",docname)
+	if is_posting_day_today(doc.posting_date) :
+		if(it_cancel_journal_entries(doc)):
+			doc.cancel()
+			frappe.msgprint("تم إلغاء الحوالة بنجاح")
+	else:
+		it_reverse_journal_entries(doc)
+		
 @frappe.whitelist()
 def transfer_completed(docname):
 	try:

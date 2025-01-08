@@ -1,6 +1,19 @@
 import frappe
 from frappe.model.document import Document
 from frappe.utils import getdate, nowdate
+from datetime import datetime
+#get all linked documetns by its cheque_no
+
+@frappe.whitelist()
+def get_journal_entries_by_cheque(doc):
+    # Fetch the custom document
+    
+    # Retrieve the related journal entries where the 'cheque_no' matches
+    journal_entries = frappe.get_all('Journal Entry', filters={'cheque_no': doc.name}, fields=['name', 'posting_date', 'total_debit', 'total_credit'])
+    
+    return journal_entries 
+
+
 @frappe.whitelist()
 def get_currency_remaining_qty(currency):
 	total_sold_qty = 0
@@ -195,3 +208,7 @@ def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=
 	
 	except Exception as e:
 		frappe.throw(f"Error while creating Journal Entry: {str(e)}")
+
+
+def is_posting_day_today(posting_date):
+    return posting_date == datetime.now().date()

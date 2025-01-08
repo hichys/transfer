@@ -168,12 +168,12 @@
    "label": "\u062e\u0627\u0631\u062c\u064a\u0629"
   },
   {
-   "default": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629",
+   "default": "\u0634\u0631\u0643\u0627\u062a",
    "depends_on": "eval:doc.checkbox_external_transfer",
    "fieldname": "select_external",
    "fieldtype": "Select",
    "label": "\u062e\u0627\u0631\u062c\u064a - \u0646\u0648\u0639\u0647\u0627",
-   "options": "\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0634\u0631\u0643\u0629\n\u062e\u0627\u0631\u062c\u064a"
+   "options": "\u0634\u0631\u0643\u0627\u062a\n\u062e\u0627\u0631\u062c\u064a"
   },
   {
    "fieldname": "section_break_flul",
@@ -397,7 +397,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-07 12:41:02.786674",
+ "modified": "2025-01-08 16:56:32.888174",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",
