@@ -1,6 +1,6 @@
 import frappe
 from frappe.model.document import Document
-
+from frappe.utils import getdate, nowdate
 @frappe.whitelist()
 def get_currency_remaining_qty(currency):
 	total_sold_qty = 0

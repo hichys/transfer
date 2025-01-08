@@ -1,7 +1,7 @@
 {
  "app": "transfer",
  "charts": [],
- "content": "[{\"id\":\"v_vwBg3AJ6\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u062a\u062d\u0648\u064a\u0644\u0627\u062a</span>\",\"col\":12}},{\"id\":\"grLsBLn215\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u0634\u0631\u0643\u0627\u062a\",\"col\":3}},{\"id\":\"wGPQpNTuCg\",\"type\":\"card\",\"data\":{\"card_name\":\"\u0641\u0631\u0648\u0639\",\"col\":4}}]",
+ "content": "[{\"id\":\"v_vwBg3AJ6\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u062a\u062d\u0648\u064a\u0644\u0627\u062a</span>\",\"col\":12}},{\"id\":\"grLsBLn215\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u062a\u062d\u0648\u064a\u0644 \u0634\u0631\u0643\u0627\u062a \u062f\u0627\u062e\u0644\u064a\",\"col\":4}},{\"id\":\"wGPQpNTuCg\",\"type\":\"card\",\"data\":{\"card_name\":\"\u0641\u0631\u0648\u0639\",\"col\":4}}]",
  "creation": "2025-01-03 19:12:58.742608",
  "custom_blocks": [],
  "docstatus": 0,
@@ -45,7 +45,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-01-07 02:07:29.896282",
+ "modified": "2025-01-08 00:37:03.798863",
  "modified_by": "awd@hotmail.it",
  "module": "transfer",
  "name": "\u062a\u062d\u0648\u064a\u0644\u0627\u062a",
@@ -64,8 +64,8 @@
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "\u0634\u0631\u0643\u0627\u062a",
-   "link_to": "company transfer",
+   "label": "\u062a\u062d\u0648\u064a\u0644 \u0634\u0631\u0643\u0627\u062a \u062f\u0627\u062e\u0644\u064a",
+   "link_to": "Internal Transfer",
    "stats_filter": "[]",
    "type": "DocType"
   }

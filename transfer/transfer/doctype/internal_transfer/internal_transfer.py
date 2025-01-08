@@ -34,11 +34,9 @@ def create_journal_entry(self,temp=False):
 
 	debit = self.debit
 	credit = self.credit
-
 	branch = self.branch
 	our_profit = self.our_profit
 	other_party_profit = self.other_party_profit
-	amount = self.amount + other_party_profit
 	from_party_name = self.from_company
 	to_party_name = self.to_company
 	
@@ -66,19 +64,25 @@ def create_journal_entry(self,temp=False):
 		debit_in_account_currency = 0
 		credit_in_account_currency = 0
 
+		# from company to branch 25  -  out_profit = 2 , other 5
+		# branch debit   27
+		# company credit 25 + out_profit(2)
+
 		if(self.from_type == "Customer"):
+			frappe.msgprint("من فرع الي شركة")
 			from_type = "Customer"
 			from_party_type = from_party_name
 			to_type = ""
 			to_party_type = ""
-			debit_in_account_currency =  amount + our_profit
-			credit_in_account_currency = amount  
+			debit_in_account_currency =  self.amount  + our_profit 
+			credit_in_account_currency = self.amount  
 		else :
 			if(self.to_type == "Customer" and self.from_type != "Customer"):
+				frappe.msgprint("من شركة الي فرع")
 				to_type = "Customer"
 				to_party_type = to_party_name
-				debit_in_account_currency =  amount + our_profit + other_party_profit
-				credit_in_account_currency = amount  + other_party_profit  
+				debit_in_account_currency =  self.amount  + other_party_profit +our_profit
+				credit_in_account_currency = self.amount   + other_party_profit  
 				from_type = ""
 				from_party_type = ""
 	 
@@ -104,13 +108,22 @@ def create_journal_entry(self,temp=False):
 			}
 		]
 		# Add an entry for out_proft if not 0
-		if our_profit != 0:
-			accounts.append({
-				"account": profit_account,
-				"branch": branch,
-				"debit_in_account_currency": 0,
-				"credit_in_account_currency": our_profit,
-			})	
+		if(self.from_type == "Customer"):
+			if our_profit != 0:
+				accounts.append({
+					"account": profit_account,
+					"branch": branch,
+					"debit_in_account_currency": 0,
+					"credit_in_account_currency": our_profit,
+				})	
+		else:
+			if our_profit != 0:
+				accounts.append({
+					"account": profit_account,
+					"branch": branch,
+					"debit_in_account_currency": 0,
+					"credit_in_account_currency": our_profit,
+				})			
 		# Add an entry for other_party_profit if not 0
 	 
 
@@ -130,8 +143,9 @@ def create_journal_entry(self,temp=False):
 		# Save and Submit the Journal Entry
 		journal_entry.insert(ignore_permissions=True)
 		journal_entry.submit()
-		self.journal_entry = journal_entry.name
-
+		#self.journal_entry = journal_entry.name
+		self.status = "غير مستلمة"
+		self.save()
 		frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
 
 		return {
@@ -198,3 +212,14 @@ def reverse_journal_entry(self,docname):
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Error in Reversing Journal Entry")
 		frappe.throw(f"An error occurred while reversing the Journal Entry: {str(e)}")
+
+@frappe.whitelist()
+def handel_cancellation():
+	pass
+
+@frappe.whitelist()
+def transfer_completed(docname):
+	doc = frappe.get_doc("Internal Transfer",docname)
+	doc.status = "مستلمة"
+	doc.save()
+	frappe.db.commit()
