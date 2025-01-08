@@ -7,9 +7,7 @@
 let type = 2;
 frappe.ui.form.on("Internal Transfer", {
 
-    setup: function(frm){
-    
-    },
+   
     /**
      * التاكد من ان حقل المرسل والستقبل يحتوي علي قيم صحيحه
      * 
@@ -149,6 +147,7 @@ frappe.ui.form.on("Internal Transfer", {
     select_internal:function (frm){
 
         
+        
 
         if(frm.doc.select_internal == "من شركة الي فرع"){
             frappe.show_alert("من شركة الي فرع 2525");
@@ -180,12 +179,15 @@ frappe.ui.form.on("Internal Transfer", {
 
         //clear field for new inputs
       
-        frm.fields_dict['from_company'].set_value("")
-        frm.fields_dict['branch'].set_value("")
-        frm.fields_dict['to_company'].set_value("")
-        
-        frm.refresh_fields()
-         
+        if(frm.select_internal)
+            {
+                frm.fields_dict['from_company'].set_value("")
+                frm.fields_dict['branch'].set_value("")
+                frm.fields_dict['to_company'].set_value("")
+                
+                frm.refresh_fields()
+             
+            }
     },
     without_profit: function(frm){
 

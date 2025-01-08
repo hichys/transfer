@@ -143,3 +143,55 @@ def get_profit_account(branch):
 def get_temp_account(branch):
 	return get_account_for_branch(branch,2);
 
+import frappe
+from frappe.utils import nowdate
+
+def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=None, posting_date=None, remarks=None):
+	try:
+		# Validate inputs
+		if not from_account or not to_account:
+			frappe.throw("Both From Account and To Account must be specified.")
+		if not amount:
+			frappe.throw("Amount must be greater than zero.")
+		
+		# Use today's date if posting_date is not provided
+		posting_date = posting_date or nowdate()
+		remarks = remarks or f""
+
+		branch = branch or ""
+		cheque_no = cheque_no or ""
+		# Create the Journal Entry document
+
+		accounts = [
+				{
+					"account": from_account,
+					"debit_in_account_currency": 0,
+					"credit_in_account_currency": amount,
+				},
+				{
+					"account": to_account,
+					"credit_in_account_currency": 0,
+					"debit_in_account_currency": amount,
+				}
+			]
+
+		journal_entry = frappe.get_doc({
+			"doctype": "Journal Entry",
+			"posting_date": posting_date,
+			"voucher_type": "Journal Entry",
+			"accounts": accounts,
+			"user_remark": remarks,
+			"branch" : branch,
+			"cheque_no": cheque_no,
+			"cheque_date": frappe.utils.nowdate(),
+		})
+		
+		# Insert and submit the Journal Entry
+		journal_entry.insert()
+		journal_entry.submit()
+		
+		frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
+		return journal_entry.name
+	
+	except Exception as e:
+		frappe.throw(f"Error while creating Journal Entry: {str(e)}")

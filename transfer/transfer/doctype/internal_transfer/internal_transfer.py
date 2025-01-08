@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import get_account_for_branch,get_main_account,get_profit_account,get_temp_account
+from transfer.transfer.api import create_journal_entry as cr_j, get_account_for_branch,get_main_account,get_profit_account,get_temp_account
 from frappe.utils import getdate, nowdate
 
 
@@ -219,7 +219,28 @@ def handel_cancellation():
 
 @frappe.whitelist()
 def transfer_completed(docname):
-	doc = frappe.get_doc("Internal Transfer",docname)
-	doc.status = "مستلمة"
-	doc.save()
-	frappe.db.commit()
+	try:
+		doc = frappe.get_doc("Internal Transfer",docname)
+
+		if doc.from_type == "Customer" :
+			cr_j(
+				from_account= get_temp_account(doc.branch),
+				to_account=  get_main_account(doc.branch),
+				branch=	doc.branch,
+				amount=	doc.amount,
+				cheque_no=docname,
+				posting_date=None, 
+				remarks=None
+			)
+		doc.status = "مستلمة"
+		doc.save()
+		frappe.db.commit()
+		
+	except frappe.exceptions.ValidationError as ve:
+		# Handle specific Frappe validation errors
+		frappe.throw(f"Validation Error: {str(ve)}")
+
+	except Exception as e:
+		# Handle other exceptions with error logging
+		frappe.log_error(message=str(e), title="Transfer Completion Error")
+		frappe.throw(f"Unexpected Error Occurred. Contact support with code #6666: {str(e)}")

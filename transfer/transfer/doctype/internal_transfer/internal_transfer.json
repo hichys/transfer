@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:CIT-{branch}.{#####}",
+ "autoname": "format:CIT.{#####}",
  "creation": "2025-01-07 12:44:27.837129",
  "default_view": "List",
  "doctype": "DocType",
@@ -73,6 +73,7 @@
    "default": "\u063a\u064a\u0631 \u0645\u0633\u062c\u0644\u0629",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_standard_filter": 1,
    "label": "\u0627\u0644\u062d\u0627\u0644\u0629",
    "options": "\u063a\u064a\u0631 \u0645\u0633\u062c\u0644\u0629\n\u063a\u064a\u0631 \u0645\u0633\u062a\u0644\u0645\u0629\n\u0645\u0633\u062a\u0644\u0645\u0629\n\u0645\u0644\u063a\u064a\u0629",
    "reqd": 1
@@ -131,7 +132,8 @@
    "fieldtype": "Link",
    "label": "to_type",
    "options": "DocType",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "column_break_glph",
@@ -270,7 +272,7 @@
    "fieldname": "our_profit",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629",
+   "label": "\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0641\u0631\u0639",
    "precision": "2",
    "reqd": 1
   },
@@ -327,7 +329,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-08 01:55:08.490761",
+ "modified": "2025-01-08 16:01:18.811888",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Internal Transfer",
