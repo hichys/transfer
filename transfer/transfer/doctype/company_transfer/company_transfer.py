@@ -15,9 +15,9 @@ class companytransfer(Document):
 		if(self.our_profit + self.other_party_profit > self.profit):
 			frappe.throw("الرجاء التاكد من قيمة العمولة")
 	def before_save(self):
-		if not self.journal_entry:
-			create_journal_entry(self)
-  
+		# if not self.journal_entry:
+		# 	create_journal_entry(self)
+		pass
    
 	def after_cancel(self):
 		self.status = "ملغية"

@@ -1,15 +1,65 @@
 // Copyright (c) 2024, a and contributors
 // For license information, please see license.txt
-
+let type = 1;
 frappe.ui.form.on('company transfer', {
-            onload: function(frm) {
-                if (frm.doc.amended_from) {
-                    frappe.show_alert("تم تعديل الحوالة");
-                    frm.set_value("profit_account", ""); // Replace with your fieldname
-                    frm.set_value("journal_entry", ""); // Replace with your fieldname
-                    frm.set_value("status", "غير مستلمة");
+
+    validate: function(frm) {
+        if (type === 1) { //من شركة الي شركة
+            
+ 
+            
+            frappe.call({
+                method: "frappe.client.get_list",
+                args: {
+                    doctype: "Customer",
+                    filters: { name: frm.doc.from_company },
+                    fields: ["name"]
+                },
+                callback: function(response) {
+                    if (!response.message || response.message.length === 0) {
+                        frappe.msgprint(__('The company "{0}" is not linked to any customer.', [frm.doc.from_company]));
+                        frappe.validated = false;
+                    }
                 }
-            },
+            });
+        }
+        else{
+            if(type === 2)
+            {
+                if(frm.doc.branch !== frm.doc.from_company)
+                    frappe.throw(('الرجاء التاكد من الفرع'));
+            }
+        }
+        if ((frm.doc.our_profit + frm.doc.other_party_profit )> frm.doc.amount) {
+            frappe.throw(('الرجاء التحقق من القيمه والعمولات'));
+        }
+
+        validate = true
+    },
+    onload: function(frm) {
+        if(frm.doc.__islocal){
+            //default setting is من شركة الي شركة(شركات) Debtors - A
+            frappe.show_alert("الرجاء اخال المعلومات ومراجعتها ثم الحفظ");
+            frm.set_value("status", "غير مستلمة");
+            frm.set_value("debit", "Debtors - A");
+            frm.set_value("credit", "Debtors - A");
+            frm.set_value("to_type", "Customer");
+            frm.set_value("from_type", "Customer");
+            frm.set_value("branch", "العالمية الفرناج");
+            type = 1;
+
+        }
+        if (frm.is_new()) {
+            // This block runs only if the document is being created for the first time
+            frappe.show_alert(__('This is a new document.'));
+        }
+        if (frm.doc.amended_from) {
+            frappe.show_alert("تم تعديل الحوالة");
+            frm.set_value("profit_account", ""); // Replace with your fieldname
+            frm.set_value("journal_entry", ""); // Replace with your fieldname
+            
+        }
+    },
 
     profit_is_splited: function (frm) {
         //make our_profit and other_party_profit same
@@ -38,103 +88,54 @@ frappe.ui.form.on('company transfer', {
         frm.set_value('our_profit', frm.doc.profit);
         frm.set_value('other_party_profit', 0);
     },
-    checkbox_external_transfer: function (frm) {
-        if (frm.doc.checkbox_external_transfer  ) {
-            frappe.show_alert("تحويلة خارجية");
-            frm.set_value("checkbox_internal_transfer", 0);
-            frm.set_value('branch', 'العالمية الفرناج').then(() => {
-            });
-            
-            frm.set_df_property("branch", "read_only", 0);
-            frm.set_df_property("to_company", "read_only", 0);
-            
-            
-            frm.fields_dict['from_type'].set_value("Customer");
-            frm.fields_dict['to_type'].set_value("Customer");
-        }  
-        
-    },
     select_external:function (frm){
 
-       
-            reset_fields(frm);
-            if(frm.doc.select_external == "من شركة الي شركة"){
-                frm.fields_dict['from_type'].set_value("Customer");
-                frm.fields_dict['to_type'].set_value("Customer");
-            }
-    
-            if(frm.doc.select_external == "خارجي"){
-                frm.set_value('from_company',frm.branch);
-                frm.reset_fields()
-                frm.fields_dict['from_type'].set_value("Branch");
-                frm.fields_dict['to_type'].set_value("Customer");
-                
-            }
-     
-     
-    },
-    select_internal:function (frm){
-        if(frm.doc.select_internal == "من شركة الي فرع"){
-            frappe.show_alert("من شركة الي فرع 2525");
-           
-            frm.fields_dict['from_type'].set_value("Customer");
-            frm.fields_dict['to_type'].set_value("Branch");
-             
-        }
-        if(frm.doc.select_internal == "من فرع الي شركة"){
-            frappe.show_alert("من شركة الي فرع 2525");
-             
-            frm.fields_dict['from_type'].set_value("Branch");
-            frm.fields_dict['to_type'].set_value("Customer");
-             
-        }
-         
-    },
-    checkbox_internal_transfer: function (frm) {
-        if (frm.doc.checkbox_internal_transfer) {
-            frappe.show_alert("تحويلة داخلية");
-            frm.set_value("checkbox_external_transfer", 0);
-            frm.set_value('branch', 'العالمية الفرناج').then(() => {
-                
-            });
-            frm.fields_dict['from_type'].set_value("Customer");
-            frm.fields_dict['to_type'].set_value("Branch");
-            // set branch title to : الي فرع 
-            frm.set_df_property("branch", "label", "من فرع ؟");
-        
-            // Make the field read-only (disabled)
+        if(frm.doc.select_external === "شركات"){
             frm.set_df_property("branch", "read_only", 1);
-            frm.set_df_property("to_company", "read_only", 1);
 
-            // Refresh the field to apply the changes
-            frm.refresh_field("branch");
-        } 
+        }
+        else{
+            frm.set_df_property("branch", "read_only", 0);
+        }
+            //reset_fields(frm);
+            if(frm.doc.select_external){
+                if(frm.doc.select_external === "شركات"){
+                    type = 1;
+                    frm.fields_dict['from_type'].set_value("Customer");
+                    frm.fields_dict['to_type'].set_value("Customer");
+                }
+        
+                if(frm.doc.select_external === "خارجي"){
+                    type = 2;
+                    frm.set_value('from_company',frm.branch);
+                    frm.fields_dict['from_type'].set_value("Branch");
+                    frm.fields_dict['to_type'].set_value("Customer");
+                    
+                }
+            }
+     
+     
     },
     from_company: function (frm) {
-       if(frm.doc.checkbox_external_transfer)
-       {
+
             //  frm.set_value('debit',"Debtors - A" );
-       }
+
     },
     to_company: function (frm) {
-        // Refresh logic if needed
-        frm.set_value('credit',"Debtors - A" );
+        
     },
     to_type: function(frm) {
-        frm.refresh_fields(); 
+       
     },
     from_type: function(frm){
-        frm.refresh_fields()
     },
     branch:function(frm){
-        if(frm.select_external === "خارجي"){
-            frappe.msgprint(frm.doc.branch)
-            frm.set_value('from_company',frm.doc.branch)
-            frm.refresh_fields();
-        }
+        
+        //old code
+        
         if(frm.doc.branch){
             if(frm.doc.from_type == "Branch"){
-                frm.fields_dict['from_company'].set_value(frm.doc.branch);
+                frm.set_value("from_company",frm.doc.branch);
                 frm.set_df_property("from_company", "read_only", 1);
             }
             
@@ -154,6 +155,7 @@ frappe.ui.form.on('company transfer', {
                 },
                 error: function(error) {
                     frappe.msgprint(__('لا يوجد حساب لهذا الفرع'));
+                    frm.set_value("branch",null)
                 }
             });
             
