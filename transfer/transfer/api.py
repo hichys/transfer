@@ -2,6 +2,8 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import getdate, nowdate
 from datetime import datetime
+import re
+
 #get all linked documetns by its cheque_no
 
 @frappe.whitelist()
@@ -212,3 +214,11 @@ def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=
 
 def is_posting_day_today(posting_date):
     return posting_date == datetime.now().date()
+
+@frappe.whitelist()
+def extract_phone_number(text):
+    # Regular expression to match numbers starting with 09 and followed by 8 digits
+    match = re.search(r'\b09\d{8}\b', text)
+    if match:
+        return match.group(0)
+    return None

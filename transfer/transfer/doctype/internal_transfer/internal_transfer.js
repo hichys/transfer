@@ -7,6 +7,11 @@
 let type = 2;
 frappe.ui.form.on("Internal Transfer", {
 
+    onload: function(frm){
+        frm.set_value("to_type","Customer")
+        frm.set_value("from_type","Branch")
+    },
+
    
     /**
      * التاكد من ان حقل المرسل والستقبل يحتوي علي قيم صحيحه

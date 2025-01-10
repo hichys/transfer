@@ -4,13 +4,21 @@
 # import frappe
 from frappe.model.document import Document
 import frappe
-from transfer.transfer.api import get_account_for_branch
-from frappe.utils import getdate, nowdate
+from transfer.transfer.api import get_journal_entries_by_cheque, get_account_for_branch,extract_phone_number , is_posting_day_today, reverse_journal_entry
+from frappe.utils import getdate, nowdate 
 
 class companytransfer(Document):
 	
 	def create_company_transfer():
 		frappe.msgprint("Company Transfer Created")
+  
+	def on_submit(self):
+		if(self.status == "غير مسجلة"):
+			handle_creation(self.name,"submit")
+		
+	def on_cancel(self):
+		if(self.docstatus == 2):
+			self.status = "ملغية"
 	def before_insert(self):
 		if(self.our_profit + self.other_party_profit > self.profit):
 			frappe.throw("الرجاء التاكد من قيمة العمولة")
@@ -23,10 +31,10 @@ class companytransfer(Document):
 		self.status = "ملغية"
 		frappe.msgprint("تم الغاء العملية")
   
-	def before_cancel(self):
-		if self.docstatus == 1:  # Check if the document is in draft state
-				# Cancel directly without journal entry handling
-					self.status = "ملغية"
+	def after_cancel(self):
+		if self.docstatus == 2:  # Check if the document is in draft state
+			# Cancel directly without journal entry handling
+			self.status = "ملغية"
 	def on_cancel(self):
 	 
 	
@@ -66,14 +74,27 @@ class companytransfer(Document):
 		except Exception as main_error:
 			frappe.log_error(frappe.get_traceback(), "Error in on_cancel method")
 			frappe.throw(f"An error occurred during cancellation: {str(main_error)}")
-
-			
-   
+@frappe.whitelist()
+def get_branch():
+	return "العالمية الفرناج"
+def getSelf(docname):
+	return frappe.get_doc('company transfer', docname)
+@frappe.whitelist()
+def handle_creation(docname,method="submit"):
+	
+	doc = getSelf(docname)
+	doc.status = "غير مستلمة"
+	doc.submit()
+	create_journal_entry(doc)	
+	frappe.db.commit()
+	frappe.publish_realtime('doc_update', {"docname": docname, "status": doc.status})
+	
+ 
+ 
 @frappe.whitelist()
 def create_journal_entry(self):
 	debit = self.amount
 	credit = self.execution_amount
-	profit = self.profit
 	our_profit = self.our_profit
 	profit_account = get_account_for_branch(self.branch, 1)  # حساب العمولات
 	branch = self.branch
@@ -84,7 +105,7 @@ def create_journal_entry(self):
 		journal_entries = frappe.get_all("Journal Entry", filters={"cheque_no": self.name})
 		if journal_entries:
 			frappe.log_error(frappe.get_traceback(), "Error in Creating Journal Entry")
-			frappe.thrown(f"الحوالة مسجلة مسبقا{str(e)}")
+			frappe.throw(f"الحوالة مسجلة مسبقا {journal_entries[0].name}")
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Error in Creating Journal Entry")
 		frappe.throw(f"An error occurred while creating the Journal Entry: {str(e)}")
@@ -94,15 +115,15 @@ def create_journal_entry(self):
 		if not (debit and credit and profit_account):
 			frappe.throw("Debit, Credit, and Profit Account must be specified.")
 
-		# Prepare accounts for the Journal Entry
-		accounts = [
+		if self.from_type == "Branch":
+			accounts = [
 			{
 				"account": self.debit,  # Specify the debit account
 				"branch": branch,
-				"party_type": "Customer",
-				"party": from_party_name,
-				"debit_in_account_currency": debit,
-				"credit_in_account_currency": 0,
+				"party_type": "",
+				"party": "",
+				"debit_in_account_currency": self.amount + self.profit,
+				"credit_in_account_currency": 0
 			},
 			{
 				"account": self.credit,  # Specify the credit account
@@ -110,9 +131,29 @@ def create_journal_entry(self):
 				"party_type": "Customer",
 				"party": to_party_name,
 				"debit_in_account_currency": 0,
-				"credit_in_account_currency": credit,
+				"credit_in_account_currency": self.execution_amount - self.our_profit ,
 			}
 		]
+		else:
+		# Prepare accounts for the Journal Entry
+			accounts = [
+				{
+					"account": self.debit,  # Specify the debit account
+					"branch": branch,
+					"party_type": "Customer",
+					"party": from_party_name,
+					"debit_in_account_currency": credit ,
+					"credit_in_account_currency": 0,
+				},
+				{
+					"account": self.credit,  # Specify the credit account
+					"branch": branch,
+					"party_type": "Customer",
+					"party": to_party_name,
+					"debit_in_account_currency": 0,
+					"credit_in_account_currency": debit + other_party_profit,
+				}
+			]
 		# Add an entry for out_proft if not 0
 		if our_profit != 0:
 			accounts.append({
@@ -122,15 +163,15 @@ def create_journal_entry(self):
 				"credit_in_account_currency": our_profit,
 			})	
 		# Add an entry for other_party_profit if not 0
-		if other_party_profit != 0:
-			accounts.append({
-				"account": self.credit,
-				"branch": branch,
-				"party_type": "Customer",
-				"party": to_party_name,
-				"debit_in_account_currency": 0,
-				"credit_in_account_currency": other_party_profit,
-			})
+		# if other_party_profit != 0:
+		# 	accounts.append({
+		# 		"account": self.credit,
+		# 		"branch": branch,
+		# 		"party_type": "Customer",
+		# 		"party": to_party_name,
+		# 		"debit_in_account_currency": 0,
+		# 		"credit_in_account_currency": other_party_profit,
+		# 	})
 
 
 		# Construct the Journal Entry document
@@ -150,8 +191,8 @@ def create_journal_entry(self):
 		journal_entry.submit()
 		self.journal_entry = journal_entry.name
 
-		frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
-
+		# frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
+		self.status = "غير مستلمة"
 		return {
 			"status": "success",
 			"journal_entry": journal_entry.name
@@ -229,8 +270,8 @@ def handle_recived_transfer(docname,method):
 	 
 	if doc.docstatus == 1:  # Check if the document is submitted
 		if doc.status == "غير مستلمة":
-			frappe.msgprint(f"Document {docname} is in the status: {doc.status}")
 			doc.status = "مستلمة"
+			frappe.msgprint(f"Document {docname} is in the status: {doc.status}")
 			doc.save()
 			frappe.db.commit()
 		
@@ -247,29 +288,39 @@ def handle_cancel_transfer(docname,method="cancel"):
 
 	frappe.msgprint("caling handle_cancel_transfer;")
 	if doc.docstatus == 1  :  # Check if the document is submitted
-		
-		frappe.msgprint("attempt to cancel")
-		frappe.msgprint(f"{doc.docstatus}")
-		doc.status = "ملغية"
-		doc.cancel()
-		
+		if is_posting_day_today(doc.posting_date) :
+			frappe.msgprint(f"attempt to cancel {doc.docstatus}")
+			doc.status = "ملغية"
+			doc.save()
+			frappe.db.commit()
+			doc.cancel()
+		else :
+			handel_reverse(doc)
+			doc.status = "ملغية"
+			doc.save()
+			frappe.db.commit()
+			
 		
 	else:
 		if method == "cancel" :
 			frappe.throw("The document is not submitted.")
 
-
+@frappe.whitelist()
+def handel_reverse(doc):
+	journal_entry = get_journal_entries_by_cheque(doc)
+	reverse_journal_entry(self=journal_entry[0],docname=doc.name)
 #wrapper to call api function and get branch account
 
 #الحساب الرئيسي
 @frappe.whitelist()
 def get_main_account(branch):
-	return get_account_for_branch(branch,0);
+	return get_account_for_branch(branch,0)
 @frappe.whitelist()
 #معلقات
 def get_profit_account(branch):
-	return get_account_for_branch(branch,1);
+	return get_account_for_branch(branch,1)
 #ارباح
 @frappe.whitelist()
 def get_temp_account(branch):
-	return get_account_for_branch(branch,2);
+	return get_account_for_branch(branch,2)
+

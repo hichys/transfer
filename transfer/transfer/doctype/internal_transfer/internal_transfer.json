@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:CIT.{#####}",
+ "autoname": "format:CIT-{YY}{MM}{DD}{#####}",
  "creation": "2025-01-07 12:44:27.837129",
  "default_view": "List",
  "doctype": "DocType",
@@ -329,7 +329,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-08 17:32:54.385493",
+ "modified": "2025-01-10 04:31:21.306555",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Internal Transfer",
