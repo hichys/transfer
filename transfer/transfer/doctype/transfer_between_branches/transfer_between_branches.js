@@ -70,7 +70,7 @@ frappe.ui.form.on('transfer between branches', {
 		if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
 			frm.add_custom_button(__('تسجيل'), function () {
 				frappe.confirm(
-					"هل أنت متأكد أنك تسجيل؟",
+					"هل تم استلام المبلغ ؟",
 					() => {
 						frappe.call({
 							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
@@ -170,33 +170,33 @@ frappe.ui.form.on('transfer between branches', {
         // Add a custom button for workflow_state "تم التسليم"
       
 
-			frm.add_custom_button(__('حــذف نهائي'), function () {
-				frappe.confirm(
-					'هل انت متاكد ?',
-					function () {
-						// Call the server-side method to delete the current document
-						frappe.call({
-							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc',
-							args: {
-								docname: frm.doc.name,
-								method : "submit"
-							},
-							callback: function (response) {
-								if (response.message.status === 'success') {
-									frappe.msgprint(response.message.message);
-									frappe.set_route('List', 'transfer between branches');
-								} else {
-									frappe.msgprint({
-										title: __('Error'),
-										message: response.message.message,
-										indicator: 'red'
-									});
-								}
-							}
-						});
-					}
-				);
-			});
+			// frm.add_custom_button(__('حــذف نهائي'), function () {
+			// 	frappe.confirm(
+			// 		'هل انت متاكد ?',
+			// 		function () {
+			// 			// Call the server-side method to delete the current document
+			// 			frappe.call({
+			// 				method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc',
+			// 				args: {
+			// 					docname: frm.doc.name,
+			// 					method : "submit"
+			// 				},
+			// 				callback: function (response) {
+			// 					if (response.message.status === 'success') {
+			// 						frappe.msgprint(response.message.message);
+			// 						frappe.set_route('List', 'transfer between branches');
+			// 					} else {
+			// 						frappe.msgprint({
+			// 							title: __('Error'),
+			// 							message: response.message.message,
+			// 							indicator: 'red'
+			// 						});
+			// 					}
+			// 				}
+			// 			});
+			// 		}
+			// 	);
+			// });
 		   }
 	});
 
@@ -407,6 +407,16 @@ frappe.ui.form.on('transfer between branches', {
 				}
 			}
 			
+			}
+		},
+		whatsapp_desc: function(frm){
+			if (frm.doc.whatsapp_desc) {
+				let phoneNumber = extract_phone_number(frm.doc.whatsapp_desc);
+				frm.set_value("phone_number", phoneNumber); // Set the phone number field
+				frappe.show_alert({
+					message: phoneNumber === "ادخل يدويا" ? "لا يمكن استخراج الرقم. ادخله يدوياً" : `تم استخراج الرقم: ${phoneNumber}`,
+					indicator: phoneNumber === "ادخل يدويا" ? "red" : "green"
+				});
 			}
 		}
 	});

@@ -215,10 +215,19 @@ def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=
 def is_posting_day_today(posting_date):
     return posting_date == datetime.now().date()
 
-@frappe.whitelist()
-def extract_phone_number(text):
-    # Regular expression to match numbers starting with 09 and followed by 8 digits
-    match = re.search(r'\b09\d{8}\b', text)
-    if match:
-        return match.group(0)
-    return None
+# @frappe.whitelist()
+# def extract_phone_number(whatsapp_desc):
+#     try:
+#         # Clean the text to remove spaces and hyphens
+#         cleaned_text = whatsapp_desc.replace(" ", "").replace("-", "")  # Remove spaces and hyphens
+
+#         # Match a phone number pattern with or without the country code
+#         match = re.match(r'(?:\+?218)?0?(9[1234]\d{7})', cleaned_text)
+
+#         if match:
+#             return '0' + match.group(1)  # Return the matched phone number
+#         else:
+#             return "ادخل يدويا"  # Fallback if no match
+#     except Exception as error:
+#         print("Error in extract_phone_number:", error)
+#         return "ادخل يدويا"  # Fallback for unexpected errors

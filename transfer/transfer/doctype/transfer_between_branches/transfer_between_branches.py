@@ -381,11 +381,13 @@ def create_journal_entry_from_handed_transfer(doc, method):
 		"accounts": [
 			{
 				"account": debit_to_liabilities,
+				"branch":doc.to_branch,
 				"debit_in_account_currency": doc.amount,
 				"credit_in_account_currency": 0,
 			},
 			{
 				"account": credit_to_account,
+				"branch" :doc.to_branch,
 				"debit_in_account_currency": 0,
 				"credit_in_account_currency": doc.amount,
 			}
@@ -425,7 +427,8 @@ def reverse_journal_entry(docname):
 				"credit_in_account_currency": line.debit_in_account_currency,
 				"cost_center": line.cost_center,
 				"party_type": line.party_type,
-				"party": line.party
+				"party": line.party,
+				"branch": line.branch
 				
 			})
 

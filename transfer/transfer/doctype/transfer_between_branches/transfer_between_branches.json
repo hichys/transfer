@@ -3,6 +3,7 @@
  "autoname": "format:TBB-{DD}-{MM}-{YY}-{#####}",
  "creation": "2024-12-25 17:37:12.404320",
  "doctype": "DocType",
+ "document_type": "Other",
  "engine": "InnoDB",
  "field_order": [
   "section_break_baym",
@@ -28,7 +29,8 @@
   "total_profit",
   "our_profit",
   "other_party_profit",
-  "split_profit"
+  "split_profit",
+  "phone_number"
  ],
  "fields": [
   {
@@ -178,7 +180,6 @@
    "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0643\u0644\u064a\u0629",
    "non_negative": 1,
    "precision": "2",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -215,6 +216,11 @@
    "fieldname": "split_profit",
    "fieldtype": "Check",
    "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0645\u0642\u0633\u0648\u0645\u0647 \u0639\u0644\u064a \u0627\u0644\u0641\u0631\u0648\u0639"
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "label": "\u0631\u0642\u0645 \u0627\u0644\u0645\u0633\u062a\u0644\u0645"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -225,7 +231,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-06 11:59:49.319450",
+ "modified": "2025-01-11 02:58:11.516123",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",

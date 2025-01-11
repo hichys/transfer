@@ -4,7 +4,7 @@
 # import frappe
 from frappe.model.document import Document
 import frappe
-from transfer.transfer.api import get_journal_entries_by_cheque, get_account_for_branch,extract_phone_number , is_posting_day_today, reverse_journal_entry
+from transfer.transfer.api import get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
 from frappe.utils import getdate, nowdate 
 
 class companytransfer(Document):
@@ -124,7 +124,7 @@ def create_journal_entry(self):
 				"party": "",
 				"debit_in_account_currency": self.amount + self.profit,
 				"credit_in_account_currency": 0
-			},
+			}, 
 			{
 				"account": self.credit,  # Specify the credit account
 				"branch": branch,

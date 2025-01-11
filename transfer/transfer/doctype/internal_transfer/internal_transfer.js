@@ -264,15 +264,16 @@ frappe.ui.form.on("Internal Transfer", {
     from_type: function(frm){
          
     },
-    
-
-
-    
-
-
-
-
-
+    whatsapp_desc:function(frm){
+        if (frm.doc.whatsapp_desc) {
+            let phoneNumber = extract_phone_number(frm.doc.whatsapp_desc);
+            frm.set_value("phone_number", phoneNumber); // Set the phone number field
+            frappe.show_alert({
+                message: phoneNumber === "ادخل يدويا" ? "لا يمكن استخراج الرقم. ادخله يدوياً" : `تم استخراج الرقم: ${phoneNumber}`,
+                indicator: phoneNumber === "ادخل يدويا" ? "red" : "green"
+            });
+        }
+    }
     
 });
 function reset_fields(frm){
