@@ -4,14 +4,21 @@
 # import frappe
 from frappe.model.document import Document
 import frappe
-from transfer.transfer.api import get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
+from transfer.transfer.api import validate_linked_journal_entries,get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
 from frappe.utils import getdate, nowdate 
 
 class companytransfer(Document):
-	
+	# def after_save(doc, method):
+	# 	if doc.docstatus == 1:  # Document is submitted
+	# 		frappe.publish_realtime(
+	# 			"msgprint",
+	# 			{"message": _("Document has been updated. Please reload."), "alert": 1},
+	# 			user=frappe.session.user
+	# 		)
 	def create_company_transfer():
 		frappe.msgprint("Company Transfer Created")
-  
+	def before_cancel(self):
+		validate_linked_journal_entries(self.name)	
 	def on_submit(self):
 		if(self.status == "غير مسجلة"):
 			handle_creation(self.name,"submit")
@@ -66,7 +73,7 @@ class companytransfer(Document):
 				
 				
 					frappe.msgprint("Document canceled successfully from Draft state.")
-					
+	 				
  
 			except Exception as journal_error:
 				frappe.log_error(frappe.get_traceback(), "Error handling Journal Entry")
@@ -130,6 +137,7 @@ def create_journal_entry(self):
 				"branch": branch,
 				"party_type": "Customer",
 				"party": to_party_name,
+				# "is_advance":"Yes",
 				"debit_in_account_currency": 0,
 				"credit_in_account_currency": self.execution_amount - self.our_profit ,
 			}

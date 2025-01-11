@@ -215,6 +215,41 @@ def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=
 def is_posting_day_today(posting_date):
     return posting_date == datetime.now().date()
 
+
+#قبل الإلغاء التاكد من ان الجورنال قد لغيت او عكست
+def validate_linked_journal_entries(docname, link_fields=["cheque_no"]):
+    """
+    Validate that all Journal Entries linked to the given document are either canceled,
+    reversed (custom_reversed_by set), or have a reversal_of field set.
+
+    Args:
+        docname (str): The name of the document being checked.
+        link_fields (list): The fields in Journal Entry used to link to the document.
+
+    Raises:
+        frappe.ValidationError: If any linked Journal Entries do not meet the required criteria.
+    """
+    for link_field in link_fields:
+        # Fetch all linked Journal Entries
+        journal_entries = frappe.get_all(
+            "Journal Entry",
+            filters={
+                link_field: docname,
+                "docstatus": ["!=", 2],  # Not canceled
+                "custom_reversed_by": ["is", "not set"],  # Not reversed
+                "reversal_of": ["is", "not set"]  # Not a reversal
+            },
+            fields=["name", "docstatus", "custom_reversed_by", "reversal_of"]
+        )
+
+        # If any Journal Entries do not meet the criteria
+        if journal_entries:
+            linked_entries = ", ".join([entry["name"] for entry in journal_entries])
+            frappe.throw(
+                ("Cannot cancel this document because the following Journal Entries are not canceled or reversed: {0}")
+                .format(linked_entries)
+            )
+
 # @frappe.whitelist()
 # def extract_phone_number(whatsapp_desc):
 #     try:

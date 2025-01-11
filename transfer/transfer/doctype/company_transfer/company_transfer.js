@@ -161,8 +161,8 @@ frappe.ui.form.on('company transfer', {
         frm.set_value('other_party_profit', 0);
         if(frm.doc.profit )
         {
-            if(!frm.doc.execution_amount)
             frm.set_value("execution_amount",frm.doc.amount + frm.doc.profit)
+            
         }
     },
     select_external: function (frm) {
@@ -294,7 +294,7 @@ function calculate_profit_or_loss(frm) {
     const execution_amount = frm.doc.execution_amount || 0;
 
     if (amount > 0 && execution_amount > 0) {
-        const profit = amount - execution_amount;
+        const profit =    execution_amount - amount;
 
         // Update profit field
         frm.set_value('profit', profit);

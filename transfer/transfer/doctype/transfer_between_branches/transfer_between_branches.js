@@ -1,29 +1,30 @@
 // Copyright (c) 2024, a and contributors
 // For license information, please see license.txt
-frappe.ui.form.on('transfer between branches', {
-    before_workflow_action:function (frm, action) {
-        if (action === "إلغاء الحوالة") {
-            try {
-                // Proceed with server-side cancellation
-                frappe.call({
-                    method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_cancel",
-                    args: {
-                        docname: frm.doc.name,
-						method:"cancel"
-                    },
-                    callback: function (r) {
-                        if (!r.exc) {
-                            frappe.msgprint("تم إلغاء المستند بنجاح.");
-                            frm.reload_doc();
-                        }
-                    }
-                });
-            } catch (error) {
-                frappe.throw("تم إلغاء الإجراء.");
-            }
-        }
-    }
-});
+// frappe.ui.form.on('transfer between branches', {
+//     before_workflow_action:function (frm, action) {
+//         if (action === "إلغاء الحوالة") {
+//             try {
+// 				frappe.msgprint("ASDASDASD")
+//                 // Proceed with server-side cancellation
+//                 frappe.call({
+//                     method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_cancel",
+//                     args: {
+//                         docname: frm.doc.name,
+// 						method:"cancel"
+//                     },
+//                     callback: function (r) {
+//                         if (!r.exc) {
+//                             frappe.msgprint("تم إلغاء المستند بنجاح.");
+//                             frm.reload_doc();
+//                         }
+//                     }
+//                 });
+//             } catch (error) {
+//                 frappe.throw("تم إلغاء الإجراء.");
+//             }
+//         }
+//     }
+// });
 
 frappe.ui.form.on('transfer between branches', {
 

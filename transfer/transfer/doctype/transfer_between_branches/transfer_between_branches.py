@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import get_main_account,get_temp_account,get_profit_account
+from transfer.transfer.api import get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
 from .create_journal_entery import *
 from datetime import datetime, timedelta
 
@@ -11,7 +11,8 @@ class transferbetweenbranches(Document):
 	
 	def on_trash(self):
 		frappe.msgprint("This document has been trashed")
-
+	def before_cancel(self):
+		validate_linked_journal_entries(self.name)
 	def on_cancel(self):
 		pass
 	def after_insert(self):

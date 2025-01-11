@@ -3,13 +3,15 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
+from transfer.transfer.api import validate_linked_journal_entries,create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
 from frappe.utils import getdate, nowdate
 from .it_api import *
 
 class InternalTransfer(Document):
 	def before_cancel(self):
+		validate_linked_journal_entries(self.name)
 		self.status = "ملغية"
+
 
 
 def getDoc(docname):
@@ -227,7 +229,7 @@ def handel_cancellation(docname):
 			frappe.msgprint("تم إلغاء الحوالة بنجاح")
 	else:
 		it_reverse_journal_entries(doc)
-		
+	 	
 @frappe.whitelist()
 def transfer_completed(docname):
 	try:
