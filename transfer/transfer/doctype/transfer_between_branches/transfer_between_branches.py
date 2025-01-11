@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
+from transfer.transfer.api import get_journal_entries_by_cheque, get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
 from .create_journal_entery import *
 from datetime import datetime, timedelta
 

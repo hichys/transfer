@@ -26,6 +26,7 @@
 //     }
 // });
 
+
 frappe.ui.form.on('transfer between branches', {
 
 	validate: function(frm) {
