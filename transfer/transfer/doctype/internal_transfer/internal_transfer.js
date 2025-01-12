@@ -2,7 +2,6 @@
 // For license information, please see license.txt
 
 //
- 
 frappe.ui.form.on('Internal Transfer', {
     create_journal_entry: function(frm) {
         frappe.call({
@@ -11,34 +10,36 @@ frappe.ui.form.on('Internal Transfer', {
             callback: function(r) {
                 if (r.message) {
                     const details = r.message;
-                    
+
                     // Display a dialog with transaction details
                     const dialog = new frappe.ui.Dialog({
-                        title: 'Confirm Transaction',
+                        title: 'تأكيد العملية',
                         fields: [
                             {
                                 fieldname: 'details_html',
                                 fieldtype: 'HTML',
                                 options: `
-                                    <div>
+                                    <div style="direction: rtl; text-align: right; font-family: 'Cairo', sans-serif; line-height: 1.8;">
+                                        <h4 style="color: #333;">تفاصيل العملية:</h4>
                                         <p><strong>الفرع:</strong> ${details.branch}</p>
                                         <p><strong>المرسل:</strong> ${details.from_company}</p>
                                         <p><strong>المستقبل:</strong> ${details.to_company}</p>
                                         <p><strong>القيمة:</strong> ${details.amount}</p>
-                                        <p><strong>عمولة</strong> ${details.from_company}: ${details.profit}</p>
-                                        <p><strong>عمولة</strong> ${details.to_company}: ${details.other_party_profit}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.from_company}</span>:</strong> ${details.profit}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.to_company}</span>:</strong> ${details.other_party_profit}</p>
+                                        <button id="copy-details" class="btn btn-secondary" style="margin-top: 15px;">نسخ التفاصيل</button>
                                     </div>
                                 `,
                             },
                         ],
-                        primary_action_label: 'تاكيد',
+                        primary_action_label: 'تأكيد',
                         primary_action: function() {
                             frappe.call({
                                 method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.handel_journal_entries_creation',
                                 args: { docname: frm.doc.name },
                                 callback: function(r) {
                                     if (r.message.status === 'success') {
-                                        frappe.msgprint('Journal Entry created successfully.');
+                                        frappe.msgprint('تم إنشاء القيد بنجاح.');
                                         frm.reload_doc();
                                     }
                                 }
@@ -47,7 +48,25 @@ frappe.ui.form.on('Internal Transfer', {
                         }
                     });
 
+                    // Show the dialog
                     dialog.show();
+
+                    // Add "copy details" functionality
+                    dialog.$wrapper.on('click', '#copy-details', function() {
+                        const detailsText = `
+                            الفرع: ${details.branch}
+                            المرسل: ${details.from_company}
+                            المستقبل: ${details.to_company}
+                            القيمة: ${details.amount}
+                            عمولة ${details.from_company}: ${details.profit}
+                            عمولة ${details.to_company}: ${details.other_party_profit}
+                        `;
+                        navigator.clipboard.writeText(detailsText).then(() => {
+                            frappe.show_alert('تم نسخ التفاصيل إلى الحافظة.');
+                        }).catch(err => {
+                            frappe.msgprint('حدث خطأ أثناء نسخ النص.');
+                        });
+                    });
                 }
             }
         });
@@ -122,7 +141,7 @@ frappe.ui.form.on("Internal Transfer", {
     },
     refresh : function(frm){
 
-        if (frm.doc.docstatus === 0) {  // Show the delete button only for draft documents
+        if (frm.doc.docstatus === 0 || frm.doc.status === "غير مسجلة") {  // Show the delete button only for draft documents
             frm.add_custom_button('مسح الحوالة', function() {
                 frm.trigger('delete_draft');
             });

@@ -76,7 +76,9 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "\u0627\u0644\u062d\u0627\u0644\u0629",
+   "no_copy": 1,
    "options": "\u063a\u064a\u0631 \u0645\u0633\u062c\u0644\u0629\n\u063a\u064a\u0631 \u0645\u0633\u062a\u0644\u0645\u0629\n\u0645\u0633\u062a\u0644\u0645\u0629\n\u0645\u0644\u063a\u064a\u0629",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -335,7 +337,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-11 21:19:17.845156",
+ "modified": "2025-01-12 02:35:32.324673",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Internal Transfer",
@@ -353,20 +355,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "alalmia employee",
    "share": 1,
    "submit": 1,
    "write": 1

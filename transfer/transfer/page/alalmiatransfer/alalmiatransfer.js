@@ -16,7 +16,7 @@ frappe.pages['alalmiatransfer'].on_page_load = function(wrapper) {
     $(page.body).html(`
         <div style="text-align: center; margin-top: 20px;">
             <!-- Company Logo -->
-            <img src="/assets/transfer/images/logo.jpg" alt="شركــة العالمــية" style="max-width: 200px; margin-bottom: 20px;">
+            <img src="/assets/transfer/images/logo.png" alt="شركــة العالمــية" style="max-width: 200px; margin-bottom: 20px;">
             
             <!-- Page Title -->
             <h1 style="font-size: 28px; color: #333; margin-bottom: 20px;">مرحباً بكم في شركــة العالمــية</h1>
