@@ -6,7 +6,7 @@
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
- "for_user": "user@user.com",
+ "for_user": "",
  "hide_custom": 0,
  "icon": "clipboard",
  "idx": 8,
@@ -26,8 +26,8 @@
    "type": "Link"
   }
  ],
- "modified": "2025-01-10 21:53:24.235841",
- "modified_by": "user@user.com",
+ "modified": "2025-01-12 00:41:33.234434",
+ "modified_by": "Administrator",
  "module": "transfer",
  "name": "alalmia",
  "number_cards": [],
@@ -41,9 +41,12 @@
   },
   {
    "role": "Employee"
+  },
+  {
+   "role": "alalmia employee"
   }
  ],
- "sequence_id": 0.0,
+ "sequence_id": 13.0,
  "shortcuts": [
   {
    "color": "Grey",

@@ -2,10 +2,15 @@ frappe.pages['alalmiatransfer'].on_page_load = function(wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
         title: 'شركــة العالمــية',
-        single_column: true
+        single_column: true,
     });
 
     // Hide the sidebar explicitly if it appears
+    
+    // setTimeout(() => {
+    //     $(wrapper).find('.body-sidebar-top').css('display', "none"); // Hides the sidebar
+    //     $(wrapper).find('.app-logo').css('display', "none"); // Adjusts the page layout
+    // }, 100); // Delay to ensure the DOM is fully loaded
 
     // Add your company logo and style the page
     $(page.body).html(`

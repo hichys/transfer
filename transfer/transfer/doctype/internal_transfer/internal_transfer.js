@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 
 //
-
+ 
 
 let type = 2;
 frappe.ui.form.on("Internal Transfer", {
@@ -12,7 +12,24 @@ frappe.ui.form.on("Internal Transfer", {
         frm.set_value("from_type","Branch")
     },
 
-   
+    delete_draft: function(frm) {
+        frappe.confirm(
+            'هل انت متاكد من المسح ؟',
+            function() {
+                frappe.call({
+                    method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.delete_draft_doc',
+                    args: {
+                        doctype: frm.doc.doctype,
+                        docname: frm.doc.name
+                    },
+                    callback: function(response) {
+                        frappe.msgprint(response.message);
+                        frappe.set_route('List', frm.doc.doctype); // Redirect to the list view after deletion
+                    }
+                });
+            }
+        );
+    },
     /**
      * التاكد من ان حقل المرسل والستقبل يحتوي علي قيم صحيحه
      * 
@@ -54,6 +71,13 @@ frappe.ui.form.on("Internal Transfer", {
     after_save: function(frm) {
     },
     refresh : function(frm){
+
+        if (frm.doc.docstatus === 0) {  // Show the delete button only for draft documents
+            frm.add_custom_button('مسح الحوالة', function() {
+                frm.trigger('delete_draft');
+            });
+        }
+
         if (frm.doc.docstatus === 1   && frm.doc.status === "غير مسجلة") {
             frm.add_custom_button(__('تسجيل'), function () {
                 frappe.confirm(

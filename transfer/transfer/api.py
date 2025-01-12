@@ -4,8 +4,51 @@ from frappe.utils import getdate, nowdate
 from datetime import datetime
 import re
 
-#get all linked documetns by its cheque_no
+@frappe.whitelist()
+def create_journal_entry_preview(docname):
+	doc = frappe.get_doc("Your Doctype", docname)
+	# Prepare transaction details
+	transaction_details = {
+		"debit": doc.debit,
+		"credit": doc.credit,
+		"amount": doc.amount,
+		"profit": doc.our_profit,
+		"branch": doc.branch
+	}
+	return transaction_details
 
+@frappe.whitelist()
+def delete_draft_doc(doctype, docname):
+	"""
+	Deletes a draft document of the specified doctype and docname.
+	Args:
+		doctype (str): The type of the document to be deleted.
+		docname (str): The name of the document to be deleted.
+	Returns:
+		str: A success message indicating the document has been deleted.
+	Raises:
+		frappe.exceptions.ValidationError: If the document is not in draft status.
+		frappe.exceptions.ValidationError: If there is an error while deleting the document.
+	"""
+	try:
+		# Fetch the document
+		doc = frappe.get_doc(doctype, docname)
+		
+		# Check if the document is in draft status
+		if doc.docstatus != 0:
+			frappe.throw(f"Cannot delete {docname} because it is not in draft status.")
+		
+		# Delete the document
+		frappe.delete_doc(doctype, docname, ignore_permissions=True)
+		frappe.db.commit()
+		
+		return f"تم مسح {docname}"
+	
+	except Exception as e:
+		frappe.throw(f"Error while deleting document: {str(e)}")
+		
+		
+#get all linked documetns by its cheque_no
 @frappe.whitelist()
 def get_journal_entries_by_cheque(doc):
 	# Fetch the custom document

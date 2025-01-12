@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import validate_linked_journal_entries,create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
+from transfer.transfer.api import  validate_linked_journal_entries,create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
 from frappe.utils import getdate, nowdate
 from .it_api import *
 
@@ -24,11 +24,11 @@ def handel_journal_entries_creation(docname):
 
 	#بدون تعليق الحوالة
 	if doc.select_internal == "من فرع الي شركة":
-		frappe.msgprint("handel journal enteris من فرع الي شركة")
+		# frappe.msgprint("handel journal enteris من فرع الي شركة")
 		create_journal_entry(doc,temp=False)
 	#الحوالة تعلق لين تستلم
 	if doc.select_internal == "من شركة الي فرع" :
-		frappe.msgprint("#######")
+		# frappe.msgprint("#######")
 		create_journal_entry(doc,temp=True)
 
 @frappe.whitelist()
@@ -83,7 +83,6 @@ def create_journal_entry(self,temp=False):
 			credit_in_account_currency = self.amount  
 		else :
 			if(self.to_type == "Customer" and self.from_type != "Customer"):
-				frappe.msgprint("من شركة الي فرع")
 				to_type = "Customer"
 				to_party_type = to_party_name
 				debit_in_account_currency =  self.amount  + other_party_profit +our_profit
@@ -149,10 +148,16 @@ def create_journal_entry(self,temp=False):
 		journal_entry.insert(ignore_permissions=True)
 		journal_entry.submit()
 		#self.journal_entry = journal_entry.name
+		
+  
+		if journal_entry.docstatus != 1 :
+			frappe.throw("خطا كود 1025 الرجاء مراجعة الادمن")
+   
 		self.status = "غير مستلمة"
 		self.save()
-		frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
-
+  
+		# frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
+		frappe.msgprint(f"تم انشاء الحوالة بنجاح")
 		return {
 			"status": "success",
 			"journal_entry": journal_entry.name

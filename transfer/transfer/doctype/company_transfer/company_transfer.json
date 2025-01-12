@@ -160,6 +160,7 @@
   {
    "fieldname": "to_company",
    "fieldtype": "Dynamic Link",
+   "in_filter": 1,
    "in_list_view": 1,
    "label": "\u0627\u0644\u064a \u0634\u0631\u0643\u0629",
    "options": "to_type",
@@ -180,6 +181,7 @@
   {
    "fieldname": "from_company",
    "fieldtype": "Dynamic Link",
+   "in_filter": 1,
    "in_list_view": 1,
    "label": "\u0645\u0646 \u0634\u0631\u0643\u0629",
    "options": "from_type",
@@ -201,6 +203,7 @@
    "columns": 10,
    "fieldname": "branch",
    "fieldtype": "Link",
+   "in_filter": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "\u0627\u0644\u0641\u0631\u0639",
@@ -321,6 +324,7 @@
    "allow_on_submit": 1,
    "fieldname": "phone_number",
    "fieldtype": "Data",
+   "in_filter": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "\u0631\u0642\u0645 \u0627\u0644\u0645\u0633\u062a\u0644\u0645"
@@ -334,7 +338,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-11 21:19:55.558707",
+ "modified": "2025-01-11 22:15:51.639465",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",
