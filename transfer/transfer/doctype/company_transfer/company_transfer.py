@@ -4,7 +4,7 @@
 # import frappe
 from frappe.model.document import Document
 import frappe
-from transfer.transfer.api import validate_linked_journal_entries,get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
+from transfer.transfer.api import create_journal_entry_preview, validate_linked_journal_entries,get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
 from frappe.utils import getdate, nowdate 
 
 class companytransfer(Document):

@@ -25,7 +25,76 @@
 //         }
 //     }
 // });
+frappe.ui.form.on('transfer between branches', {
+    create_journal_entry: function(frm) {
+        frappe.call({
+            method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.create_journal_entry_preview',
+            args: { doctype: frm.doctype, docname: frm.doc.name },
+            callback: function(r) {
+                if (r.message) {
+                    const details = r.message;
 
+                    // Display a dialog with transaction details
+                    const dialog = new frappe.ui.Dialog({
+                        title: 'تأكيد العملية',
+                        fields: [
+                            {
+                                fieldname: 'details_html',
+                                fieldtype: 'HTML',
+                                options: `
+                                    <div style="direction: rtl; text-align: right; font-family: 'Cairo', sans-serif; line-height: 1.8;">
+                                        <h4 style="color: #333;">تفاصيل العملية:</h4>
+                                        <p><strong>الفرع:</strong> ${details.branch}</p>
+                                        <p><strong>المرسل:</strong> ${details.from_company}</p>
+                                        <p><strong>المستقبل:</strong> ${details.to_company}</p>
+                                        <p><strong>القيمة:</strong> ${details.amount}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.from_company}</span>:</strong> ${details.profit}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.to_company}</span>:</strong> ${details.other_party_profit}</p>
+                                        <button id="copy-details" class="btn btn-secondary" style="margin-top: 15px;">نسخ التفاصيل</button>
+                                    </div>
+                                `,
+                            },
+                        ],
+                        primary_action_label: 'تأكيد',
+                        primary_action: function() {
+                            frappe.call({
+                                method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
+                                args: { docname: frm.doc.name },
+                                callback: function(r) {
+                                    if (r.message.status === 'success') {
+										frappe.show_alert(__('تم التسجيل'));
+                                        frm.reload_doc();
+                                    }
+                                }
+                            });
+                            dialog.hide();
+                        }
+                    });
+
+                    // Show the dialog
+                    dialog.show();
+
+                    // Add "copy details" functionality
+                    dialog.$wrapper.on('click', '#copy-details', function() {
+                        const detailsText = `
+                            الفرع: ${details.branch}
+                            المرسل: ${details.from_company}
+                            المستقبل: ${details.to_company}
+                            القيمة: ${details.amount}
+                            عمولة ${details.from_company}: ${details.profit}
+                            عمولة ${details.to_company}: ${details.other_party_profit}
+                        `;
+                        navigator.clipboard.writeText(detailsText).then(() => {
+                            frappe.show_alert('تم نسخ التفاصيل إلى الحافظة.');
+                        }).catch(err => {
+                            frappe.msgprint('حدث خطأ أثناء نسخ النص.');
+                        });
+                    });
+                }
+            }
+        });
+    }
+});
 
 frappe.ui.form.on('transfer between branches', {
 
@@ -69,33 +138,45 @@ frappe.ui.form.on('transfer between branches', {
 				frm.refresh_field('to_branch');
 			}
 		}
+
 		if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
-			frm.add_custom_button(__('تسجيل'), function () {
-				frappe.confirm(
-					"هل تم استلام المبلغ ؟",
-					() => {
-						frappe.call({
-							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
-							args: {
-								docname: frm.doc.name,
-							},
-							callback: function (r) {
-								if (!r.exc) {
-									frappe.msgprint(__('تم التسجيل'));
-									frm.reload_doc(); // Reload to reflect changes
-								}
-							}
-						});
-					},
-					() => {
-						frappe.msgprint(__('تم إلغاء الإجراء.'));
-					}
-				);
-			});
-		} else {
+            frm.add_custom_button(__('تسجيل'), function () {
+                frm.trigger('create_journal_entry');
+				frm.reload_doc(); // Reload to reflect changes
+            });
+        }
+		else {
 			// If the document is saved or in any other workflow state, don't show the button
 			frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
 		}
+
+		// if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
+		// 	frm.add_custom_button(__('تسجيل'), function () {
+		// 		frappe.confirm(
+		// 			"هل تم استلام المبلغ ؟",
+		// 			() => {
+		// 				frappe.call({
+		// 					method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
+		// 					args: {
+		// 						docname: frm.doc.name,
+		// 					},
+		// 					callback: function (r) {
+		// 						if (!r.exc) {
+		// 							frappe.msgprint(__('تم التسجيل'));
+		// 							frm.reload_doc(); // Reload to reflect changes
+		// 						}
+		// 					}
+		// 				});
+		// 			},
+		// 			() => {
+		// 				frappe.msgprint(__('تم إلغاء الإجراء.'));
+		// 			}
+		// 		);
+		// 	});
+		// } else {
+		// 	// If the document is saved or in any other workflow state, don't show the button
+		// 	frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
+		// }
         // Check if the document is in the "غير مستلمة" workflow state
 		if (frm.doc.docstatus === 1) {
 			// Get the creation date (posting_date) and strip the time part

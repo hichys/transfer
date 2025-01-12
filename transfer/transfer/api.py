@@ -5,9 +5,21 @@ from datetime import datetime
 import re
 
 @frappe.whitelist()
-def create_journal_entry_preview(docname):
-	doc = frappe.get_doc("Internal Transfer", docname)
+def create_journal_entry_preview(doctype, docname):
+	doc = frappe.get_doc(doctype, docname)
 	# Prepare transaction details
+ 
+	if doctype == 'transfer between branches':
+		transaction_details = {
+		"from_company": doc.from_branch,
+		"to_company": doc.to_branch,
+		"amount": doc.amount,
+		"profit": doc.our_profit,
+		"other_party_profit":doc.other_party_profit
+	}
+		return transaction_details
+
+
 	transaction_details = {
 		"from_company": doc.from_company,
 		"to_company": doc.to_company,

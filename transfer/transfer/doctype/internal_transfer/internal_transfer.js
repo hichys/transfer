@@ -6,7 +6,7 @@ frappe.ui.form.on('Internal Transfer', {
     create_journal_entry: function(frm) {
         frappe.call({
             method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.create_journal_entry_preview',
-            args: { docname: frm.doc.name },
+            args: { doctype: frm.doctype, docname: frm.doc.name },
             callback: function(r) {
                 if (r.message) {
                     const details = r.message;
