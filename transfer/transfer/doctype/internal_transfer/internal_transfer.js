@@ -31,7 +31,7 @@ frappe.ui.form.on('Internal Transfer', {
                                 `,
                             },
                         ],
-                        primary_action_label: 'Confirm',
+                        primary_action_label: 'تاكيد',
                         primary_action: function() {
                             frappe.call({
                                 method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.handel_journal_entries_creation',
