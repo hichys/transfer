@@ -1,5 +1,77 @@
 import frappe
 from frappe.model.document import Document
+from frappe.utils import getdate, nowdate
+from datetime import datetime
+import re
+
+@frappe.whitelist()
+def create_journal_entry_preview(doctype, docname):
+	doc = frappe.get_doc(doctype, docname)
+	# Prepare transaction details
+ 
+	if doctype == 'transfer between branches':
+		transaction_details = {
+		"from_company": doc.from_branch,
+		"to_company": doc.to_branch,
+		"amount": doc.amount,
+		"profit": doc.our_profit,
+		"other_party_profit":doc.other_party_profit
+	}
+		return transaction_details
+
+
+	transaction_details = {
+		"from_company": doc.from_company,
+		"to_company": doc.to_company,
+		"amount": doc.amount,
+		"profit": doc.our_profit,
+		"branch": doc.branch,
+		"other_party_profit":doc.other_party_profit
+	}
+	return transaction_details
+
+@frappe.whitelist()
+def delete_draft_doc(doctype, docname):
+	"""
+	Deletes a draft document of the specified doctype and docname.
+	Args:
+		doctype (str): The type of the document to be deleted.
+		docname (str): The name of the document to be deleted.
+	Returns:
+		str: A success message indicating the document has been deleted.
+	Raises:
+		frappe.exceptions.ValidationError: If the document is not in draft status.
+		frappe.exceptions.ValidationError: If there is an error while deleting the document.
+	"""
+	try:
+		# Fetch the document
+		doc = frappe.get_doc(doctype, docname)
+		
+		# Check if the document is in draft status
+		if doc.docstatus != 0:
+			frappe.throw(f"Cannot delete {docname} because it is not in draft status.")
+		
+		# Delete the document
+		frappe.delete_doc(doctype, docname, ignore_permissions=True)
+		frappe.db.commit()
+		
+		return f"تم مسح {docname}"
+	
+	except Exception as e:
+		frappe.throw(f"Error while deleting document: {str(e)}")
+		
+		
+#get all linked documetns by its cheque_no
+@frappe.whitelist()
+def get_journal_entries_by_cheque(doc):
+	# Fetch the custom document
+	# Retrieve the related journal entries where the 'cheque_no' matches
+	if isinstance(doc, str):
+		doc = frappe.get_doc(doc)
+	
+	journal_entries = frappe.get_all('Journal Entry', filters={'cheque_no': doc.name}, fields=['name','title'])
+	return journal_entries 
+
 
 @frappe.whitelist()
 def get_currency_remaining_qty(currency):
@@ -143,3 +215,111 @@ def get_profit_account(branch):
 def get_temp_account(branch):
 	return get_account_for_branch(branch,2);
 
+import frappe
+from frappe.utils import nowdate
+
+def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=None, posting_date=None, remarks=None):
+	try:
+		# Validate inputs
+		if not from_account or not to_account:
+			frappe.throw("Both From Account and To Account must be specified.")
+		if not amount:
+			frappe.throw("Amount must be greater than zero.")
+		
+		# Use today's date if posting_date is not provided
+		posting_date = posting_date or nowdate()
+		remarks = remarks or f""
+
+		branch = branch or ""
+		cheque_no = cheque_no or ""
+		# Create the Journal Entry document
+
+		accounts = [
+				{
+					"account": from_account,
+					"debit_in_account_currency": 0,
+					"credit_in_account_currency": amount,
+				},
+				{
+					"account": to_account,
+					"credit_in_account_currency": 0,
+					"debit_in_account_currency": amount,
+				}
+			]
+
+		journal_entry = frappe.get_doc({
+			"doctype": "Journal Entry",
+			"posting_date": posting_date,
+			"voucher_type": "Journal Entry",
+			"accounts": accounts,
+			"user_remark": remarks,
+			"branch" : branch,
+			"cheque_no": cheque_no,
+			"cheque_date": frappe.utils.nowdate(),
+		})
+		
+		# Insert and submit the Journal Entry
+		journal_entry.insert()
+		journal_entry.submit()
+		
+		frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
+		return journal_entry.name
+	
+	except Exception as e:
+		frappe.throw(f"Error while creating Journal Entry: {str(e)}")
+
+
+def is_posting_day_today(posting_date):
+	return posting_date == datetime.now().date()
+
+
+#قبل الإلغاء التاكد من ان الجورنال قد لغيت او عكست
+def validate_linked_journal_entries(docname, link_fields=["cheque_no"]):
+	"""
+	Validate that all Journal Entries linked to the given document are either canceled,
+	reversed (custom_reversed_by set), or have a reversal_of field set.
+
+	Args:
+		docname (str): The name of the document being checked.
+		link_fields (list): The fields in Journal Entry used to link to the document.
+
+	Raises:
+		frappe.ValidationError: If any linked Journal Entries do not meet the required criteria.
+	"""
+	for link_field in link_fields:
+		# Fetch all linked Journal Entries
+		journal_entries = frappe.get_all(
+			"Journal Entry",
+			filters={
+				link_field: docname,
+				"docstatus": ["!=", 2],  # Not canceled
+				"custom_reversed_by": ["is", "not set"],  # Not reversed
+				"reversal_of": ["is", "not set"]  # Not a reversal
+			},
+			fields=["name", "docstatus", "custom_reversed_by", "reversal_of"]
+		)
+
+		# If any Journal Entries do not meet the criteria
+		if journal_entries:
+			linked_entries = ", ".join([entry["name"] for entry in journal_entries])
+			frappe.throw(
+				("Cannot cancel this document because the following Journal Entries are not canceled or reversed: {0}")
+				.format(linked_entries)
+			)
+
+# @frappe.whitelist()
+# def extract_phone_number(whatsapp_desc):
+#     try:
+#         # Clean the text to remove spaces and hyphens
+#         cleaned_text = whatsapp_desc.replace(" ", "").replace("-", "")  # Remove spaces and hyphens
+
+#         # Match a phone number pattern with or without the country code
+#         match = re.match(r'(?:\+?218)?0?(9[1234]\d{7})', cleaned_text)
+
+#         if match:
+#             return '0' + match.group(1)  # Return the matched phone number
+#         else:
+#             return "ادخل يدويا"  # Fallback if no match
+#     except Exception as error:
+#         print("Error in extract_phone_number:", error)
+#         return "ادخل يدويا"  # Fallback for unexpected errors

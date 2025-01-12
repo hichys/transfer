@@ -1,0 +1,26 @@
+{
+ "content": null,
+ "creation": "2025-01-10 23:10:15.494730",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2025-01-11 21:42:26.101711",
+ "modified_by": "Administrator",
+ "module": "transfer",
+ "name": "alalmiatransfer",
+ "owner": "Administrator",
+ "page_name": "alalmiatransfer",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "alalmia employee"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "\u0634\u0631\u0643\u0640\u0640\u0629 \u0627\u0644\u0639\u0627\u0644\u0645\u0640\u0640\u064a\u0629"
+}

@@ -1,53 +1,54 @@
 {
  "actions": [],
- "autoname": "format:CMTR-{YY}{MM}{DD}{####}",
- "creation": "2024-12-29 19:14:56.674172",
+ "autoname": "format:CIT-{YY}{MM}{DD}{#####}",
+ "creation": "2025-01-07 12:44:27.837129",
  "default_view": "List",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "custom_section_1_section",
   "column_break_zmuk",
-  "column_break_meef",
   "column_break_onwu",
   "status",
+  "go_to",
   "column_break_efom",
   "delivery_date",
   "column_break_bhuq",
   "posting_date",
+  "column_break_meef",
   "section_break_wfug",
   "column_break_dqec",
-  "column_break_fzdm",
   "to_type",
-  "column_break_glph",
+  "column_break_fzdm",
   "from_type",
-  "column_break_pcyw",
-  "select_external",
+  "column_break_glph",
+  "select_internal",
   "section_break_flul",
   "column_break_vakh",
-  "column_break_dfrt",
   "to_company",
   "credit",
-  "column_break_aeer",
+  "column_break_dfrt",
   "from_company",
   "debit",
-  "column_break_lups",
+  "column_break_aeer",
   "branch",
   "profit_account",
   "section_break_tzha",
-  "column_break_wpec",
   "handed_account",
   "phone_number",
-  "column_break_pkny",
-  "profit",
-  "our_profit",
-  "other_party_profit",
+  "notyet",
+  "handed",
+  "canceld_journal_entry",
+  "journal_entry_link",
+  "column_break_wpec",
   "whatsapp_desc",
   "column_break_nnoi",
+  "our_profit",
+  "other_party_profit",
+  "column_break_pkny",
   "amount",
-  "execution_amount",
   "without_profit",
-  "profit_is_splited",
+  "column_break_hhmq",
   "section_break_tkcp",
   "amended_from"
  ],
@@ -73,15 +74,18 @@
    "default": "\u063a\u064a\u0631 \u0645\u0633\u062c\u0644\u0629",
    "fieldname": "status",
    "fieldtype": "Select",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_preview": 1,
    "in_standard_filter": 1,
    "label": "\u0627\u0644\u062d\u0627\u0644\u0629",
    "no_copy": 1,
    "options": "\u063a\u064a\u0631 \u0645\u0633\u062c\u0644\u0629\n\u063a\u064a\u0631 \u0645\u0633\u062a\u0644\u0645\u0629\n\u0645\u0633\u062a\u0644\u0645\u0629\n\u0645\u0644\u063a\u064a\u0629",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "go_to",
+   "fieldtype": "Button",
+   "hidden": 1,
+   "label": "go to"
   },
   {
    "fieldname": "column_break_efom",
@@ -122,28 +126,27 @@
    "fieldname": "from_type",
    "fieldtype": "Link",
    "label": "from_type",
-   "options": "DocType"
+   "options": "DocType",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "to_type",
    "fieldtype": "Link",
    "label": "to_type",
-   "options": "DocType"
+   "options": "DocType",
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "column_break_glph",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_pcyw",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "\u0634\u0631\u0643\u0627\u062a",
-   "fieldname": "select_external",
+   "fieldname": "select_internal",
    "fieldtype": "Select",
-   "label": "\u062e\u0627\u0631\u062c\u064a - \u0646\u0648\u0639\u0647\u0627",
-   "options": "\u0634\u0631\u0643\u0627\u062a\n\u062e\u0627\u0631\u062c\u064a"
+   "label": "\u062f\u0627\u062e\u0644\u064a - \u0646\u0648\u0639\u0647\u0627",
+   "options": "\u0645\u0646 \u0641\u0631\u0639 \u0627\u0644\u064a \u0634\u0631\u0643\u0629\n\u0645\u0646 \u0634\u0631\u0643\u0629 \u0627\u0644\u064a \u0641\u0631\u0639"
   },
   {
    "fieldname": "section_break_flul",
@@ -154,24 +157,37 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_dfrt",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "to_company",
    "fieldtype": "Dynamic Link",
-   "in_filter": 1,
    "in_list_view": 1,
-   "label": "\u0627\u0644\u064a \u0634\u0631\u0643\u0629",
+   "label": "\u0627\u0644\u0645\u0633\u062a\u0642\u0628\u0644",
    "options": "to_type",
    "reqd": 1
   },
   {
    "allow_on_submit": 1,
    "fieldname": "credit",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "credit",
-   "options": "Account",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_dfrt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_company",
+   "fieldtype": "Dynamic Link",
+   "in_list_view": 1,
+   "label": "\u0627\u0644\u0645\u0631\u0633\u0644",
+   "options": "from_type",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "debit",
+   "fieldtype": "Data",
+   "label": "debit",
    "read_only": 1
   },
   {
@@ -179,33 +195,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "from_company",
-   "fieldtype": "Dynamic Link",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "label": "\u0645\u0646 \u0634\u0631\u0643\u0629",
-   "options": "from_type",
-   "reqd": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "debit",
-   "fieldtype": "Link",
-   "label": "debit",
-   "options": "Account",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_lups",
-   "fieldtype": "Column Break"
-  },
-  {
    "columns": 10,
    "fieldname": "branch",
    "fieldtype": "Link",
-   "in_filter": 1,
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "\u0627\u0644\u0641\u0631\u0639",
    "options": "Branch",
    "reqd": 1
@@ -214,7 +207,7 @@
    "allow_on_submit": 1,
    "fieldname": "profit_account",
    "fieldtype": "Link",
-   "label": "profit account",
+   "label": "\u0627\u0644\u062e\u0632\u0646\u0629",
    "options": "Account",
    "read_only": 1
   },
@@ -223,6 +216,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "columns": 4,
    "fieldname": "column_break_wpec",
    "fieldtype": "Column Break"
   },
@@ -231,12 +225,44 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
+   "fieldname": "notyet",
+   "fieldtype": "Data",
+   "label": "\u0642\u064a\u062f  \u0627\u0644\u062a\u0633\u062c\u064a\u0644",
+   "no_copy": 1,
+   "read_only": 1,
+   "remember_last_selected_value": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "handed",
+   "fieldtype": "Data",
+   "label": "\u0642\u064a\u062f - \u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "no_copy": 1,
+   "read_only": 1,
+   "remember_last_selected_value": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "canceld_journal_entry",
+   "fieldtype": "Data",
+   "label": "\u0642\u064a\u062f - \u0627\u0644\u0625\u0644\u063a\u0627\u0621",
+   "no_copy": 1,
+   "read_only": 1,
+   "remember_last_selected_value": 1
+  },
+  {
+   "fieldname": "journal_entry_link",
+   "fieldtype": "HTML",
+   "label": "journal_entry_link",
+   "no_copy": 1
+  },
+  {
    "fieldname": "column_break_pkny",
    "fieldtype": "Column Break",
    "placeholder": "\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0648\u0627\u062a\u0633"
   },
   {
-   "allow_on_submit": 1,
    "fieldname": "whatsapp_desc",
    "fieldtype": "Small Text",
    "label": "\u062a\u0641\u0627\u0635\u064a\u0644 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u0648\u0627\u062a\u0633"
@@ -246,30 +272,11 @@
    "fieldtype": "Column Break"
   },
   {
-   "columns": 1,
-   "fieldname": "execution_amount",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "\u0627\u0644\u0642\u064a\u0645\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629",
-   "non_negative": 1,
-   "precision": "2",
-   "reqd": 1
-  },
-  {
-   "columns": 6,
-   "depends_on": "eval:!doc.without_profit;",
-   "fieldname": "profit",
-   "fieldtype": "Currency",
-   "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0627\u0633\u0627\u0633\u064a\u0629",
-   "precision": "2",
-   "reqd": 1
-  },
-  {
    "depends_on": "eval:!doc.without_profit;",
    "fieldname": "our_profit",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "\u0639\u0645\u0648\u0644\u062a\u0646\u0627",
+   "label": "\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0641\u0631\u0639",
    "precision": "2",
    "reqd": 1
   },
@@ -283,18 +290,10 @@
    "reqd": 1
   },
   {
-   "default": "0",
-   "depends_on": "eval:!doc.without_profit",
-   "description": "\u062a\u0646\u062d\u064a \u0627\u0644\u0639\u0644\u0627\u0645\u0629 \u0641\u064a \u062d\u0627\u0644\u0629 \u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0644\u0644\u0641\u0631\u0639 \u0627\u0644\u0645\u0628\u0639\u0648\u062a \u0645\u0646\u0647 \u0641\u0642\u0637",
-   "fieldname": "profit_is_splited",
-   "fieldtype": "Check",
-   "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0645\u0642\u0633\u0648\u0645\u0647 \u0639\u0644\u064a \u0627\u0644\u0637\u0631\u0641\u064a\u0646"
-  },
-  {
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "\u0627\u0644\u0645\u0628\u0644\u063a",
+   "label": "\u0627\u0644\u0642\u064a\u0645\u0629",
    "non_negative": 1,
    "precision": "2",
    "reqd": 1
@@ -315,18 +314,18 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "company transfer",
+   "options": "Internal Transfer",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
   },
   {
-   "allow_on_submit": 1,
+   "fieldname": "column_break_hhmq",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "phone_number",
    "fieldtype": "Data",
-   "in_filter": 1,
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "\u0631\u0642\u0645 \u0627\u0644\u0645\u0633\u062a\u0644\u0645"
   }
  ],
@@ -338,10 +337,10 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-11 22:15:51.639465",
+ "modified": "2025-01-12 02:35:32.324673",
  "modified_by": "Administrator",
  "module": "transfer",
- "name": "company transfer",
+ "name": "Internal Transfer",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
@@ -356,22 +355,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "select": 1,
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "alalmia employee",
-   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1
@@ -381,7 +364,7 @@
  "sort_order": "DESC",
  "states": [
   {
-   "color": "Cyan",
+   "color": "Gray",
    "title": "\u063a\u064a\u0631 \u0645\u0633\u062c\u0644\u0629"
   },
   {
@@ -396,8 +379,5 @@
    "color": "Red",
    "title": "\u0645\u0644\u063a\u064a\u0629"
   }
- ],
- "track_changes": 1,
- "track_seen": 1,
- "track_views": 1
+ ]
 }

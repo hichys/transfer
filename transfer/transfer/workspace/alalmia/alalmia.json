@@ -1,0 +1,78 @@
+{
+ "app": "transfer",
+ "charts": [],
+ "content": "[{\"id\":\"v_vwBg3AJ6\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u062a\u062d\u0648\u064a\u0644\u0627\u062a</span>\",\"col\":12}},{\"id\":\"-ebE2cjqKp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u062a\u062d\u0648\u064a\u0644\u0627\u062a \u0628\u064a\u0646 \u0627\u0644\u0641\u0631\u0648\u0639\",\"col\":4}},{\"id\":\"5-PyVQgVyE\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u062a\u062d\u0648\u064a\u0644 \u062e\u0627\u0631\u062c\u064a\",\"col\":3}},{\"id\":\"grLsBLn215\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u062a\u062d\u0648\u064a\u0644 \u062f\u0627\u062e\u0644\u064a\",\"col\":4}}]",
+ "creation": "2025-01-03 19:12:58.742608",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "clipboard",
+ "idx": 8,
+ "indicator_color": "yellow",
+ "is_hidden": 0,
+ "label": "alalmia",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u062a\u062d\u0648\u064a\u0644\u0627\u062a \u0627\u0644\u0641\u0631\u0648\u0639",
+   "link_count": 0,
+   "link_to": "transfer between branches",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-01-12 00:41:33.234434",
+ "modified_by": "Administrator",
+ "module": "transfer",
+ "name": "alalmia",
+ "number_cards": [],
+ "owner": "awd@hotmail.it",
+ "parent_page": "alalmia",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "alalmia employee"
+  }
+ ],
+ "sequence_id": 13.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "\u062a\u062d\u0648\u064a\u0644 \u062e\u0627\u0631\u062c\u064a",
+   "link_to": "company transfer",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "\u062a\u062d\u0648\u064a\u0644\u0627\u062a \u0628\u064a\u0646 \u0627\u0644\u0641\u0631\u0648\u0639",
+   "link_to": "transfer between branches",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "\u062a\u062d\u0648\u064a\u0644 \u062f\u0627\u062e\u0644\u064a",
+   "link_to": "Internal Transfer",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "alalmia",
+ "type": "Workspace"
+}

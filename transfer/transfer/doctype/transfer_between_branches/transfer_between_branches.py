@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import get_main_account,get_temp_account,get_profit_account
+from transfer.transfer.api import get_journal_entries_by_cheque, get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
 from .create_journal_entery import *
 from datetime import datetime, timedelta
 
@@ -11,7 +11,8 @@ class transferbetweenbranches(Document):
 	
 	def on_trash(self):
 		frappe.msgprint("This document has been trashed")
-
+	def before_cancel(self):
+		validate_linked_journal_entries(self.name)
 	def on_cancel(self):
 		pass
 	def after_insert(self):
@@ -381,11 +382,13 @@ def create_journal_entry_from_handed_transfer(doc, method):
 		"accounts": [
 			{
 				"account": debit_to_liabilities,
+				"branch":doc.to_branch,
 				"debit_in_account_currency": doc.amount,
 				"credit_in_account_currency": 0,
 			},
 			{
 				"account": credit_to_account,
+				"branch" :doc.to_branch,
 				"debit_in_account_currency": 0,
 				"credit_in_account_currency": doc.amount,
 			}
@@ -425,7 +428,8 @@ def reverse_journal_entry(docname):
 				"credit_in_account_currency": line.debit_in_account_currency,
 				"cost_center": line.cost_center,
 				"party_type": line.party_type,
-				"party": line.party
+				"party": line.party,
+				"branch": line.branch
 				
 			})
 

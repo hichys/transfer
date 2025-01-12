@@ -1,27 +1,98 @@
 // Copyright (c) 2024, a and contributors
 // For license information, please see license.txt
+// frappe.ui.form.on('transfer between branches', {
+//     before_workflow_action:function (frm, action) {
+//         if (action === "إلغاء الحوالة") {
+//             try {
+// 				frappe.msgprint("ASDASDASD")
+//                 // Proceed with server-side cancellation
+//                 frappe.call({
+//                     method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_cancel",
+//                     args: {
+//                         docname: frm.doc.name,
+// 						method:"cancel"
+//                     },
+//                     callback: function (r) {
+//                         if (!r.exc) {
+//                             frappe.msgprint("تم إلغاء المستند بنجاح.");
+//                             frm.reload_doc();
+//                         }
+//                     }
+//                 });
+//             } catch (error) {
+//                 frappe.throw("تم إلغاء الإجراء.");
+//             }
+//         }
+//     }
+// });
 frappe.ui.form.on('transfer between branches', {
-    before_workflow_action:function (frm, action) {
-        if (action === "إلغاء الحوالة") {
-            try {
-                // Proceed with server-side cancellation
-                frappe.call({
-                    method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_cancel",
-                    args: {
-                        docname: frm.doc.name,
-						method:"cancel"
-                    },
-                    callback: function (r) {
-                        if (!r.exc) {
-                            frappe.msgprint("تم إلغاء المستند بنجاح.");
-                            frm.reload_doc();
+    create_journal_entry: function(frm) {
+        frappe.call({
+            method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.create_journal_entry_preview',
+            args: { doctype: frm.doctype, docname: frm.doc.name },
+            callback: function(r) {
+                if (r.message) {
+                    const details = r.message;
+
+                    // Display a dialog with transaction details
+                    const dialog = new frappe.ui.Dialog({
+                        title: 'تأكيد العملية',
+                        fields: [
+                            {
+                                fieldname: 'details_html',
+                                fieldtype: 'HTML',
+                                options: `
+                                    <div style="direction: rtl; text-align: right; font-family: 'Cairo', sans-serif; line-height: 1.8;">
+                                        <h4 style="color: #333;">تفاصيل العملية:</h4>
+                                        <p><strong>الفرع:</strong> ${details.branch}</p>
+                                        <p><strong>المرسل:</strong> ${details.from_company}</p>
+                                        <p><strong>المستقبل:</strong> ${details.to_company}</p>
+                                        <p><strong>القيمة:</strong> ${details.amount}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.from_company}</span>:</strong> ${details.profit}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.to_company}</span>:</strong> ${details.other_party_profit}</p>
+                                        <button id="copy-details" class="btn btn-secondary" style="margin-top: 15px;">نسخ التفاصيل</button>
+                                    </div>
+                                `,
+                            },
+                        ],
+                        primary_action_label: 'تأكيد',
+                        primary_action: function() {
+                            frappe.call({
+                                method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
+                                args: { docname: frm.doc.name },
+                                callback: function(r) {
+                                    if (r.message.status === 'success') {
+										frappe.show_alert(__('تم التسجيل'));
+                                        frm.reload_doc();
+                                    }
+                                }
+                            });
+                            dialog.hide();
                         }
-                    }
-                });
-            } catch (error) {
-                frappe.throw("تم إلغاء الإجراء.");
+                    });
+
+                    // Show the dialog
+                    dialog.show();
+
+                    // Add "copy details" functionality
+                    dialog.$wrapper.on('click', '#copy-details', function() {
+                        const detailsText = `
+                            الفرع: ${details.branch}
+                            المرسل: ${details.from_company}
+                            المستقبل: ${details.to_company}
+                            القيمة: ${details.amount}
+                            عمولة ${details.from_company}: ${details.profit}
+                            عمولة ${details.to_company}: ${details.other_party_profit}
+                        `;
+                        navigator.clipboard.writeText(detailsText).then(() => {
+                            frappe.show_alert('تم نسخ التفاصيل إلى الحافظة.');
+                        }).catch(err => {
+                            frappe.msgprint('حدث خطأ أثناء نسخ النص.');
+                        });
+                    });
+                }
             }
-        }
+        });
     }
 });
 
@@ -67,33 +138,45 @@ frappe.ui.form.on('transfer between branches', {
 				frm.refresh_field('to_branch');
 			}
 		}
+
 		if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
-			frm.add_custom_button(__('تسجيل'), function () {
-				frappe.confirm(
-					"هل أنت متأكد أنك تسجيل؟",
-					() => {
-						frappe.call({
-							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
-							args: {
-								docname: frm.doc.name,
-							},
-							callback: function (r) {
-								if (!r.exc) {
-									frappe.msgprint(__('تم التسجيل'));
-									frm.reload_doc(); // Reload to reflect changes
-								}
-							}
-						});
-					},
-					() => {
-						frappe.msgprint(__('تم إلغاء الإجراء.'));
-					}
-				);
-			});
-		} else {
+            frm.add_custom_button(__('تسجيل'), function () {
+                frm.trigger('create_journal_entry');
+				frm.reload_doc(); // Reload to reflect changes
+            });
+        }
+		else {
 			// If the document is saved or in any other workflow state, don't show the button
 			frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
 		}
+
+		// if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
+		// 	frm.add_custom_button(__('تسجيل'), function () {
+		// 		frappe.confirm(
+		// 			"هل تم استلام المبلغ ؟",
+		// 			() => {
+		// 				frappe.call({
+		// 					method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
+		// 					args: {
+		// 						docname: frm.doc.name,
+		// 					},
+		// 					callback: function (r) {
+		// 						if (!r.exc) {
+		// 							frappe.msgprint(__('تم التسجيل'));
+		// 							frm.reload_doc(); // Reload to reflect changes
+		// 						}
+		// 					}
+		// 				});
+		// 			},
+		// 			() => {
+		// 				frappe.msgprint(__('تم إلغاء الإجراء.'));
+		// 			}
+		// 		);
+		// 	});
+		// } else {
+		// 	// If the document is saved or in any other workflow state, don't show the button
+		// 	frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
+		// }
         // Check if the document is in the "غير مستلمة" workflow state
 		if (frm.doc.docstatus === 1) {
 			// Get the creation date (posting_date) and strip the time part
@@ -170,33 +253,33 @@ frappe.ui.form.on('transfer between branches', {
         // Add a custom button for workflow_state "تم التسليم"
       
 
-			frm.add_custom_button(__('حــذف نهائي'), function () {
-				frappe.confirm(
-					'هل انت متاكد ?',
-					function () {
-						// Call the server-side method to delete the current document
-						frappe.call({
-							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc',
-							args: {
-								docname: frm.doc.name,
-								method : "submit"
-							},
-							callback: function (response) {
-								if (response.message.status === 'success') {
-									frappe.msgprint(response.message.message);
-									frappe.set_route('List', 'transfer between branches');
-								} else {
-									frappe.msgprint({
-										title: __('Error'),
-										message: response.message.message,
-										indicator: 'red'
-									});
-								}
-							}
-						});
-					}
-				);
-			});
+			// frm.add_custom_button(__('حــذف نهائي'), function () {
+			// 	frappe.confirm(
+			// 		'هل انت متاكد ?',
+			// 		function () {
+			// 			// Call the server-side method to delete the current document
+			// 			frappe.call({
+			// 				method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc',
+			// 				args: {
+			// 					docname: frm.doc.name,
+			// 					method : "submit"
+			// 				},
+			// 				callback: function (response) {
+			// 					if (response.message.status === 'success') {
+			// 						frappe.msgprint(response.message.message);
+			// 						frappe.set_route('List', 'transfer between branches');
+			// 					} else {
+			// 						frappe.msgprint({
+			// 							title: __('Error'),
+			// 							message: response.message.message,
+			// 							indicator: 'red'
+			// 						});
+			// 					}
+			// 				}
+			// 			});
+			// 		}
+			// 	);
+			// });
 		   }
 	});
 
@@ -407,6 +490,16 @@ frappe.ui.form.on('transfer between branches', {
 				}
 			}
 			
+			}
+		},
+		whatsapp_desc: function(frm){
+			if (frm.doc.whatsapp_desc) {
+				let phoneNumber = extract_phone_number(frm.doc.whatsapp_desc);
+				frm.set_value("phone_number", phoneNumber); // Set the phone number field
+				frappe.show_alert({
+					message: phoneNumber === "ادخل يدويا" ? "لا يمكن استخراج الرقم. ادخله يدوياً" : `تم استخراج الرقم: ${phoneNumber}`,
+					indicator: phoneNumber === "ادخل يدويا" ? "red" : "green"
+				});
 			}
 		}
 	});
