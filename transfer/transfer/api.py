@@ -6,14 +6,15 @@ import re
 
 @frappe.whitelist()
 def create_journal_entry_preview(docname):
-	doc = frappe.get_doc("Your Doctype", docname)
+	doc = frappe.get_doc("Internal Transfer", docname)
 	# Prepare transaction details
 	transaction_details = {
-		"debit": doc.debit,
-		"credit": doc.credit,
+		"from_company": doc.from_company,
+		"to_company": doc.to_company,
 		"amount": doc.amount,
 		"profit": doc.our_profit,
-		"branch": doc.branch
+		"branch": doc.branch,
+		"other_party_profit":doc.other_party_profit
 	}
 	return transaction_details
 

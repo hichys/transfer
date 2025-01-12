@@ -3,6 +3,56 @@
 
 //
  
+frappe.ui.form.on('Internal Transfer', {
+    create_journal_entry: function(frm) {
+        frappe.call({
+            method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.create_journal_entry_preview',
+            args: { docname: frm.doc.name },
+            callback: function(r) {
+                if (r.message) {
+                    const details = r.message;
+                    
+                    // Display a dialog with transaction details
+                    const dialog = new frappe.ui.Dialog({
+                        title: 'Confirm Transaction',
+                        fields: [
+                            {
+                                fieldname: 'details_html',
+                                fieldtype: 'HTML',
+                                options: `
+                                    <div>
+                                        <p><strong>الفرع:</strong> ${details.branch}</p>
+                                        <p><strong>المرسل:</strong> ${details.from_company}</p>
+                                        <p><strong>المستقبل:</strong> ${details.to_company}</p>
+                                        <p><strong>القيمة:</strong> ${details.amount}</p>
+                                        <p><strong>عمولة</strong> ${details.from_company}: ${details.profit}</p>
+                                        <p><strong>عمولة</strong> ${details.to_company}: ${details.other_party_profit}</p>
+                                    </div>
+                                `,
+                            },
+                        ],
+                        primary_action_label: 'Confirm',
+                        primary_action: function() {
+                            frappe.call({
+                                method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.handel_journal_entries_creation',
+                                args: { docname: frm.doc.name },
+                                callback: function(r) {
+                                    if (r.message.status === 'success') {
+                                        frappe.msgprint('Journal Entry created successfully.');
+                                        frm.reload_doc();
+                                    }
+                                }
+                            });
+                            dialog.hide();
+                        }
+                    });
+
+                    dialog.show();
+                }
+            }
+        });
+    }
+});
 
 let type = 2;
 frappe.ui.form.on("Internal Transfer", {
@@ -80,27 +130,7 @@ frappe.ui.form.on("Internal Transfer", {
 
         if (frm.doc.docstatus === 1   && frm.doc.status === "غير مسجلة") {
             frm.add_custom_button(__('تسجيل'), function () {
-                frappe.confirm(
-                    'Are you sure you want to proceed?',
-                    () => {
-                        // Action to take if user confirms
-                        frappe.call({
-                            method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.handel_journal_entries_creation',
-                            args: {
-                                docname: frm.doc.name
-                            },
-                            callback: function (r) {
-                                if (!r.exc) {
-                                    frappe.msgprint(__('Action completed successfully.'));
-                                    frm.reload_doc(); // Reload document to reflect changes
-                                }
-                            }
-                        });
-                    },
-                    () => {
-                        frappe.msgprint(__('Action was canceled.'));
-                    }
-                );
+                frm.trigger('create_journal_entry');
             });
         }
 
