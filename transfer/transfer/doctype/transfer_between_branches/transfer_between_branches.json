@@ -233,7 +233,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-11 21:19:35.295507",
+ "modified": "2025-01-12 22:59:18.511679",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",
@@ -250,20 +250,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "alalmia employee",
    "share": 1,
    "submit": 1,
    "write": 1
