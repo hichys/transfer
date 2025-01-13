@@ -199,7 +199,7 @@ def reverse_journal_entry(self,docname):
 				"cheque_no": f"{docname}",
 				"cheque_date": nowdate(),
 				"reversal_of": journal_entry.name,
-    			"remarks": journal_entry.whatsapp_desc
+    			"remarks":journal_entry.remark
 			})
 			
 			# Insert and submit the reversed journal entry
