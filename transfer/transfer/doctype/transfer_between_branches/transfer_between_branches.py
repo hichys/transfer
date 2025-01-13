@@ -221,7 +221,7 @@ def create_journal_entry_from_pending_transfer(doc, method):
 
 	journal_entry = frappe.get_doc({
 		"doctype": "Journal Entry",
-		"posting_date": doc.posting_date,
+		"posting_date": frappe.utils.nowdate(),
 		"mode_of_payment": "Cash",
 		"accounts": accounts,
 		"cheque_no" : doc.name,
