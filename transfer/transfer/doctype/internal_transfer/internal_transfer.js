@@ -77,8 +77,13 @@ let type = 2;
 frappe.ui.form.on("Internal Transfer", {
 
     onload: function(frm){
-        frm.set_value("to_type","Customer")
-        frm.set_value("from_type","Branch")
+        if(frm.doc.is_new())
+        {
+            frm.set_value("select_internal","من شركة الي فرع")
+            frm.set_value("to_type","Branch")
+            frm.set_value("from_type","Customer")
+            frm.refresh_fields()
+        }
     },
 
     delete_draft: function(frm) {
@@ -226,18 +231,27 @@ frappe.ui.form.on("Internal Transfer", {
     },
     select_internal:function (frm){
 
-        
-        
+        if(frm.doc.select_internal)
+        {
+            reset_fields(frm);
+        }
+
 
         if(frm.doc.select_internal == "من شركة الي فرع"){
             frappe.show_alert("من شركة الي فرع 2525");
-           
             // frm.fields_dict['from_type'].set_value("Customer");
             // frm.fields_dict['to_type'].set_value("Branch");
             frm.set_value('from_type','Customer');
             frm.set_value('to_type','Branch');
+
+            frm.set_df_property('other_party_profit', 'read_only', 0);
             frm.set_df_property('from_company', 'label', 'من شركة ');
             frm.set_df_property('to_company', 'label', 'الي فرع ال');
+            frm.set_df_property('branch', 'label', 'الفرع (المستقبل)');
+
+            frm.set_df_property('our_profit', 'label', "عمولة الشركة")
+            frm.set_df_property('other_party_profit', 'label', 'عمولة الفرع')
+
             type = 1;
             frm.set_df_property('to_comapny','read_only',1)
             frm.set_df_property('from_company','read_only',0)
@@ -245,16 +259,31 @@ frappe.ui.form.on("Internal Transfer", {
 
         }
         if(frm.doc.select_internal == "من فرع الي شركة"){
-            frappe.show_alert("من شركة الي فرع 2525");
-             
+            frappe.show_alert("من فرع الي شركة ");
+
+             //الطرف الاخر لا نحسب عمولتة
+             frm.doc.other_party_profit = 0;
+             frm.set_df_property('other_party_profit', 'read_only', 1);
+ 
+            
+
             frm.set_value('from_type','Branch');
             frm.set_value('to_type','Customer');
-            frm.set_df_property('from_company', 'label', 'من فرع ال');
+            frm.set_df_property('from_company', 'label', 'من فرع');
             frm.set_df_property('to_company', 'label', 'الي شركة ');
+            frm.set_df_property('branch', 'label', 'الفرع (المرسل)');
+            
+             
+            frm.set_df_property('our_profit', 'label', "عمولة الفرع")
+            frm.set_df_property('other_party_profit', 'label', "عمولة الشركة")
+            
              type = 2;
 
              frm.set_df_property('from_company','read_only',1)
-             frm.set_df_property('to_comapny','read_only',0)
+             frm.set_df_property('to_comapny','read_only',0);
+             
+             //reset from_company to_company fields
+             
         }
 
         //clear field for new inputs
@@ -349,13 +378,13 @@ frappe.ui.form.on("Internal Transfer", {
     }
     
 });
+ 
 function reset_fields(frm){
-    frm.set_value('from_company','');
-    frm.set_value('to_company',''); 
-    frm.set_value('branch','')
-    frm.set_value('profit_account','')
-    frm.set_value('credit','')
-    frm.set_value('debit','')
-    frm.refresh_fields()
+    frm.set_value("branch","");
+    frm.set_value("from_company","");
+    frm.set_value("to_company","");
+    frm.set_value("profit_account","");
+    frm.set_value("debit","");
+    frm.set_value("credit","");
+    frm.refresh_fields();
 }
-

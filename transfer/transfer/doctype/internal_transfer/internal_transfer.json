@@ -285,7 +285,7 @@
    "depends_on": "eval:!doc.without_profit",
    "fieldname": "other_party_profit",
    "fieldtype": "Currency",
-   "label": "\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0637\u0631\u0641 \u0627\u0644\u0627\u062e\u0631",
+   "label": "\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0634\u0631\u0643\u0629",
    "precision": "2",
    "reqd": 1
   },
@@ -337,7 +337,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-12 02:35:32.324673",
+ "modified": "2025-01-14 23:43:33.123411",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Internal Transfer",
