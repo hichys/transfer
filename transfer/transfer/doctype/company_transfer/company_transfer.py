@@ -240,7 +240,7 @@ def reverse_journal_entry(self,docname):
 				"mode_of_payment": "Cash",  # Adjust as per your requirements
 				"cheque_no": f"{docname}",
 				"cheque_date": nowdate(),
-				"reversal_of": journal_entry.name
+				"reversal_of": journal_entry.name,
 				"user_remark":journal_entry.user_remark
 			})
 			
