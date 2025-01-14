@@ -215,9 +215,6 @@ def get_profit_account(branch):
 def get_temp_account(branch):
 	return get_account_for_branch(branch,2);
 
-import frappe
-from frappe.utils import nowdate
-
 def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=None, posting_date=None, remarks=None):
 	try:
 		# Validate inputs
@@ -306,6 +303,8 @@ def validate_linked_journal_entries(docname, link_fields=["cheque_no"]):
 				("Cannot cancel this document because the following Journal Entries are not canceled or reversed: {0}")
 				.format(linked_entries)
 			)
+	#all journal entries has been canceled 
+	return True
 
 # @frappe.whitelist()
 # def extract_phone_number(whatsapp_desc):

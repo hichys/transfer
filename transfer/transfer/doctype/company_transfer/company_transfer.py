@@ -18,7 +18,7 @@ class companytransfer(Document):
 	def create_company_transfer():
 		frappe.msgprint("Company Transfer Created")
 	def before_cancel(self):
-		validate_linked_journal_entries(self.name)	
+		pass
 	def on_submit(self):
 		if(self.status == "غير مسجلة"):
 			handle_creation(self.name,"submit")
@@ -63,6 +63,8 @@ class companytransfer(Document):
 				if posting_date == today:
 					# If the journal entry was created today, cancel it
 					je.cancel()
+					if not validate_linked_journal_entries(self.name):
+						frappe.throw("ERRROR CODE COM888")
 					frappe.msgprint(f"Journal Entry {je.name} has been cancelled.")
 				else:
 					# If the journal entry is older than today, reverse it
@@ -301,8 +303,8 @@ def handle_cancel_transfer(docname,method="cancel"):
 			frappe.msgprint(f"attempt to cancel {doc.docstatus}")
 			doc.status = "ملغية"
 			doc.save()
-			frappe.db.commit()
 			doc.cancel()
+			frappe.db.commit()
 		else :
 			handel_reverse(doc)
 			doc.status = "ملغية"
