@@ -199,7 +199,7 @@ def reverse_journal_entry(self,docname):
 				"cheque_no": f"{docname}",
 				"cheque_date": nowdate(),
 				"reversal_of": journal_entry.name,
-    			"remarks":journal_entry.remark
+    			"user_remark":journal_entry.user_remark
 			})
 			
 			# Insert and submit the reversed journal entry
@@ -249,7 +249,7 @@ def transfer_completed(docname):
 				amount=	doc.amount,
 				cheque_no=docname,
 				posting_date=nowdate(), 
-				remarks=doc.whatsapp_desc
+				user_remark=doc.whatsapp_desc
 			)
 		doc.status = "مستلمة"
 		doc.save()

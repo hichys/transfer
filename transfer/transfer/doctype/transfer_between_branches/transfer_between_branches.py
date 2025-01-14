@@ -226,7 +226,7 @@ def create_journal_entry_from_pending_transfer(doc, method):
 		"accounts": accounts,
 		"cheque_no" : doc.name,
 		"cheque_date" : doc.posting_date,
-		"remark": doc.whatsapp_desc
+		"user_remark": doc.whatsapp_desc
 	})
 
 	
@@ -441,7 +441,7 @@ def reverse_journal_entry(docname):
 			"posting_date": frappe.utils.nowdate(),
 			"company"     : original_entry.company,
 			"accounts"    : accounts,
-			"remark"     : original_entry.remark,
+			"user_remark"     : original_entry.user_remark,
 			"reversal_of" : original_entry.name,  # Link the reversal to the original
 			"cheque_no"   : original_entry.cheque_no,
 			"cheque_date" : original_entry.posting_date
@@ -452,7 +452,7 @@ def reverse_journal_entry(docname):
 		reversal_entry.submit()
 
 		# Update the original journal entry to reference the reversal
-		# original_entry.db_set("remark", "تم انعكاسة")
+		original_entry.db_set("remark", "تم انعكاسة")
 		original_entry.db_set("custom_reversed_by", reversal_entry.name)
 
 		

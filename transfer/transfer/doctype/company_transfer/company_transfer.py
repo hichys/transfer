@@ -191,7 +191,7 @@ def create_journal_entry(self):
 			"mode_of_payment": "Cash",
    			"cheque_no": self.name,
 			"cheque_date": frappe.utils.nowdate(),
-			"remarks":doc.whatsapp_desc
+			"user_remark":self.whatsapp_desc
 		})
 
 		# Save and Submit the Journal Entry
@@ -241,7 +241,7 @@ def reverse_journal_entry(self,docname):
 				"cheque_no": f"{docname}",
 				"cheque_date": nowdate(),
 				"reversal_of": journal_entry.name
-				"remarks":journal_entry.remark
+				"user_remark":journal_entry.user_remark
 			})
 			
 			# Insert and submit the reversed journal entry
