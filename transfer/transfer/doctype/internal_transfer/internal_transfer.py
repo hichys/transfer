@@ -141,6 +141,7 @@ def create_journal_entry(self,temp=False):
 			"mode_of_payment": "Cash",
    			"cheque_no": self.name,
 			"cheque_date": frappe.utils.nowdate(),
+			"user_remark" : self.whatsapp_desc
 
 		})
 
@@ -249,7 +250,7 @@ def transfer_completed(docname):
 				amount=	doc.amount,
 				cheque_no=docname,
 				posting_date=nowdate(), 
-				user_remark=doc.whatsapp_desc
+				remarks=doc.whatsapp_desc
 			)
 		doc.status = "مستلمة"
 		doc.save()
