@@ -4,7 +4,7 @@
  "docstatus": 0,
  "doctype": "Page",
  "idx": 0,
- "modified": "2025-01-11 21:42:26.101711",
+ "modified": "2025-01-14 13:18:29.422621",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "alalmiatransfer",
@@ -15,7 +15,7 @@
    "role": "System Manager"
   },
   {
-   "role": "alalmia employee"
+   "role": "alalmia transfer"
   }
  ],
  "script": null,

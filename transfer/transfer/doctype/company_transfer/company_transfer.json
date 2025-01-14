@@ -338,7 +338,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-11 22:15:51.639465",
+ "modified": "2025-01-14 13:17:53.737673",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",
@@ -362,7 +362,6 @@
    "write": 1
   },
   {
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -370,10 +369,8 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "alalmia employee",
-   "select": 1,
+   "role": "alalmia transfer",
    "share": 1,
-   "submit": 1,
    "write": 1
   }
  ],
