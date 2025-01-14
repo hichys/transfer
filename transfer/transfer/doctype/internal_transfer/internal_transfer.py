@@ -141,6 +141,7 @@ def create_journal_entry(self,temp=False):
 			"mode_of_payment": "Cash",
    			"cheque_no": self.name,
 			"cheque_date": frappe.utils.nowdate(),
+			"user_remark" : self.whatsapp_desc
 
 		})
 
@@ -198,7 +199,8 @@ def reverse_journal_entry(self,docname):
 				"mode_of_payment": "Cash",  # Adjust as per your requirements
 				"cheque_no": f"{docname}",
 				"cheque_date": nowdate(),
-				"reversal_of": journal_entry.name
+				"reversal_of": journal_entry.name,
+    			"user_remark":journal_entry.user_remark
 			})
 			
 			# Insert and submit the reversed journal entry
@@ -247,8 +249,8 @@ def transfer_completed(docname):
 				branch=	doc.branch,
 				amount=	doc.amount,
 				cheque_no=docname,
-				posting_date=None, 
-				remarks=None
+				posting_date=nowdate(), 
+				remarks=doc.whatsapp_desc
 			)
 		doc.status = "مستلمة"
 		doc.save()

@@ -221,11 +221,12 @@ def create_journal_entry_from_pending_transfer(doc, method):
 
 	journal_entry = frappe.get_doc({
 		"doctype": "Journal Entry",
-		"posting_date": doc.posting_date,
+		"posting_date": frappe.utils.nowdate(),
 		"mode_of_payment": "Cash",
 		"accounts": accounts,
 		"cheque_no" : doc.name,
-		"cheque_date" : doc.posting_date
+		"cheque_date" : doc.posting_date,
+		"user_remark": doc.whatsapp_desc
 	})
 
 	
@@ -379,6 +380,7 @@ def create_journal_entry_from_handed_transfer(doc, method):
 		"posting_date": doc.posting_date,
 		"cheque_no" : doc.name,
 		"cheque_date" : doc.posting_date,
+		"user_remark" : doc.whatsapp_desc,
 		"accounts": [
 			{
 				"account": debit_to_liabilities,
@@ -435,15 +437,15 @@ def reverse_journal_entry(docname):
 
 		# Create the reversal journal entry
 		reversal_entry = frappe.get_doc({
-			"doctype": "Journal Entry",
+			"doctype"	  : "Journal Entry",
 			"voucher_type": original_entry.voucher_type,
 			"posting_date": frappe.utils.nowdate(),
-			"company": original_entry.company,
-			"accounts": accounts,
-			"remark": f"Reversal of Journal Entry {original_entry.name}",
-			"reversal_of": original_entry.name,  # Link the reversal to the original
-			"cheque_no" : original_entry.cheque_no,
-			"cheque_date" : original_entry.posting_date
+			"company"     : original_entry.company,
+			"accounts"    : accounts,
+			"reversal_of" : original_entry.name,  # Link the reversal to the original
+			"cheque_no"   : original_entry.cheque_no,
+			"cheque_date" : original_entry.posting_date,
+			"user_remark"     : original_entry.user_remark
 		})
 		
 		# Insert and submit the reversal entry
