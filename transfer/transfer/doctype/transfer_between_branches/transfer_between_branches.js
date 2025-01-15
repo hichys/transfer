@@ -248,7 +248,7 @@ frappe.ui.form.on('transfer between branches', {
 });
 
 frappe.ui.form.on('transfer between branches', {
-	refresh: function (frm) {
+	// refresh: function (frm) {
 
 		// Add a custom button for workflow_state "تم التسليم"
 
@@ -280,10 +280,21 @@ frappe.ui.form.on('transfer between branches', {
 		// 		}
 		// 	);
 		// });
-	}
+	// }
 });
 
 frappe.ui.form.on('transfer between branches', {
+	delivery_date: function(frm) {
+        if (frm.doc.delivery_date && frm.doc.posting_date) {
+            const deliveryDate = frappe.datetime.str_to_obj(frm.doc.delivery_date);
+            const postingDate = frappe.datetime.str_to_obj(frm.doc.posting_date);
+
+            if (deliveryDate < postingDate) {
+                frappe.msgprint(__('تاريخ التسليم خطأ'));
+                frm.set_value('delivery_date', null);
+            }
+        }
+    },
 	from_branch: function (frm) {
 		if (frm.doc.from_branch) {
 			console.log('Selected branch:', frm.doc.from_branch, frm.doc.to_branch); // Log the selected branch

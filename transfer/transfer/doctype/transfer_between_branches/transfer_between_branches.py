@@ -2,13 +2,24 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from transfer.transfer.api import get_journal_entries_by_cheque, get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
 from .create_journal_entery import *
 from datetime import datetime, timedelta
+from frappe.utils import getdate
 
 class transferbetweenbranches(Document):
-	
+	def on_update_after_submit(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
+
+	def validate(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
+
 	def on_trash(self):
 		frappe.msgprint("This document has been trashed")
 	def before_cancel(self):
@@ -20,6 +31,7 @@ class transferbetweenbranches(Document):
 	  # Save the previous state when the document is loaded
 
 	def on_change(self):
+		
 		# check previous state
 		if(self.get_doc_before_save() and not self.get_doc_before_save().workflow_state == "مستلمة"):
 			if self.workflow_state == "مستلمة" and not self.handed:
@@ -28,7 +40,8 @@ class transferbetweenbranches(Document):
 
 
 	def on_update(self):
-		print("on update called")
+		# frappe.msgprint("on update called")
+		pass
 		
 
 	def on_submit(self):
@@ -221,7 +234,7 @@ def create_journal_entry_from_pending_transfer(doc, method):
 
 	journal_entry = frappe.get_doc({
 		"doctype": "Journal Entry",
-		"posting_date": frappe.utils.nowdate(),
+		"posting_date": doc.posting_date,
 		"mode_of_payment": "Cash",
 		"accounts": accounts,
 		"cheque_no" : doc.name,
@@ -271,7 +284,7 @@ def handel_reversal(docname, method):
 				frappe.msgprint(f"Reversing Handed Journal Entry: {doc.handed}")
 				handed = doc.handed
 				doc.handed = ""
-				reverse_journal_entry(handed)  # Reverse the journal entry
+				reverse_journal_entry(handed,doc.posting_date)  # Reverse the journal entry
 				frappe.msgprint(f"Handed Journal Entry {handed} has been reversed")
 
 		# Handling the notyet journal entry
@@ -280,7 +293,7 @@ def handel_reversal(docname, method):
 				frappe.msgprint(f"Reversing NotYet Journal Entry: {doc.notyet}")
 				notyet = doc.notyet
 				doc.notyet = ""
-				reverse_journal_entry(notyet)  # Reverse the journal entry
+				reverse_journal_entry(notyet,doc.posting_date)  # Reverse the journal entry
 				frappe.msgprint(f"NotYet Journal Entry {notyet} has been reversed")
 			if method == "cancel":
 				frappe.msgprint(f"Cancelling NotYet Journal Entry: {doc.notyet}")
@@ -338,12 +351,12 @@ def cancel_handed_transfer_after_a_day(docname, method=None):
 			# Reverse 'handed' journal entry
 			if doc.handed:
 				frappe.msgprint(f"Reversing Journal Entry: {doc.handed}")
-				reverse_journal_entry(doc.handed)
+				reverse_journal_entry(doc.handed,doc.posting_date)
 
 			# Reverse 'notyet' journal entry
 			if doc.notyet:
 				frappe.msgprint(f"Reversing Journal Entry: {doc.notyet}")
-				reverse_journal_entry(doc.notyet)
+				reverse_journal_entry(doc.notyet,doc.posting_date)
 
 			# Update workflow state and status
 			doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
@@ -410,7 +423,7 @@ def create_journal_entry_from_handed_transfer(doc, method):
 	frappe.publish_realtime("refresh_ui", {"docname": doc.name, "journal_entry": journal_entry.name}, user=frappe.session.user)
 
 @frappe.whitelist()
-def reverse_journal_entry(docname):
+def reverse_journal_entry(docname,reversal_date):
 	try:
 		# Fetch the original journal entry
 		original_entry = frappe.get_doc("Journal Entry", docname)
@@ -439,7 +452,7 @@ def reverse_journal_entry(docname):
 		reversal_entry = frappe.get_doc({
 			"doctype"	  : "Journal Entry",
 			"voucher_type": original_entry.voucher_type,
-			"posting_date": frappe.utils.nowdate(),
+			"posting_date": reversal_date,
 			"company"     : original_entry.company,
 			"accounts"    : accounts,
 			"reversal_of" : original_entry.name,  # Link the reversal to the original
