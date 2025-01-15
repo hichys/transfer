@@ -3,11 +3,11 @@
 
 //
 frappe.ui.form.on('Internal Transfer', {
-    create_journal_entry: function(frm) {
+    create_journal_entry: function (frm) {
         frappe.call({
             method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.create_journal_entry_preview',
             args: { doctype: frm.doctype, docname: frm.doc.name },
-            callback: function(r) {
+            callback: function (r) {
                 if (r.message) {
                     const details = r.message;
 
@@ -33,11 +33,11 @@ frappe.ui.form.on('Internal Transfer', {
                             },
                         ],
                         primary_action_label: 'تأكيد',
-                        primary_action: function() {
+                        primary_action: function () {
                             frappe.call({
                                 method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.handel_journal_entries_creation',
                                 args: { docname: frm.doc.name },
-                                callback: function(r) {
+                                callback: function (r) {
                                     if (r.message.status === 'success') {
                                         frappe.msgprint('تم إنشاء القيد بنجاح.');
                                         frm.reload_doc();
@@ -52,7 +52,7 @@ frappe.ui.form.on('Internal Transfer', {
                     dialog.show();
 
                     // Add "copy details" functionality
-                    dialog.$wrapper.on('click', '#copy-details', function() {
+                    dialog.$wrapper.on('click', '#copy-details', function () {
                         const detailsText = `
                             الفرع: ${details.branch}
                             المرسل: ${details.from_company}
@@ -76,27 +76,28 @@ frappe.ui.form.on('Internal Transfer', {
 let type = 2;
 frappe.ui.form.on("Internal Transfer", {
 
-    onload: function(frm){
-        if(frm.doc.is_new())
-        {
-            frm.set_value("select_internal","من شركة الي فرع")
-            frm.set_value("to_type","Branch")
-            frm.set_value("from_type","Customer")
-            frm.refresh_fields()
+    onload: function (frm) {
+        if (frm.doc.__islocal) {
+            frappe.show_alert("جديدة");
+            // frm.set_value("select_internal","من فرع الي شركة");
+            // frm.set_value("to_type","Customer");
+            // frm.set_value("from_type","Branch");
+            // frm.refresh_fields(); 
+            frm.trigger("select_internal")
         }
     },
 
-    delete_draft: function(frm) {
+    delete_draft: function (frm) {
         frappe.confirm(
             'هل انت متاكد من المسح ؟',
-            function() {
+            function () {
                 frappe.call({
                     method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.delete_draft_doc',
                     args: {
                         doctype: frm.doc.doctype,
                         docname: frm.doc.name
                     },
-                    callback: function(response) {
+                    callback: function (response) {
                         frappe.msgprint(response.message);
                         frappe.set_route('List', frm.doc.doctype); // Redirect to the list view after deletion
                     }
@@ -108,12 +109,12 @@ frappe.ui.form.on("Internal Transfer", {
      * التاكد من ان حقل المرسل والستقبل يحتوي علي قيم صحيحه
      * 
      */
-    validate: function(frm) {
+    validate: function (frm) {
         if (type === 1) { //من شركة الي فرع
-            
-            if(frm.doc.branch !== frm.doc.to_company)
+
+            if (frm.doc.branch !== frm.doc.to_company)
                 frappe.throw(('الرجاء التاكد من الفرع'));
-            
+
             frappe.call({
                 method: "frappe.client.get_list",
                 args: {
@@ -121,7 +122,7 @@ frappe.ui.form.on("Internal Transfer", {
                     filters: { name: frm.doc.from_company },
                     fields: ["name"]
                 },
-                callback: function(response) {
+                callback: function (response) {
                     if (!response.message || response.message.length === 0) {
                         frappe.msgprint(__('The company "{0}" is not linked to any customer.', [frm.doc.from_company]));
                         frappe.validated = false;
@@ -129,30 +130,29 @@ frappe.ui.form.on("Internal Transfer", {
                 }
             });
         }
-        else{
-            if(type === 2)
-            {
-                if(frm.doc.branch !== frm.doc.from_company)
+        else {
+            if (type === 2) {
+                if (frm.doc.branch !== frm.doc.from_company)
                     frappe.throw(('الرجاء التاكد من الفرع'));
             }
         }
-        if ((frm.doc.our_profit + frm.doc.other_party_profit )> frm.doc.amount) {
+        if ((frm.doc.our_profit + frm.doc.other_party_profit) > frm.doc.amount) {
             frappe.throw(('الرجاء التحقق من القيمه والعمولات'));
         }
 
         validate = true
     },
-    after_save: function(frm) {
+    after_save: function (frm) {
     },
-    refresh : function(frm){
+    refresh: function (frm) {
 
         if (frm.doc.docstatus === 0 || frm.doc.status === "غير مسجلة") {  // Show the delete button only for draft documents
-            frm.add_custom_button('مسح الحوالة', function() {
+            frm.add_custom_button('مسح الحوالة', function () {
                 frm.trigger('delete_draft');
             });
         }
 
-        if (frm.doc.docstatus === 1   && frm.doc.status === "غير مسجلة") {
+        if (frm.doc.docstatus === 1 && frm.doc.status === "غير مسجلة") {
             frm.add_custom_button(__('تسجيل'), function () {
                 frm.trigger('create_journal_entry');
             });
@@ -208,11 +208,11 @@ frappe.ui.form.on("Internal Transfer", {
                     }
                 );
             });
-           
+
         }
     },
-    without_profit : function(frm){
-        if(frm.doc.without_profit){
+    without_profit: function (frm) {
+        if (frm.doc.without_profit) {
             frappe.show_alert(frm.doc.our_profit);
             frappe.show_alert(frm.doc.other_party_profit);
         }
@@ -229,20 +229,19 @@ frappe.ui.form.on("Internal Transfer", {
         frm.set_value('our_profit', frm.doc.profit);
         frm.set_value('other_party_profit', 0);
     },
-    select_internal:function (frm){
+    select_internal: function (frm) {
 
-        if(frm.doc.select_internal)
-        {
+        if (frm.doc.select_internal) {
             reset_fields(frm);
         }
 
 
-        if(frm.doc.select_internal == "من شركة الي فرع"){
+        if (frm.doc.select_internal == "من شركة الي فرع") {
             frappe.show_alert("من شركة الي فرع 2525");
             // frm.fields_dict['from_type'].set_value("Customer");
             // frm.fields_dict['to_type'].set_value("Branch");
-            frm.set_value('from_type','Customer');
-            frm.set_value('to_type','Branch');
+            frm.set_value('from_type', 'Customer');
+            frm.set_value('to_type', 'Branch');
 
             frm.set_df_property('other_party_profit', 'read_only', 0);
             frm.set_df_property('from_company', 'label', 'من شركة ');
@@ -253,105 +252,103 @@ frappe.ui.form.on("Internal Transfer", {
             frm.set_df_property('other_party_profit', 'label', 'عمولة الفرع')
 
             type = 1;
-            frm.set_df_property('to_comapny','read_only',1)
-            frm.set_df_property('from_company','read_only',0)
+            frm.set_df_property('to_comapny', 'read_only', 1)
+            frm.set_df_property('from_company', 'read_only', 0)
 
 
         }
-        if(frm.doc.select_internal == "من فرع الي شركة"){
+        if (frm.doc.select_internal == "من فرع الي شركة") {
             frappe.show_alert("من فرع الي شركة ");
 
-             //الطرف الاخر لا نحسب عمولتة
-             frm.doc.other_party_profit = 0;
-             frm.set_df_property('other_party_profit', 'read_only', 1);
- 
-            
+            //الطرف الاخر لا نحسب عمولتة
+            frm.doc.other_party_profit = 0;
+            frm.set_df_property('other_party_profit', 'read_only', 1);
 
-            frm.set_value('from_type','Branch');
-            frm.set_value('to_type','Customer');
+
+
+            frm.set_value('from_type', 'Branch');
+            frm.set_value('to_type', 'Customer');
             frm.set_df_property('from_company', 'label', 'من فرع');
             frm.set_df_property('to_company', 'label', 'الي شركة ');
             frm.set_df_property('branch', 'label', 'الفرع (المرسل)');
-            
-             
+
+
             frm.set_df_property('our_profit', 'label', "عمولة الفرع")
             frm.set_df_property('other_party_profit', 'label', "عمولة الشركة")
-            
-             type = 2;
 
-             frm.set_df_property('from_company','read_only',1)
-             frm.set_df_property('to_comapny','read_only',0);
-             
-             //reset from_company to_company fields
-             
+            type = 2;
+
+            frm.set_df_property('from_company', 'read_only', 1)
+            frm.set_df_property('to_comapny', 'read_only', 0);
+
+            //reset from_company to_company fields
+
         }
 
         //clear field for new inputs
-      
-        if(frm.select_internal)
-            {
-                frm.fields_dict['from_company'].set_value("")
-                frm.fields_dict['branch'].set_value("")
-                frm.fields_dict['to_company'].set_value("")
-                
-                frm.refresh_fields()
-             
-            }
-    },
-    without_profit: function(frm){
 
-        frm.set_value('our_profit',0)
-        frm.set_value('other_party_profit',0)
+        if (frm.select_internal) {
+            frm.fields_dict['from_company'].set_value("")
+            frm.fields_dict['branch'].set_value("")
+            frm.fields_dict['to_company'].set_value("")
+
+            frm.refresh_fields()
+
+        }
     },
-    branch: function (frm){
-        if(frm.doc.branch){
-            if(type === 1){
+    without_profit: function (frm) {
+
+        frm.set_value('our_profit', 0)
+        frm.set_value('other_party_profit', 0)
+    },
+    branch: function (frm) {
+        if (frm.doc.branch) {
+            if (type === 1) {
                 frappe.show_alert("من شركة الي فرع")
-                frm.set_value('to_company',frm.doc.branch)
-                frm.set_df_property('to_comapny','read_only',1)
+                frm.set_value('to_company', frm.doc.branch)
+                frm.set_df_property('to_comapny', 'read_only', 1)
                 frappe.call({
                     method: 'transfer.transfer.doctype.company_transfer.company_transfer.get_temp_account', // Specify your server-side method here
                     args: {
                         branch: frm.doc.branch,
-                        
+
                     },
-                    callback: function(r) {
+                    callback: function (r) {
                         if (r.message) {
                             // check if the account is found
                             frm.set_value('profit_account', r.message);
-                            frm.set_value('credit',r.message)
-                            frm.set_value('debit',"Debtors - A")
+                            frm.set_value('credit', r.message)
+                            frm.set_value('debit', "Debtors - A")
                         }
                     },
-                    error: function(error) {
+                    error: function (error) {
                         frappe.msgprint(__('لا يوجد حساب لهذا الفرع'));
                     }
                 });
             }
-            else{
-                
-                if(type === 2)
-                {
+            else {
+
+                if (type === 2) {
                     frappe.show_alert("من فرع الي شركة")
-                    frm.set_value('from_company',frm.doc.branch)
-                    frm.set_df_property('from_company','read_only',1)
+                    frm.set_value('from_company', frm.doc.branch)
+                    frm.set_df_property('from_company', 'read_only', 1)
 
                     frappe.call({
                         method: 'transfer.transfer.doctype.company_transfer.company_transfer.get_main_account', // Specify your server-side method here
                         args: {
                             branch: frm.doc.branch,
-                            
+
                         },
-                        callback: function(r) {
+                        callback: function (r) {
                             if (r.message) {
                                 // check if the account is found
                                 frm.set_value('profit_account', r.message);
-                                frm.set_value('debit',r.message)
-                                frm.set_value('credit',"Debtors - A")
-                                
+                                frm.set_value('debit', r.message)
+                                frm.set_value('credit', "Debtors - A")
+
                             }
                         },
-                        error: function(error) {
+                        error: function (error) {
                             frappe.msgprint(__('لا يوجد حساب لهذا الفرع'));
                         }
                     });
@@ -360,13 +357,13 @@ frappe.ui.form.on("Internal Transfer", {
             }
 
 
-           
+
         }
     },
-    from_type: function(frm){
-         
+    from_type: function (frm) {
+
     },
-    whatsapp_desc:function(frm){
+    whatsapp_desc: function (frm) {
         if (frm.doc.whatsapp_desc) {
             let phoneNumber = extract_phone_number(frm.doc.whatsapp_desc);
             frm.set_value("phone_number", phoneNumber); // Set the phone number field
@@ -376,15 +373,15 @@ frappe.ui.form.on("Internal Transfer", {
             });
         }
     }
-    
+
 });
- 
-function reset_fields(frm){
-    frm.set_value("branch","");
-    frm.set_value("from_company","");
-    frm.set_value("to_company","");
-    frm.set_value("profit_account","");
-    frm.set_value("debit","");
-    frm.set_value("credit","");
+
+function reset_fields(frm) {
+    frm.set_value("branch", "");
+    frm.set_value("from_company", "");
+    frm.set_value("to_company", "");
+    frm.set_value("profit_account", "");
+    frm.set_value("debit", "");
+    frm.set_value("credit", "");
     frm.refresh_fields();
 }
