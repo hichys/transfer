@@ -6,8 +6,19 @@ from frappe.model.document import Document
 import frappe
 from transfer.transfer.api import create_journal_entry_preview, validate_linked_journal_entries,get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
 from frappe.utils import getdate, nowdate 
-
+from frappe import _
 class companytransfer(Document):
+	def on_update_after_submit(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
+
+	def validate(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
+
+
 	# def after_save(doc, method):
 	# 	if doc.docstatus == 1:  # Document is submitted
 	# 		frappe.publish_realtime(

@@ -110,6 +110,7 @@ frappe.ui.form.on("Internal Transfer", {
      * 
      */
     validate: function (frm) {
+        
         if (type === 1) { //من شركة الي فرع
 
             if (frm.doc.branch !== frm.doc.to_company)
@@ -209,6 +210,17 @@ frappe.ui.form.on("Internal Transfer", {
                 );
             });
 
+        }
+    },
+    delivery_date: function(frm) {
+        if (frm.doc.delivery_date && frm.doc.posting_date) {
+            const deliveryDate = frappe.datetime.str_to_obj(frm.doc.delivery_date);
+            const postingDate = frappe.datetime.str_to_obj(frm.doc.posting_date);
+
+            if (deliveryDate < postingDate) {
+                frappe.msgprint(__('تاريخ التسليم خطأ'));
+                frm.set_value('delivery_date', null);
+            }
         }
     },
     without_profit: function (frm) {

@@ -6,11 +6,11 @@ let per_branch = null;
 
 
 frappe.ui.form.on('company transfer', {
-    create_journal_entry: function(frm) {
+    create_journal_entry: function (frm) {
         frappe.call({
             method: 'transfer.transfer.doctype.company_transfer.company_transfer.create_journal_entry_preview',
             args: { doctype: frm.doctype, docname: frm.doc.name },
-            callback: function(r) {
+            callback: function (r) {
                 if (r.message) {
                     const details = r.message;
 
@@ -36,13 +36,13 @@ frappe.ui.form.on('company transfer', {
                             },
                         ],
                         primary_action_label: 'تأكيد',
-                        primary_action: function() {
+                        primary_action: function () {
                             frappe.call({
                                 method: 'transfer.transfer.doctype.company_transfer.company_transfer.handle_creation',
                                 args: { docname: frm.doc.name },
-                                callback: function(r) {
+                                callback: function (r) {
                                     if (r.message.status === 'success') {
-										frappe.show_alert(__('تم التسجيل'));
+                                        frappe.show_alert(__('تم التسجيل'));
                                         frm.reload_doc();
                                     }
                                 }
@@ -55,7 +55,7 @@ frappe.ui.form.on('company transfer', {
                     dialog.show();
 
                     // Add "copy details" functionality
-                    dialog.$wrapper.on('click', '#copy-details', function() {
+                    dialog.$wrapper.on('click', '#copy-details', function () {
                         const detailsText = `
                             الفرع: ${details.branch}
                             المرسل: ${details.from_company}
@@ -101,7 +101,7 @@ function fetchBranch(callback) {
     });
 }
 
- 
+
 
 
 
@@ -110,8 +110,7 @@ frappe.ui.form.on('company transfer', {
 
     validate: function (frm) {
 
-        if(frm.doc.from_company === frm.doc.to_company)
-        {
+        if (frm.doc.from_company === frm.doc.to_company) {
             frappe.throw("لا يمكن التحويل الي نفس الشركة");
             validate = false;
         }
@@ -146,7 +145,7 @@ frappe.ui.form.on('company transfer', {
     },
     onload: function (frm) {
 
-        frappe.realtime.on('doc_update', function(data) {
+        frappe.realtime.on('doc_update', function (data) {
             if (cur_frm && cur_frm.docname === data.docname) {
                 cur_frm.reload_doc();  // Reload the document to reflect changes
             }
@@ -164,9 +163,9 @@ frappe.ui.form.on('company transfer', {
         frappe.call({
             method: "transfer.transfer.doctype.company_transfer.company_transfer.get_branch",
             args: {
-                  // Pass any parameters needed
+                // Pass any parameters needed
             },
-            callback: function(response) {
+            callback: function (response) {
                 if (response.message) {
                     per_branch = response.message; // Store value globally
                     console.log("Value retrieved and stored:", per_branch);
@@ -177,7 +176,7 @@ frappe.ui.form.on('company transfer', {
         });
 
         if (frm.doc.__islocal) {
-           
+
             //default setting is من شركة الي شركة(شركات) Debtors - A
             frm.set_value("status", "غير مسجلة");
             frm.set_value("debit", "Debtors - A");
@@ -196,8 +195,19 @@ frappe.ui.form.on('company transfer', {
 
         }
     },
-    after_submit: function(frm){
-            frm.reload_doc();
+    after_submit: function (frm) {
+        frm.reload_doc();
+    },
+    delivery_date: function (frm) {
+        if (frm.doc.delivery_date && frm.doc.posting_date) {
+            const deliveryDate = frappe.datetime.str_to_obj(frm.doc.delivery_date);
+            const postingDate = frappe.datetime.str_to_obj(frm.doc.posting_date);
+
+            if (deliveryDate < postingDate) {
+                frappe.msgprint(__('تاريخ التسليم خطأ'));
+                frm.set_value('delivery_date', null);
+            }
+        }
     },
     profit_is_splited: function (frm) {
         //make our_profit and other_party_profit same
@@ -222,17 +232,16 @@ frappe.ui.form.on('company transfer', {
     our_profit: function (frm) {
         adjust_profits(frm, 'our_profit');
     },
-    profit_account: function(frm){
-       
+    profit_account: function (frm) {
+
 
     },
     profit: function (frm) {
         frm.set_value('our_profit', frm.doc.profit);
         frm.set_value('other_party_profit', 0);
-        if(frm.doc.profit )
-        {
-            frm.set_value("execution_amount",frm.doc.amount + frm.doc.profit)
-            
+        if (frm.doc.profit) {
+            frm.set_value("execution_amount", frm.doc.amount + frm.doc.profit)
+
         }
     },
     select_external: function (frm) {
@@ -241,7 +250,7 @@ frappe.ui.form.on('company transfer', {
             frm.fields_dict['branch'].set_value(per_branch);
             frm.set_df_property("branch", "read_only", 1);
             frm.fields_dict['from_company'].set_value('');
-            frm.set_value("debit","Debtors - A")
+            frm.set_value("debit", "Debtors - A")
 
         }
         else {
@@ -262,8 +271,8 @@ frappe.ui.form.on('company transfer', {
 
             if (frm.doc.select_external === "خارجي") {
                 type = 2;
-                frm.set_value('from_type',"Branch");
-                frm.set_value('to_type',"Customer");
+                frm.set_value('from_type', "Branch");
+                frm.set_value('to_type', "Customer");
                 frm.trigger('branch')
                 frm.set_df_property("from_company", "read_only", 1);
             }
@@ -274,13 +283,12 @@ frappe.ui.form.on('company transfer', {
     from_company: function (frm) {
 
         //  frm.set_value('debit',"Debtors - A" );
-        if(frm.doc.from_company)
-        {
-          //  frm.set_value("debit",frm.doc.profit_account) 
+        if (frm.doc.from_company) {
+            //  frm.set_value("debit",frm.doc.profit_account) 
         }
 
     },
-    debit: function(frm){
+    debit: function (frm) {
         // frappe.msgprint(frm.doc.debit)
     },
     to_company: function (frm) {
@@ -307,12 +315,12 @@ frappe.ui.form.on('company transfer', {
 
         if (frm.doc.branch) {
             if (frm.doc.from_type == "Branch") {
-                
+
                 frappe.call({
                     method: 'transfer.transfer.doctype.company_transfer.company_transfer.get_main_account', // Specify your server-side method here
                     args: {
                         branch: frm.doc.branch,
-    
+
                     },
                     callback: function (r) {
                         if (r.message) {
@@ -364,7 +372,7 @@ function calculate_profit_or_loss(frm) {
     const execution_amount = frm.doc.execution_amount || 0;
 
     if (amount > 0 && execution_amount > 0) {
-        const profit =    execution_amount - amount;
+        const profit = execution_amount - amount;
 
         // Update profit field
         frm.set_value('profit', profit);
@@ -482,7 +490,7 @@ frappe.ui.form.on('company transfer', {
         if (frm.doc.docstatus == 0 && frm.doc.status == "غير مسجلة" && !frm.is_new()) {
             frm.add_custom_button(__('تسجيل'), function () {
                 frm.trigger('create_journal_entry');
-                
+
             });
         }
         // if (frm.doc.docstatus == 0 && frm.doc.status == "غير مسجلة" && !frm.is_new()) {
@@ -544,7 +552,7 @@ frappe.ui.form.on('company transfer', {
             });
         }
         else {
-            
+
         }
     }
 });
@@ -552,7 +560,7 @@ frappe.ui.form.on('company transfer', {
 // إلغاء الحوالة سواء كانت مسلمة او غير مسلمة
 // يتم إلغاءها وإلغاء القيود اذا تم الإلغاء في نفس اليوم
 // غير ذالك يتم ارجاعها
- 
+
 
 
 
