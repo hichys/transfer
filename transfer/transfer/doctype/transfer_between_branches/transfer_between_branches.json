@@ -9,20 +9,15 @@
   "section_break_baym",
   "amended_from",
   "section_break_qfcp",
-  "column_break_iyxg",
-  "notyet",
-  "handed",
-  "canceld_journal_entry",
-  "journal_entry_link",
   "handed_account",
-  "whatsapp_desc",
-  "debit",
-  "credit",
   "column_break_ynyv",
+  "check_tslmfrommain",
   "from_branch",
   "to_branch",
   "posting_date",
   "delivery_date",
+  "whatsapp_desc",
+  "phone_number",
   "without_profit",
   "amount",
   "profit_per_thousand",
@@ -30,7 +25,13 @@
   "our_profit",
   "other_party_profit",
   "split_profit",
-  "phone_number"
+  "column_break_iyxg",
+  "credit",
+  "debit",
+  "notyet",
+  "handed",
+  "journal_entry_link",
+  "canceld_journal_entry"
  ],
  "fields": [
   {
@@ -64,7 +65,8 @@
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "\u0627\u0644\u062a\u0627\u0631\u064a\u062e"
+   "label": "\u0627\u0644\u062a\u0627\u0631\u064a\u062e",
+   "read_only_depends_on": "eval:doc.workflow_state === \"\u0645\u0633\u062a\u0644\u0645\u0629\""
   },
   {
    "default": "0",
@@ -78,7 +80,7 @@
    "fieldname": "amount",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "\u0627\u0644\u0642\u064a\u0645\u0629 \u0628\u062f\u0648\u0646 \u0639\u0645\u0648\u0644\u0629",
+   "label": "\u0627\u0644\u0642\u064a\u0645\u0629",
    "non_negative": 1,
    "precision": "2",
    "reqd": 1
@@ -114,8 +116,8 @@
    "fieldtype": "Data",
    "label": "debit",
    "not_nullable": 1,
-   "read_only": 1,
-   "reqd": 1
+   "permlevel": 2,
+   "read_only": 1
   },
   {
    "allow_on_submit": 1,
@@ -123,8 +125,8 @@
    "fieldtype": "Data",
    "label": "credit",
    "not_nullable": 1,
-   "read_only": 1,
-   "reqd": 1
+   "permlevel": 2,
+   "read_only": 1
   },
   {
    "fieldname": "handed_account",
@@ -137,6 +139,7 @@
    "label": "\u0642\u064a\u062f -\u0627\u0644\u062a\u0633\u062c\u064a\u0644",
    "no_copy": 1,
    "options": "Journal Entry",
+   "permlevel": 2,
    "placeholder": "\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645 \u0628\u0639\u062c",
    "read_only": 1
   },
@@ -147,6 +150,7 @@
    "label": "\u0642\u064a\u062f - \u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
    "no_copy": 1,
    "options": "Journal Entry",
+   "permlevel": 2,
    "read_only": 1
   },
   {
@@ -156,6 +160,7 @@
    "label": "\u0642\u064a\u062f - \u0627\u0644\u0625\u0644\u063a\u0627\u0621",
    "no_copy": 1,
    "options": "Journal Entry",
+   "permlevel": 2,
    "read_only": 1,
    "set_only_once": 1
   },
@@ -165,13 +170,15 @@
    "fieldname": "delivery_date",
    "fieldtype": "Date",
    "label": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
+   "read_only_depends_on": "eval:doc.workflow_state === \"\u0645\u0633\u062a\u0644\u0645\u0629\"",
    "reqd": 1
   },
   {
    "fieldname": "journal_entry_link",
    "fieldtype": "HTML",
    "label": "journal_entry_link",
-   "no_copy": 1
+   "no_copy": 1,
+   "permlevel": 2
   },
   {
    "columns": 6,
@@ -223,8 +230,18 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "\u0631\u0642\u0645 \u0627\u0644\u0645\u0633\u062a\u0644\u0645"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "depends_on": "eval:doc.to_branch ===\"\u0627\u0644\u0639\u0627\u0644\u0645\u064a\u0629 \u0627\u0644\u0641\u0631\u0646\u0627\u062c\" ;",
+   "fieldname": "check_tslmfrommain",
+   "fieldtype": "Check",
+   "label": "\u062a\u0633\u0644\u064a\u0645 \u0645\u0646 \u0627\u0644\u062e\u0632\u0646\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629",
+   "read_only_depends_on": "eval:doc.workflow_state === \"\u0645\u0633\u062a\u0644\u0645\u0629\""
   }
  ],
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [
@@ -233,7 +250,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-12 22:59:18.511679",
+ "modified": "2025-01-16 15:14:12.411462",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",
@@ -250,6 +267,21 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "alalmia employee",
    "share": 1,
    "submit": 1,
    "write": 1

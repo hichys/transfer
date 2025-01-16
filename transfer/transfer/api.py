@@ -214,6 +214,10 @@ def get_profit_account(branch):
 @frappe.whitelist()
 def get_temp_account(branch):
 	return get_account_for_branch(branch,2);
+#حساب الشركة الرئسي
+@frappe.whitelist()
+def get_company_main_account(branch="العالمية الفرناج"):
+	return get_account_for_branch(branch,3);
 
 def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=None, posting_date=None, remarks=None):
 	try:

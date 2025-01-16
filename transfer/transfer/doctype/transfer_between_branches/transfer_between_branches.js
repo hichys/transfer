@@ -250,51 +250,51 @@ frappe.ui.form.on('transfer between branches', {
 frappe.ui.form.on('transfer between branches', {
 	// refresh: function (frm) {
 
-		// Add a custom button for workflow_state "تم التسليم"
+	// Add a custom button for workflow_state "تم التسليم"
 
 
-		// frm.add_custom_button(__('حــذف نهائي'), function () {
-		// 	frappe.confirm(
-		// 		'هل انت متاكد ?',
-		// 		function () {
-		// 			// Call the server-side method to delete the current document
-		// 			frappe.call({
-		// 				method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc',
-		// 				args: {
-		// 					docname: frm.doc.name,
-		// 					method : "submit"
-		// 				},
-		// 				callback: function (response) {
-		// 					if (response.message.status === 'success') {
-		// 						frappe.msgprint(response.message.message);
-		// 						frappe.set_route('List', 'transfer between branches');
-		// 					} else {
-		// 						frappe.msgprint({
-		// 							title: __('Error'),
-		// 							message: response.message.message,
-		// 							indicator: 'red'
-		// 						});
-		// 					}
-		// 				}
-		// 			});
-		// 		}
-		// 	);
-		// });
+	// frm.add_custom_button(__('حــذف نهائي'), function () {
+	// 	frappe.confirm(
+	// 		'هل انت متاكد ?',
+	// 		function () {
+	// 			// Call the server-side method to delete the current document
+	// 			frappe.call({
+	// 				method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc',
+	// 				args: {
+	// 					docname: frm.doc.name,
+	// 					method : "submit"
+	// 				},
+	// 				callback: function (response) {
+	// 					if (response.message.status === 'success') {
+	// 						frappe.msgprint(response.message.message);
+	// 						frappe.set_route('List', 'transfer between branches');
+	// 					} else {
+	// 						frappe.msgprint({
+	// 							title: __('Error'),
+	// 							message: response.message.message,
+	// 							indicator: 'red'
+	// 						});
+	// 					}
+	// 				}
+	// 			});
+	// 		}
+	// 	);
+	// });
 	// }
 });
 
 frappe.ui.form.on('transfer between branches', {
-	delivery_date: function(frm) {
-        if (frm.doc.delivery_date && frm.doc.posting_date) {
-            const deliveryDate = frappe.datetime.str_to_obj(frm.doc.delivery_date);
-            const postingDate = frappe.datetime.str_to_obj(frm.doc.posting_date);
+	delivery_date: function (frm) {
+		if (frm.doc.delivery_date && frm.doc.posting_date) {
+			const deliveryDate = frappe.datetime.str_to_obj(frm.doc.delivery_date);
+			const postingDate = frappe.datetime.str_to_obj(frm.doc.posting_date);
 
-            if (deliveryDate < postingDate) {
-                frappe.msgprint(__('تاريخ التسليم خطأ'));
-                frm.set_value('delivery_date', null);
-            }
-        }
-    },
+			if (deliveryDate < postingDate) {
+				frappe.msgprint(__('تاريخ التسليم خطأ'));
+				frm.set_value('delivery_date', null);
+			}
+		}
+	},
 	from_branch: function (frm) {
 		if (frm.doc.from_branch) {
 			console.log('Selected branch:', frm.doc.from_branch, frm.doc.to_branch); // Log the selected branch
@@ -503,16 +503,58 @@ frappe.ui.form.on('transfer between branches', {
 
 		}
 	},
-	whatsapp_desc: function (frm) {
-		if (frm.doc.whatsapp_desc) {
-			let phoneNumber = extract_phone_number(frm.doc.whatsapp_desc);
-			if (phoneNumber !== "ادخل يدويا") {
-				frm.set_value("phone_number", phoneNumber);
-			} // Set the phone number field
-			frappe.show_alert({
-				message: phoneNumber === "ادخل يدويا" ? "لا يمكن استخراج الرقم. ادخله يدوياً" : `تم استخراج الرقم: ${phoneNumber}`,
-				indicator: phoneNumber === "ادخل يدويا" ? "red" : "green"
+	check_tslmfrommain: function (frm) {
+		let prev_debit = frm.doc.debit;
+		if (frm.doc.check_tslmfrommain ) {
+			// Define the account index you want to fetch
+			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
+			let company_main = "العالمية الفرناج";
+			// Call the Python method to get the account for the selected branch and index
+			frappe.call({
+				method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
+				args: {
+					branch_name: company_main, // Pass the selected branch name
+					account_index: company_main_account_index       // Pass the account index
+				},
+				callback: function (r) {
+					console.log('Account response:', r.message); // Log the response for debugging
+
+					if (r.message) {
+						// Set the account from the response to the fbfbfb field
+						frm.set_value('debit', r.message);
+						frm.refresh_field('debit');
+						//frappe.msgprint(__('Account for branch {0} is {1}', 
+						//[frm.doc.from_branch, r.message]));
+					} else {
+						// Clear the fbfbfb field if no account is found
+						frm.set_value('debit', null);
+						frm.refresh_field('debit');
+						frappe.msgprint(__('No account found for the selected branch.'));
+					}
+				},
+				error: function (error) {
+					console.error('Error fetching account:', error); // Log any errors
+				}
 			});
+		} else {
+			// Clear the fbfbfb field if no branch is selected
+			frm.set_value('debit', prev_debit);
+			frm.refresh_field('debit');
+		}
+	},
+	whatsapp_desc: function (frm) {
+		clearTimeout(frm.delayTimeout);
+		if (frm.doc.whatsapp_desc) {
+			frm.delayTimeout = setTimeout(() => {
+				let phoneNumber = extract_phone_number(frm.doc.whatsapp_desc);
+				if (phoneNumber !== "ادخل يدويا") {
+					frm.set_value("phone_number", phoneNumber);
+				} // Set the phone number field
+				frappe.show_alert({
+					message: phoneNumber === "ادخل يدويا" ? "لا يمكن استخراج الرقم. ادخله يدوياً" : `تم استخراج الرقم: ${phoneNumber}`,
+					indicator: phoneNumber === "ادخل يدويا" ? "red" : "green"
+				});
+			}, 1000);
 		}
 	}
 });

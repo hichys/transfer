@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from transfer.transfer.api import get_journal_entries_by_cheque, get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
+from transfer.transfer.api import get_company_main_account, get_journal_entries_by_cheque, get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
 from .create_journal_entery import *
 from datetime import datetime, timedelta
 from frappe.utils import getdate
@@ -388,6 +388,11 @@ def cancel_handed_transfer_after_a_day(docname, method=None):
 def create_journal_entry_from_handed_transfer(doc, method):
 	debit_to_liabilities = get_temp_account(doc.to_branch) #معلقات الفرع
 	credit_to_account = get_main_account(doc.to_branch)# حساب الفرع الرئيسي
+
+	if(doc.check_tslmfrommain):
+		#validate to_branch is actually "العالمية الفرناج"
+		if doc.to_branch == "العالمية الفرناج":
+			credit_to_account = get_company_main_account()
 	journal_entry = frappe.get_doc({
 		"doctype": "Journal Entry",
 		"posting_date": doc.posting_date,
