@@ -254,6 +254,7 @@
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",
+ "translatable" :1,
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [

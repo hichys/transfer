@@ -260,13 +260,13 @@ frappe.ui.form.on("Internal Transfer", {
             frm.set_df_property('to_company', 'label', 'الي فرع ال');
             frm.set_df_property('branch', 'label', 'الفرع (المستقبل)');
 
-            frm.set_df_property('our_profit', 'label', "عمولة الشركة")
-            frm.set_df_property('other_party_profit', 'label', 'عمولة الفرع')
+            frm.set_df_property('our_profit', 'label', "عمولة الشركة");
+            frm.set_df_property('other_party_profit', 'label', 'عمولة الفرع');
 
             type = 1;
-            frm.set_df_property('to_comapny', 'read_only', 1)
-            frm.set_df_property('from_company', 'read_only', 0)
-
+            frm.set_df_property('to_comapny', 'read_only', 1);
+            frm.set_df_property('from_company', 'read_only', 0);
+            frm.refresh_fields();
 
         }
         if (frm.doc.select_internal == "من فرع الي شركة") {
@@ -384,7 +384,51 @@ frappe.ui.form.on("Internal Transfer", {
                 indicator: phoneNumber === "ادخل يدويا" ? "red" : "green"
             });
         }
-    }
+    },
+    check_tslmfrommain: function (frm) {
+		let prev_debit = frm.doc.credit;
+		if (frm.doc.check_tslmfrommain ) {
+            prv_acc = frm.doc.credit;
+			// Define the account index you want to fetch
+			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
+			let company_main = "العالمية الفرناج";
+			// Call the Python method to get the account for the selected branch and index
+			frappe.call({
+				method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
+				args: {
+					branch_name: company_main, // Pass the selected branch name
+					account_index: company_main_account_index       // Pass the account index
+				},
+				callback: function (r) {
+					console.log('Account response:', r.message); // Log the response for debugging
+
+					if (r.message) {
+						// Set the account from the response to the fbfbfb field
+						frm.set_value('credit', r.message);
+						frm.set_value('profit_account', r.message);
+                        
+						frm.refresh_field('credit');
+						//frappe.msgprint(__('Account for branch {0} is {1}', 
+						//[frm.doc.from_branch, r.message]));
+					} else {
+						// Clear the fbfbfb field if no account is found
+						
+						frm.refresh_field('credit');
+						frappe.msgprint(__('No account found for the selected branch.'));
+					}
+				},
+				error: function (error) {
+					console.error('Error fetching account:', error); // Log any errors
+				}
+			});
+            
+		} else {
+			// Clear the fbfbfb field if no branch is selected
+			
+		}
+
+       
+	}
 
 });
 

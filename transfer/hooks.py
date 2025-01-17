@@ -230,7 +230,10 @@ doc_events = {
 # 		"doctype": "{doctype_4}"
 # 	}
 # ]
-
+#loading screen
+website_context = {
+	"splash_image": "/assets/transfer/images/logo.png"
+}
 # Authentication and authorization
 # --------------------------------
 

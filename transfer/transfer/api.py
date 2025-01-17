@@ -219,6 +219,11 @@ def get_temp_account(branch):
 def get_company_main_account(branch="العالمية الفرناج"):
 	return get_account_for_branch(branch,3);
 
+def get_account_balance(account):
+    balance = frappe.db.get_value("Account", {"name": account}, "balance")
+    if balance is None:
+        frappe.throw(f"Account {account} does not exist or has no balance.")
+    return balance
 def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=None, posting_date=None, remarks=None):
 	try:
 		# Validate inputs
