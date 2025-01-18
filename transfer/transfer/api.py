@@ -315,6 +315,24 @@ def validate_linked_journal_entries(docname, link_fields=["cheque_no"]):
 	#all journal entries has been canceled 
 	return True
 
+def get_document(doc_or_docname, doctype):
+    """
+    Retrieves a document if a docname is provided, otherwise returns the doc itself.
+
+    :param doc_or_docname: Either the document or the docname.
+    :param doctype: The doctype of the document (used only if docname is provided).
+    :return: The document object.
+    """
+    if isinstance(doc_or_docname, str):
+        # If it's a docname (string), fetch the document
+        return frappe.get_doc(doctype, doc_or_docname)
+    elif isinstance(doc_or_docname, dict) and "_doctype" in doc_or_docname:
+        # If it's already a document object, return it
+        return frappe.get_doc(doc_or_docname)
+    else:
+        return doc_or_docname
+		
+
 # @frappe.whitelist()
 # def extract_phone_number(whatsapp_desc):
 #     try:

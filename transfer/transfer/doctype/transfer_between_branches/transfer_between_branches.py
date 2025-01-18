@@ -4,10 +4,13 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from transfer.transfer.api import get_company_main_account, get_journal_entries_by_cheque, get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
+from transfer.transfer.api import get_document,get_company_main_account, get_journal_entries_by_cheque, get_main_account,get_temp_account,get_profit_account,validate_linked_journal_entries
 from .create_journal_entery import *
 from datetime import datetime, timedelta
-from frappe.utils import getdate
+from frappe.utils import getdate, nowdate
+from erpnext.accounts.utils import get_balance_on
+from frappe.model.workflow import apply_workflow
+
 
 class transferbetweenbranches(Document):
 	def on_update_after_submit(self):
@@ -62,6 +65,7 @@ def manual_submit(docname):
 		doc = frappe.get_doc("transfer between branches", docname)
 		doc.submit()
 		frappe.db.commit()
+		return "success"
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Error 6695 in manual_submit")
 
@@ -386,6 +390,9 @@ def cancel_handed_transfer_after_a_day(docname, method=None):
 
 @frappe.whitelist()
 def create_journal_entry_from_handed_transfer(doc, method):
+ 
+	doc = get_document(doc,"transfer between branches")
+
 	debit_to_liabilities = get_temp_account(doc.to_branch) #معلقات الفرع
 	credit_to_account = get_main_account(doc.to_branch)# حساب الفرع الرئيسي
 
@@ -393,6 +400,10 @@ def create_journal_entry_from_handed_transfer(doc, method):
 		#validate to_branch is actually "العالمية الفرناج"
 		if doc.to_branch == "العالمية الفرناج":
 			credit_to_account = get_company_main_account()
+			from_account_balance = get_balance_on(credit_to_account,date=nowdate())
+			if from_account_balance < doc.amount:
+				frappe.throw(f"الرصيد غير كافي في الحساب. الرصيد الحالي: {from_account_balance}, المبلغ المطلوب: {doc.amount}")
+		
 	journal_entry = frappe.get_doc({
 		"doctype": "Journal Entry",
 		"posting_date": doc.posting_date,

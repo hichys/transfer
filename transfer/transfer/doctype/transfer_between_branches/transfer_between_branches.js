@@ -1,31 +1,40 @@
-// Copyright (c) 2024, a and contributors
-// For license information, please see license.txt
-// frappe.ui.form.on('transfer between branches', {
-//     before_workflow_action:function (frm, action) {
-//         if (action === "إلغاء الحوالة") {
-//             try {
-// 				frappe.msgprint("ASDASDASD")
-//                 // Proceed with server-side cancellation
-//                 frappe.call({
-//                     method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_cancel",
-//                     args: {
-//                         docname: frm.doc.name,
-// 						method:"cancel"
-//                     },
-//                     callback: function (r) {
-//                         if (!r.exc) {
-//                             frappe.msgprint("تم إلغاء المستند بنجاح.");
-//                             frm.reload_doc();
-//                         }
-//                     }
-//                 });
-//             } catch (error) {
-//                 frappe.throw("تم إلغاء الإجراء.");
-//             }
-//         }
-//     }
-// });
+
 frappe.ui.form.on('transfer between branches', {
+	before_workflow_action: async (frm) => {
+		console.log("Triggered before_workflow_action");
+		frappe.dom.unfreeze();
+		if (frm.doc.workflow_state === "غير مستلمة" && frm.selected_workflow_action === "تم التسليم") {
+			try {
+				// Display the confirmation dialog
+				let userConfirmed = await new Promise((resolve) => {
+					frappe.confirm(
+						
+						__("هل انت متاكد من التسليم قد تم ؟"),
+						() => {
+							// User clicked "Yes"
+							resolve(true);
+						},
+						() => {
+							// User clicked "No"
+							resolve(false);
+						}
+					);
+				});
+	
+				if (!userConfirmed) {
+					// Stop the workflow by throwing an error
+					frappe.msgprint(__("تم الإلغاء"));
+					throw new Error("Workflow action cancelled by user.");
+				}
+	
+			} catch (error) {
+				throw error; // Ensure workflow doesn't proceed
+			}
+		} else {
+			console.log("Conditions not met. No confirmation required.");
+		}
+	},
+	
 	create_journal_entry: function (frm) {
 		frappe.call({
 			method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.create_journal_entry_preview',
@@ -97,6 +106,8 @@ frappe.ui.form.on('transfer between branches', {
 });
 
 frappe.ui.form.on('transfer between branches', {
+
+
 
 	validate: function (frm) {
 		///ensure that the amount is greater than 0
@@ -505,7 +516,7 @@ frappe.ui.form.on('transfer between branches', {
 	},
 	check_tslmfrommain: function (frm) {
 		let prev_debit = frm.doc.debit;
-		if (frm.doc.check_tslmfrommain ) {
+		if (frm.doc.check_tslmfrommain) {
 			// Define the account index you want to fetch
 			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
 			let company_main = "العالمية الفرناج";

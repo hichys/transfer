@@ -562,7 +562,7 @@ frappe.ui.form.on('company transfer', {
         if (frm.doc.docstatus == 1) {
             frm.add_custom_button(__('إلغاء الحوالة'), function () {
                 frappe.confirm(
-                    'هل انت متاكد من ان الحوالة سلمت ؟',
+                    'هل انت متاكد من ان الحوالة ألغيت ؟',
                     function () {
 
                         // Confirmed action
@@ -585,7 +585,7 @@ frappe.ui.form.on('company transfer', {
                     },
                     function () {
                         // Cancelled action
-                        frappe.msgprint(__('الحوالة مسلمة مسبقا'));
+                        frappe.show_alert(__('تم الإلغاء'));
                     }
                 );
             });
