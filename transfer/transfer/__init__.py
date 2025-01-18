@@ -1,4 +1,3 @@
-from . import some_module
 
 # __init__.py
 
