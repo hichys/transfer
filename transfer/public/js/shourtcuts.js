@@ -1,7 +1,7 @@
 frappe.ui.keys.add_shortcut({
     description : "sssssssssDuplicate",
-    shortcut : "shift+ctrl+l",
+    shortcut : "alt+a",
     action : () => {
-        frappe.set_route("List","Error Logs")
+        frappe.set_route("List","Internal Transfer")
     }
 })

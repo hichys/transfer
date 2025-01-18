@@ -6,8 +6,19 @@ from frappe.model.document import Document
 import frappe
 from transfer.transfer.api import create_journal_entry_preview, validate_linked_journal_entries,get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
 from frappe.utils import getdate, nowdate 
-
+from frappe import _
 class companytransfer(Document):
+	def on_update_after_submit(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
+
+	def validate(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
+
+
 	# def after_save(doc, method):
 	# 	if doc.docstatus == 1:  # Document is submitted
 	# 		frappe.publish_realtime(
@@ -18,7 +29,7 @@ class companytransfer(Document):
 	def create_company_transfer():
 		frappe.msgprint("Company Transfer Created")
 	def before_cancel(self):
-		validate_linked_journal_entries(self.name)	
+		pass
 	def on_submit(self):
 		if(self.status == "غير مسجلة"):
 			handle_creation(self.name,"submit")
@@ -63,6 +74,8 @@ class companytransfer(Document):
 				if posting_date == today:
 					# If the journal entry was created today, cancel it
 					je.cancel()
+					if not validate_linked_journal_entries(self.name):
+						frappe.throw("ERRROR CODE COM888")
 					frappe.msgprint(f"Journal Entry {je.name} has been cancelled.")
 				else:
 					# If the journal entry is older than today, reverse it
@@ -301,8 +314,8 @@ def handle_cancel_transfer(docname,method="cancel"):
 			frappe.msgprint(f"attempt to cancel {doc.docstatus}")
 			doc.status = "ملغية"
 			doc.save()
-			frappe.db.commit()
 			doc.cancel()
+			frappe.db.commit()
 		else :
 			handel_reverse(doc)
 			doc.status = "ملغية"

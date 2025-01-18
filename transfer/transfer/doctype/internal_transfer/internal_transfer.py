@@ -3,14 +3,25 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import create_journal_entry_preview, delete_draft_doc, validate_linked_journal_entries,create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
-from frappe.utils import getdate, nowdate
+from transfer.transfer.api import get_account_balance,get_company_main_account,create_journal_entry_preview, delete_draft_doc, validate_linked_journal_entries,create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
+from frappe.utils import getdate, nowdate 
+from erpnext.accounts.utils import get_balance_on
 from .it_api import *
-
+from frappe import _
 class InternalTransfer(Document):
 	def before_cancel(self):
 		validate_linked_journal_entries(self.name)
 		self.status = "ملغية"
+
+	def on_update_after_submit(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
+
+	def validate(self):
+		if self.delivery_date and self.posting_date:
+			if getdate(self.delivery_date) < getdate(self.posting_date):
+				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
 
 
 
@@ -74,12 +85,12 @@ def create_journal_entry(self,temp=False):
 		# company credit 25 + out_profit(2)
 
 		if(self.from_type == "Customer"):
-			frappe.msgprint("من فرع الي شركة")
+			frappe.msgprint("من شركة الي فرع")
 			from_type = "Customer"
 			from_party_type = from_party_name
 			to_type = ""
 			to_party_type = ""
-			debit_in_account_currency =  self.amount  + our_profit 
+			debit_in_account_currency =  self.amount  +  other_party_profit 
 			credit_in_account_currency = self.amount  
 		else :
 			if(self.to_type == "Customer" and self.from_type != "Customer"):
@@ -113,13 +124,15 @@ def create_journal_entry(self,temp=False):
 		]
 		# Add an entry for out_proft if not 0
 		if(self.from_type == "Customer"):
-			if our_profit != 0:
-				accounts.append({
+			if other_party_profit != 0:
+				accounts.append(
+					{
 					"account": profit_account,
 					"branch": branch,
 					"debit_in_account_currency": 0,
-					"credit_in_account_currency": our_profit,
-				})	
+					"credit_in_account_currency": other_party_profit,
+					}
+				)	
 		else:
 			if our_profit != 0:
 				accounts.append({
@@ -200,7 +213,7 @@ def reverse_journal_entry(self,docname):
 				"cheque_no": f"{docname}",
 				"cheque_date": nowdate(),
 				"reversal_of": journal_entry.name,
-    			"user_remark":journal_entry.user_remark
+				"user_remark":journal_entry.user_remark
 			})
 			
 			# Insert and submit the reversed journal entry
@@ -236,31 +249,48 @@ def handel_cancellation(docname):
 			frappe.msgprint("تم إلغاء الحوالة بنجاح")
 	else:
 		it_reverse_journal_entries(doc)
-	 	
 @frappe.whitelist()
 def transfer_completed(docname):
 	try:
-		doc = frappe.get_doc("Internal Transfer",docname)
-
-		if doc.from_type == "Customer" :
+		# Fetch the document
+		doc = frappe.get_doc("Internal Transfer", docname)
+		
+		# Get the target account
+		from_acc = get_temp_account(doc.branch)
+		to_acc = get_main_account(doc.branch)
+		
+		# Validate if transfer is from the main account and to the correct branch
+		if doc.check_tslmfrommain:
+			if doc.to_company== "العالمية الفرناج":
+				from_acc = get_company_main_account()
+				to_acc = get_temp_account(doc.branch)
+			else:
+				frappe.throw("غير قادر علي التسليم من الخزنة الرئسية")
+		
+		# Validate if the from_account has sufficient balance
+		from_account_balance = get_balance_on(get_company_main_account(),date=nowdate())
+		if from_account_balance < doc.amount:
+			frappe.throw(f"الرصيد غير كافي في الحساب. الرصيد الحالي: {from_account_balance}, المبلغ المطلوب: {doc.amount}")
+		
+		# Check if the transfer is from a customer
+		if doc.from_type == "Customer":
+			# Create journal entry
 			cr_j(
-				from_account= get_temp_account(doc.branch),
-				to_account=  get_main_account(doc.branch),
-				branch=	doc.branch,
-				amount=	doc.amount,
+				from_account=from_acc,
+				to_account=to_acc,
+				branch=doc.branch,
+				amount=doc.amount,
 				cheque_no=docname,
-				posting_date=nowdate(), 
+				posting_date=nowdate(),
 				remarks=doc.whatsapp_desc
 			)
+		
+		# Update the document's status
 		doc.status = "مستلمة"
 		doc.save()
 		frappe.db.commit()
-		
-	except frappe.exceptions.ValidationError as ve:
-		# Handle specific Frappe validation errors
-		frappe.throw(f"Validation Error: {str(ve)}")
-
+	
 	except Exception as e:
-		# Handle other exceptions with error logging
-		frappe.log_error(message=str(e), title="Transfer Completion Error")
-		frappe.throw(f"Unexpected Error Occurred. Contact support with code #6666: {str(e)}")
+		frappe.log_error(frappe.get_traceback(), "Error in transfer_completed")
+
+ 

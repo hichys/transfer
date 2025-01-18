@@ -7,6 +7,7 @@ app_license = "mit"
 
 # Apps
 # ------------------
+boot_session = "transfer.startup.boot_session"
 
 # required_apps = []
 
@@ -25,10 +26,11 @@ app_license = "mit"
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_js = "/assets/transfer/js/shourtcuts.js"
 
 app_include_js = [
-    "/assets/transfer/js/utils.js"
+    "/assets/transfer/js/utils.js",
+    "/assets/transfer/js/redirect.js",
+    "/assets/transfer/js/shourtcuts.js"
 ]
 # include js, css files in header of web template
 # web_include_css = "/assets/transfer/css/transfer.css"
@@ -60,7 +62,7 @@ fixtures = ["Workflow"]
 
 # application home page (will override Website Settings)
 # home_page = "login"
-
+home_page = "/app/alalmiatransfer"
 # website user home page (by Role)
 # role_home_page = {
 # 	"Role": "home_page"
@@ -228,7 +230,10 @@ doc_events = {
 # 		"doctype": "{doctype_4}"
 # 	}
 # ]
-
+#loading screen
+website_context = {
+	"splash_image": "/assets/transfer/images/logo.png"
+}
 # Authentication and authorization
 # --------------------------------
 

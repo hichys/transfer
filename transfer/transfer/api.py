@@ -214,10 +214,16 @@ def get_profit_account(branch):
 @frappe.whitelist()
 def get_temp_account(branch):
 	return get_account_for_branch(branch,2);
+#حساب الشركة الرئسي
+@frappe.whitelist()
+def get_company_main_account(branch="العالمية الفرناج"):
+	return get_account_for_branch(branch,3);
 
-import frappe
-from frappe.utils import nowdate
-
+def get_account_balance(account):
+    balance = frappe.db.get_value("Account", {"name": account}, "balance")
+    if balance is None:
+        frappe.throw(f"Account {account} does not exist or has no balance.")
+    return balance
 def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=None, posting_date=None, remarks=None):
 	try:
 		# Validate inputs
@@ -306,6 +312,26 @@ def validate_linked_journal_entries(docname, link_fields=["cheque_no"]):
 				("Cannot cancel this document because the following Journal Entries are not canceled or reversed: {0}")
 				.format(linked_entries)
 			)
+	#all journal entries has been canceled 
+	return True
+
+def get_document(doc_or_docname, doctype):
+    """
+    Retrieves a document if a docname is provided, otherwise returns the doc itself.
+
+    :param doc_or_docname: Either the document or the docname.
+    :param doctype: The doctype of the document (used only if docname is provided).
+    :return: The document object.
+    """
+    if isinstance(doc_or_docname, str):
+        # If it's a docname (string), fetch the document
+        return frappe.get_doc(doctype, doc_or_docname)
+    elif isinstance(doc_or_docname, dict) and "_doctype" in doc_or_docname:
+        # If it's already a document object, return it
+        return frappe.get_doc(doc_or_docname)
+    else:
+        return doc_or_docname
+		
 
 # @frappe.whitelist()
 # def extract_phone_number(whatsapp_desc):

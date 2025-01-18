@@ -73,6 +73,7 @@
    "default": "\u063a\u064a\u0631 \u0645\u0633\u062c\u0644\u0629",
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "in_filter": 1,
    "in_list_view": 1,
    "in_preview": 1,
@@ -170,8 +171,10 @@
    "allow_on_submit": 1,
    "fieldname": "credit",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "credit",
    "options": "Account",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -191,8 +194,10 @@
    "allow_on_submit": 1,
    "fieldname": "debit",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "debit",
    "options": "Account",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -214,8 +219,10 @@
    "allow_on_submit": 1,
    "fieldname": "profit_account",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "profit account",
    "options": "Account",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -296,6 +303,7 @@
    "in_list_view": 1,
    "label": "\u0627\u0644\u0645\u0628\u0644\u063a",
    "non_negative": 1,
+   "placeholder": "\u0627\u0644\u0642\u064a\u0645\u0647",
    "precision": "2",
    "reqd": 1
   },
@@ -338,7 +346,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-11 22:15:51.639465",
+ "modified": "2025-01-16 06:17:29.911848",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",
@@ -362,7 +370,6 @@
    "write": 1
   },
   {
-   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -370,10 +377,8 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "alalmia employee",
-   "select": 1,
+   "role": "alalmia transfer",
    "share": 1,
-   "submit": 1,
    "write": 1
   }
  ],
