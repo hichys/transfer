@@ -270,7 +270,7 @@ def transfer_completed(docname):
 					frappe.throw(f"الرصيد غير كافي في الحساب. الرصيد الحالي: {from_account_balance}, المبلغ المطلوب: {doc.amount}")
 				
 			else:
-				frappe.throw("غير قادر علي التسليم من الخزنة الرئسية")
+				frappe.throw("التسليم من الخزنة الرئسية غير متوفر لهذا الفرع")
 		
 		# Check if the transfer is from a customer
 		if doc.from_type == "Customer":
@@ -284,7 +284,7 @@ def transfer_completed(docname):
 				posting_date=nowdate(),
 				remarks=doc.whatsapp_desc
 			)
-		
+		 
 		# Update the document's status
 		doc.status = "مستلمة"
 		doc.save()
