@@ -264,13 +264,13 @@ def transfer_completed(docname):
 			if doc.to_company== "العالمية الفرناج":
 				from_acc = get_company_main_account()
 				to_acc = get_temp_account(doc.branch)
+			# Validate if the from_account has sufficient balance
+				from_account_balance = get_balance_on(get_company_main_account(),date=nowdate())
+				if from_account_balance < doc.amount:
+					frappe.throw(f"الرصيد غير كافي في الحساب. الرصيد الحالي: {from_account_balance}, المبلغ المطلوب: {doc.amount}")
+				
 			else:
 				frappe.throw("غير قادر علي التسليم من الخزنة الرئسية")
-		
-		# Validate if the from_account has sufficient balance
-		from_account_balance = get_balance_on(get_company_main_account(),date=nowdate())
-		if from_account_balance < doc.amount:
-			frappe.throw(f"الرصيد غير كافي في الحساب. الرصيد الحالي: {from_account_balance}, المبلغ المطلوب: {doc.amount}")
 		
 		# Check if the transfer is from a customer
 		if doc.from_type == "Customer":
