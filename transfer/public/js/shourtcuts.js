@@ -1,25 +1,30 @@
 frappe.ui.keys.add_shortcut(
-
-    {
-        description: "internal transfer",
-        shortcut: "alt+i",
-        action: () => {
-            frappe.set_route("List", "Internal Transfer")
+        {
+            description: "internal transfer",
+            shortcut: "shift+ctrl+3",
+            action: () => {
+                frappe.set_route("List", "Internal Transfer")
+            }
         }
-    }
-    ,
+     
+);
+frappe.ui.keys.add_shortcut(
     {
-        description: "company transfer",
-        shortcut: "alt+c",
-        action: () => {
-            frappe.set_route("List", "Company Transfer")
-        }
-    },
-    {
-        description: "branch transfer",
-        shortcut: "alt+b",
+        description: "transfer between branches",
+        shortcut: "shift+ctrl+2",
         action: () => {
             frappe.set_route("List", "transfer between branches")
         }
     }
-)a
+ 
+);
+frappe.ui.keys.add_shortcut(
+    {
+        description: "company transfer",
+        shortcut: "shift+ctrl+1",
+        action: () => {
+            frappe.set_route("List", "company transfer")
+        }
+    }
+ 
+)

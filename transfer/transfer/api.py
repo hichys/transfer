@@ -220,10 +220,10 @@ def get_company_main_account(branch="العالمية الفرناج"):
 	return get_account_for_branch(branch,3);
 
 def get_account_balance(account):
-    balance = frappe.db.get_value("Account", {"name": account}, "balance")
-    if balance is None:
-        frappe.throw(f"Account {account} does not exist or has no balance.")
-    return balance
+	balance = frappe.db.get_value("Account", {"name": account}, "balance")
+	if balance is None:
+		frappe.throw(f"Account {account} does not exist or has no balance.")
+	return balance
 def create_journal_entry(from_account, to_account, amount,branch=None,cheque_no=None, posting_date=None, remarks=None):
 	try:
 		# Validate inputs
@@ -316,22 +316,29 @@ def validate_linked_journal_entries(docname, link_fields=["cheque_no"]):
 	return True
 
 def get_document(doc_or_docname, doctype):
-    """
-    Retrieves a document if a docname is provided, otherwise returns the doc itself.
+	"""
+	Retrieves a document if a docname is provided, otherwise returns the doc itself.
 
-    :param doc_or_docname: Either the document or the docname.
-    :param doctype: The doctype of the document (used only if docname is provided).
-    :return: The document object.
-    """
-    if isinstance(doc_or_docname, str):
-        # If it's a docname (string), fetch the document
-        return frappe.get_doc(doctype, doc_or_docname)
-    elif isinstance(doc_or_docname, dict) and "_doctype" in doc_or_docname:
-        # If it's already a document object, return it
-        return frappe.get_doc(doc_or_docname)
-    else:
-        return doc_or_docname
+	:param doc_or_docname: Either the document or the docname.
+	:param doctype: The doctype of the document (used only if docname is provided).
+	:return: The document object.
+	"""
+	if isinstance(doc_or_docname, str):
+		# If it's a docname (string), fetch the document
+		return frappe.get_doc(doctype, doc_or_docname)
+	elif isinstance(doc_or_docname, dict) and "_doctype" in doc_or_docname:
+		# If it's already a document object, return it
+		return frappe.get_doc(doc_or_docname)
+	else:
+		return doc_or_docname
 		
+@frappe.whitelist()
+def get_customer_account(customer):
+	# Get the default accounts for the company
+	company = frappe.defaults.get_user_default("Company")
+	accounts = frappe.get_doc("Company", company)
+	customer_account = accounts.default_receivable_account
+	return customer_account
 
 # @frappe.whitelist()
 # def extract_phone_number(whatsapp_desc):
@@ -349,3 +356,16 @@ def get_document(doc_or_docname, doctype):
 #     except Exception as error:
 #         print("Error in extract_phone_number:", error)
 #         return "ادخل يدويا"  # Fallback for unexpected errors
+
+@frappe.whitelist()
+def get_item_qty(item_code, warehouse):
+    """
+    Fetch the available quantity of an item in a specific warehouse.
+    :param item_code: The Item Code for which quantity is to be fetched.
+    :param warehouse: The Warehouse where the item's quantity is to be checked.
+    :return: The current quantity of the item in the specified warehouse.
+    """
+    qty = frappe.db.get_value("Bin", {"item_code": item_code, "warehouse": warehouse}, "actual_qty")
+    if qty is None:
+        qty = 0  # If no record exists, quantity is considered 0
+    return qty
