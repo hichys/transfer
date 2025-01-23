@@ -30,8 +30,8 @@ boot_session = "transfer.startup.boot_session"
 app_include_js = [
     "/assets/transfer/js/utils.js",
     "/assets/transfer/js/redirect.js",
-    "/assets/transfer/js/shourtcuts.js"
-]
+    "/assets/transfer/js/custom.js"
+] 
 # include js, css files in header of web template
 # web_include_css = "/assets/transfer/css/transfer.css"
 # web_include_js = "/assets/transfer/js/transfer.js"
