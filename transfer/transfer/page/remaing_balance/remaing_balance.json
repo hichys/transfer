@@ -1,0 +1,27 @@
+{
+ "content": null,
+ "creation": "2025-01-24 16:17:58.320671",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2025-01-24 16:17:58.320671",
+ "modified_by": "Administrator",
+ "module": "transfer",
+ "name": "remaing-balance",
+ "owner": "Administrator",
+ "page_name": "remaing-balance",
+ "restrict_to_domain": "",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "alalmia transfer"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "remaing balance"
+}

@@ -237,44 +237,44 @@ frappe.ui.form.on('company transfer', {
 
     },
     check_tslmfrommain: function (frm) {
-		let prev_debit = frm.doc.debit;
-		if (frm.doc.check_tslmfrommain ) {
-			// Define the account index you want to fetch
-			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
-			let company_main = "العالمية الفرناج";
-			// Call the Python method to get the account for the selected branch and index
-			frappe.call({
-				method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
-				args: {
-					branch_name: company_main, // Pass the selected branch name
-					account_index: company_main_account_index       // Pass the account index
-				},
-				callback: function (r) {
-					console.log('Account response:', r.message); // Log the response for debugging
+        let prev_debit = frm.doc.debit;
+        if (frm.doc.check_tslmfrommain) {
+            // Define the account index you want to fetch
+            let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
+            let company_main = "العالمية الفرناج";
+            // Call the Python method to get the account for the selected branch and index
+            frappe.call({
+                method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
+                args: {
+                    branch_name: company_main, // Pass the selected branch name
+                    account_index: company_main_account_index       // Pass the account index
+                },
+                callback: function (r) {
+                    console.log('Account response:', r.message); // Log the response for debugging
 
-					if (r.message) {
-						// Set the account from the response to the fbfbfb field
-						frm.set_value('debit', r.message);
-						frm.refresh_field('debit');
-						//frappe.msgprint(__('Account for branch {0} is {1}', 
-						//[frm.doc.from_branch, r.message]));
-					} else {
-						// Clear the fbfbfb field if no account is found
-						frm.set_value('debit', null);
-						frm.refresh_field('debit');
-						frappe.msgprint(__('No account found for the selected branch.'));
-					}
-				},
-				error: function (error) {
-					console.error('Error fetching account:', error); // Log any errors
-				}
-			});
-		} else {
-			// Clear the fbfbfb field if no branch is selected
-			frm.set_value('debit', prev_debit);
-			frm.refresh_field('debit');
-		}
-	},
+                    if (r.message) {
+                        // Set the account from the response to the fbfbfb field
+                        frm.set_value('debit', r.message);
+                        frm.refresh_field('debit');
+                        //frappe.msgprint(__('Account for branch {0} is {1}', 
+                        //[frm.doc.from_branch, r.message]));
+                    } else {
+                        // Clear the fbfbfb field if no account is found
+                        frm.set_value('debit', null);
+                        frm.refresh_field('debit');
+                        frappe.msgprint(__('No account found for the selected branch.'));
+                    }
+                },
+                error: function (error) {
+                    console.error('Error fetching account:', error); // Log any errors
+                }
+            });
+        } else {
+            // Clear the fbfbfb field if no branch is selected
+            frm.set_value('debit', prev_debit);
+            frm.refresh_field('debit');
+        }
+    },
     profit: function (frm) {
         frm.set_value('our_profit', frm.doc.profit);
         frm.set_value('other_party_profit', 0);
