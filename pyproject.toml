@@ -1,8 +1,6 @@
 [project]
 name = "transfer"
-authors = [
-    { name = "a", email = "asd@jhop.com"}
-]
+authors = [{ name = "awad", email = "awd@hotmail.it" }]
 description = "transfer"
 requires-python = ">=3.10"
 readme = "README.md"

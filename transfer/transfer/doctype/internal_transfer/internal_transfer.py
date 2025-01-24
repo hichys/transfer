@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from transfer.transfer.api import get_account_balance,get_company_main_account,create_journal_entry_preview, delete_draft_doc, validate_linked_journal_entries,create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
+from transfer.transfer.api import get_customer_account,get_account_balance,get_company_main_account,create_journal_entry_preview, delete_draft_doc, validate_linked_journal_entries,create_journal_entry as cr_j,get_main_account,get_profit_account,get_currency_remaining_qty,get_account_for_branch,get_temp_account, is_posting_day_today
 from frappe.utils import getdate, nowdate 
 from erpnext.accounts.utils import get_balance_on
 from .it_api import *
@@ -51,6 +51,19 @@ def create_journal_entry(self,temp=False):
 	debit = self.debit
 	credit = self.credit
 	branch = self.branch
+
+	if (self.from_type and self.to_type):
+		if(self.from_type == "Branch"):
+			debit = get_main_account(self.branch)
+			credit = get_customer_account(self.to_type)
+		else:
+			credit = get_temp_account(self.branch)
+			debit= get_customer_account(self.to_type)
+		frappe.msgprint(f"debit {debit}, credit{credit}")
+	else:
+		frappe.throw("الرجاء اختيار نوع التحويلة اولا والمرسل والمستقبل")
+
+
 	our_profit = self.our_profit
 	other_party_profit = self.other_party_profit
 	from_party_name = self.from_company
@@ -293,4 +306,4 @@ def transfer_completed(docname):
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Error in transfer_completed")
 
- 
+
