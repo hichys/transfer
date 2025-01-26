@@ -29,7 +29,7 @@ class SimpleSales(Document):
                         si.cancel()
                         break  # Exit the inner loop once the Sales Invoice is found
             except frappe.DoesNotExistError:
-                pass
+                frappe.throw("ERROR CODE : (Simple Sales): Does not exitest 00011")
 
     def on_submit(doc, method="submit"):
         # Ensure payment mode is always "Cash"
