@@ -10,6 +10,7 @@
   "amended_from",
   "section_break_stqp",
   "due_date",
+  "branch",
   "full_name",
   "item",
   "payment_mode",
@@ -106,12 +107,18 @@
   {
    "fieldname": "column_break_bnqv",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-25 05:23:24.336154",
+ "modified": "2025-01-26 18:14:46.756637",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Simple Sales",
