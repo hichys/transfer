@@ -4,6 +4,8 @@
 import frappe
 from frappe.model.document import Document
 from frappe import _
+from transfer.transfer.api import get_main_account
+# ! Forgin Account Sales , Buy
 
 
 class SimpleSales(Document):
@@ -29,39 +31,36 @@ class SimpleSales(Document):
                         si.cancel()
                         break  # Exit the inner loop once the Sales Invoice is found
             except frappe.DoesNotExistError:
-                frappe.throw("ERROR CODE : (Simple Sales): Does not exitest 00011")
+                frappe.throw(_("ERROR CODE : (Simple Sales): Does not exitest 00011"))
 
     def on_submit(doc, method="submit"):
         # Ensure payment mode is always "Cash"
         discount = 0
         total_amount = doc.amount
+        company = doc.to_company
         if doc.discount:
             total_amount = doc.amount - doc.discount
             discount = doc.discount
         if doc.payment_mode != "Cash":
             doc.payment_mode = "Cash"
+        if doc.to == "Customer":
+            sales_invoice = doc.createSalesInvoice(discount, total_amount)
+        else:
+            sales_invoice = doc.createSalesInvoice(
+                discount, total_amount, customer=doc.to_company
+            )
+        if doc.to == "Customer":
+            # ! payment should be made only for regular Customer
+            payment_entry = doc.createPayment(total_amount, sales_invoice)
 
-        # Create Sales Invoice
-        sales_invoice = frappe.get_doc(
-            {
-                "doctype": "Sales Invoice",
-                "customer": "زبون بنكك",  # Use Full Name instead of Customer Link
-                "contact_phone": doc.phone_number,  # Add phone number to Sales Invoice
-                "update_stock": 1,
-                "disable_rounded_total": 1,
-                "discount_amount": discount,
-                "outstanding_amount": total_amount,
-                "grand_total": total_amount,
-                "items": [
-                    {"item_code": doc.item, "qty": doc.quantity, "rate": doc.rate}
-                ],
-                "total": doc.amount,
-                "due_date": doc.due_date,
-                "remarks": doc.whatsapp_description,  # Add WhatsApp description
-            }
-        )
-        sales_invoice.insert()
-        sales_invoice.submit()
+            frappe.msgprint(
+                _(
+                    f"Sales Invoice {sales_invoice.name} and Payment Entry {payment_entry.name} created."
+                )
+            )
+
+    def createPayment(doc, total_amount, sales_invoice):
+        branch_account = get_main_account(doc.branch)
 
         # Create Payment Entry
         payment_entry = frappe.get_doc(
@@ -70,7 +69,7 @@ class SimpleSales(Document):
                 "payment_type": "Receive",
                 "mode_of_payment": "Cash",
                 "paid_to_account_currency": "LYD",
-                "paid_to": "Cash - A",
+                "paid_to": branch_account,
                 "party_type": "Customer",
                 "party": "زبون بنكك",  # Use Full Name as Party
                 "party_name": "زبون بنكك",
@@ -78,6 +77,7 @@ class SimpleSales(Document):
                 "received_amount": total_amount,
                 "reference_no": doc.name,
                 "reference_date": frappe.utils.nowdate(),
+                "branch": doc.branch,
                 "references": [
                     {
                         "reference_doctype": "Sales Invoice",
@@ -90,10 +90,34 @@ class SimpleSales(Document):
         )
         payment_entry.insert()
         payment_entry.submit()
+        return payment_entry
 
-        frappe.msgprint(
-            f"Sales Invoice {sales_invoice.name} and Payment Entry {payment_entry.name} created."
+    def createSalesInvoice(doc, discount, total_amount, customer="زبون بنكك"):
+        sales_invoice = frappe.get_doc(
+            {
+                "doctype": "Sales Invoice",
+                "customer": customer,
+                "contact_phone": doc.phone_number,
+                "update_stock": 1,
+                "disable_rounded_total": 1,
+                "discount_amount": discount,
+                "outstanding_amount": total_amount,
+                "grand_total": total_amount,
+                "branch": doc.branch,
+                "items": [
+                    {"item_code": doc.item, "qty": doc.quantity, "rate": doc.rate}
+                ],
+                "total": doc.amount,
+                "due_date": doc.due_date,
+                "remarks": doc.whatsapp_description,  # Add WhatsApp description
+            }
         )
+        sales_invoice.insert()
+        sales_invoice.submit()
+        return sales_invoice
+
+
+# TODO create jounral entries that reflect on the simple sales if its buy or sale
 
 
 @frappe.whitelist()
@@ -102,9 +126,22 @@ def get_related_documents(simple_sales_name):
     payment_entries = frappe.get_all(
         "Payment Entry",
         filters={"reference_no": simple_sales_name},
-        fields=["name", "posting_date", "paid_amount", "payment_type"],
+        fields=["name"],
     )
 
     # Fetch Sales Invoices linked to the Payment Entries
 
     return {"payment_entries": payment_entries}
+
+
+@frappe.whitelist()
+def get_currency_selling_rate(base_currency, target_currency):
+    rate = frappe.db.get_value(
+        "Currency Exchange",
+        {
+            "from_currency": base_currency,
+            "to_currency": target_currency,
+        },
+        "exchange_rate",
+    )
+    return rate

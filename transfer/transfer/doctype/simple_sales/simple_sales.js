@@ -13,11 +13,36 @@ frappe.ui.form.on('Simple Sales', {
     },
     quantity: function (frm) {
         // Auto-calculate amount
-        frm.set_value('amount', frm.doc.quantity * frm.doc.rate);
+        frappe.call({
+            method: "transfer.transfer.doctype.simple_sales.simple_sales.get_currency_selling_rate",
+            args: {
+                base_currency: "LYD",
+                target_currency: "SDG"
+            },
+            callback: function (r) {
+                if (r.message) {
+                    frm.set_value('rate', r.message);
+                    frm.set_value('amount', frm.doc.quantity * frm.doc.rate);
+                } else {
+                    console.log("No rate found.");
+                    frappe.throw("Please set currency exchange rate");
+                }
+            }
+        });
+
+
+
+
     },
     rate: function (frm) {
         // Auto-calculate amount
         frm.set_value('amount', frm.doc.quantity * frm.doc.rate);
+    },
+    discount: function (frm) {
+        frm.set_value('grand_total', frm.doc.amount - frm.doc.discount)
+    },
+    to: function (frm) {
+
     }
 });
 frappe.ui.form.on('Simple Sales', {

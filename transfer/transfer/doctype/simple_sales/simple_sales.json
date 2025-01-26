@@ -11,6 +11,8 @@
   "section_break_stqp",
   "due_date",
   "branch",
+  "to",
+  "to_company",
   "full_name",
   "item",
   "payment_mode",
@@ -20,7 +22,8 @@
   "quantity",
   "rate",
   "amount",
-  "discount"
+  "discount",
+  "grand_total"
  ],
  "fields": [
   {
@@ -49,7 +52,7 @@
   },
   {
    "fieldname": "quantity",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "quantity",
    "non_negative": 1,
    "precision": "3"
@@ -57,7 +60,8 @@
   {
    "fieldname": "rate",
    "fieldtype": "Currency",
-   "label": "rate"
+   "label": "rate",
+   "read_only": 1
   },
   {
    "fieldname": "amount",
@@ -88,6 +92,7 @@
    "label": "whatsapp Description"
   },
   {
+   "depends_on": "eval:doc.to === \"Customer\";",
    "fieldname": "full_name",
    "fieldtype": "Data",
    "label": "full name"
@@ -113,12 +118,33 @@
    "fieldtype": "Link",
    "label": "Branch",
    "options": "Branch"
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "non_negative": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "to",
+   "fieldtype": "Select",
+   "label": "To",
+   "options": "Customer\nCompany"
+  },
+  {
+   "depends_on": "eval:doc.to === \"Company\";",
+   "fieldname": "to_company",
+   "fieldtype": "Link",
+   "label": "To Company",
+   "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
+   "options": "Customer"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-26 18:14:46.756637",
+ "modified": "2025-01-26 23:38:43.301835",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Simple Sales",
