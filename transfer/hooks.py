@@ -30,8 +30,8 @@ boot_session = "transfer.startup.boot_session"
 app_include_js = [
     "/assets/transfer/js/utils.js",
     "/assets/transfer/js/redirect.js",
-    "/assets/transfer/js/custom.js"
-] 
+    "/assets/transfer/js/custom.js",
+]
 # include js, css files in header of web template
 # web_include_css = "/assets/transfer/css/transfer.css"
 # web_include_js = "/assets/transfer/js/transfer.js"
@@ -142,12 +142,15 @@ home_page = "/app/alalmiatransfer"
 # Hook on document methods and events
 
 doc_events = {
-	"transfer between branches": {
-	    # "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
-	    # "on_cancel": "method",
-		#"on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc",
-	}
-} 
+    "transfer between branches": {
+        # "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
+        # "on_cancel": "method",
+        # "on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc",
+    },
+    "Payment Entry": {
+        "on_submit": "transfer.transfer.doctype.simple_sales.simple_sales.on_payment_submit"
+    },
+}
 # Scheduled Tasks
 # ---------------
 
@@ -230,10 +233,8 @@ doc_events = {
 # 		"doctype": "{doctype_4}"
 # 	}
 # ]
-#loading screen
-website_context = {
-	"splash_image": "/assets/transfer/images/logo.png"
-}
+# loading screen
+website_context = {"splash_image": "/assets/transfer/images/logo.png"}
 # Authentication and authorization
 # --------------------------------
 
@@ -247,4 +248,3 @@ website_context = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-

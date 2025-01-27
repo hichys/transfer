@@ -9,6 +9,7 @@
   "section_break_edfi",
   "amended_from",
   "section_break_stqp",
+  "posting_date",
   "due_date",
   "branch",
   "to",
@@ -23,7 +24,12 @@
   "rate",
   "amount",
   "discount",
-  "grand_total"
+  "grand_total",
+  "column_break_floi",
+  "more_information_section",
+  "si",
+  "column_break_liei",
+  "status"
  ],
  "fields": [
   {
@@ -55,12 +61,14 @@
    "fieldtype": "Currency",
    "label": "quantity",
    "non_negative": 1,
-   "precision": "3"
+   "precision": "3",
+   "reqd": 1
   },
   {
    "fieldname": "rate",
    "fieldtype": "Currency",
    "label": "rate",
+   "non_negative": 1,
    "read_only": 1
   },
   {
@@ -139,12 +147,54 @@
    "label": "To Company",
    "link_filters": "[[\"Customer\",\"customer_type\",\"=\",\"Company\"]]",
    "options": "Customer"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "si",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "no_copy": 1,
+   "options": "Sales Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "more_information_section",
+   "fieldtype": "Section Break",
+   "label": "More Information"
+  },
+  {
+   "depends_on": "eval:doc.sales_invoice",
+   "fieldname": "column_break_liei",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_floi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Paid",
+   "depends_on": "eval:doc.si",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Payment Status",
+   "no_copy": 1,
+   "options": "\nDraft\nReturn\nCredit Note Issued\nSubmitted\nPaid\nPartly Paid\nUnpaid\nUnpaid and Discounted\nPartly Paid and Discounted\nOverdue and Discounted\nOverdue\nCancelled\nInternal Transfer",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-01-26 23:38:43.301835",
+ "modified": "2025-01-27 03:05:55.063318",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Simple Sales",
@@ -167,5 +217,22 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Blue",
+   "title": "Unpaid"
+  },
+  {
+   "color": "Green",
+   "title": "Paid"
+  },
+  {
+   "color": "Red",
+   "title": "Cancelled"
+  },
+  {
+   "color": "Green",
+   "title": "Overpaid"
+  }
+ ]
 }

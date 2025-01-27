@@ -45,33 +45,61 @@ frappe.ui.form.on('Simple Sales', {
 
     }
 });
+
 frappe.ui.form.on('Simple Sales', {
     refresh: function (frm) {
-        // Call the backend to fetch linked Payment Entries and Sales Invoices
-        frappe.call({
-            method: 'transfer.transfer.doctype.simple_sales.simple_sales.get_related_documents',
-            args: {
-                simple_sales_name: frm.doc.name
-            },
-            callback: function (r) {
-                if (r.message) {
-                    // Update Payment Entries table
-                    const payment_entries = r.message.payment_entries || [];
+        if (frm.doc.docstatus === 1) {
 
-
-                    // Update Sales Invoices table
-                    payment_entries.forEach(pe => {
+            // Call the backend to fetch linked Payment Entries and Sales Invoices
+            frappe.call({
+                method: 'transfer.transfer.doctype.simple_sales.simple_sales.get_related_documents',
+                args: {
+                    simple_sales_name: frm.doc.name
+                },
+                callback: function (r) {
+                    if (frm.doc.si) {
                         frm.add_custom_button(
-                            `${__('Payment Entry')} - ${pe.name}`,
+                            `${__('Sales Invoice')} - ${frm.doc.si}`,
                             function () {
-                                frappe.set_route('Form', 'Payment Entry', pe.name);
+                                frappe.set_route('Form', 'Sales Invoice', frm.doc.si);
                             },
                             __('View')
                         );
-                    });
+                    }
+                    else
+                        if (r.message) {
+                            const payment_entries = r.message.payment_entries || [];
+                            const sales_invoice = r.message.sales_invoice;
 
+                            // Add custom buttons for Payment Entries
+                            payment_entries.forEach(pe => {
+                                frm.add_custom_button(
+                                    `${__('Payment Entry')} - ${pe.name}`,
+                                    function () {
+                                        frappe.set_route('Form', 'Payment Entry', pe.name);
+                                    },
+                                    __('View')
+                                );
+                            });
+
+                            // Update Sales Invoice field and add a button if found
+
+
+                            if (sales_invoice) {
+                                frm.add_custom_button(
+                                    `${__('Sales Invoice')} - ${sales_invoice}`,
+                                    function () {
+                                        frappe.set_route('Form', 'Sales Invoice', sales_invoice);
+                                    },
+                                    __('View')
+                                );
+                            } else {
+
+                            }
+                        }
                 }
-            }
-        });
+            });
+        }
+
     }
 });
