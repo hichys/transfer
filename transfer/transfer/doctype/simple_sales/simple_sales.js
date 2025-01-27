@@ -39,10 +39,20 @@ frappe.ui.form.on('Simple Sales', {
         frm.set_value('amount', frm.doc.quantity * frm.doc.rate);
     },
     discount: function (frm) {
-        frm.set_value('grand_total', frm.doc.amount - frm.doc.discount)
+        if (frm.doc.discount) {
+            if (frm.doc.discount > frm.doc.amount) {
+                frm.set_value('discount', 0);
+                frappe.throw("discount cant be greater than the total amount");
+            }
+            frm.set_value('grand_total', frm.doc.amount - frm.doc.discount)
+        }
     },
     to: function (frm) {
 
+    },
+    amount: function (frm) {
+        if (frm.doc)
+            frm.set_value('grand_total', frm.doc.amount - frm.doc.discount)
     }
 });
 

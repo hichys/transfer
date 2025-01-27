@@ -73,38 +73,43 @@ class SimpleSales(Document):
 
     def on_submit(doc, method="submit"):
         # Ensure payment mode is always "Cash"
-        discount = 0
-        total_amount = doc.amount
+        try:
+            discount = 0
+            total_amount = doc.amount
 
-        if doc.discount:
-            total_amount = doc.amount - doc.discount
-            discount = doc.discount
-        if doc.payment_mode != "Cash":
-            doc.payment_mode = "Cash"
-        if doc.to == "Customer":
-            sales_invoice = doc.createSalesInvoice(discount, total_amount)
-            doc.status = "Paid"
+            if doc.discount:
+                total_amount = doc.amount - doc.discount
+                discount = doc.discount
+            if doc.payment_mode != "Cash":
+                doc.payment_mode = "Cash"
+            if doc.to == "Customer":
+                sales_invoice = doc.createSalesInvoice(discount, total_amount)
+                doc.status = "Paid"
 
-            # print(f"asdkjas kdlkjaskdj {doc.si}")
-        else:
-            sales_invoice = doc.createSalesInvoice(
-                discount, total_amount, customer=doc.to_company
-            )
-            doc.si = sales_invoice.name
-            doc.status = "Unpaid"
-        doc.save()
-        doc.submit()
-        frappe.db.commit()
-
-        if doc.to == "Customer":
-            # ! payment should be made only for regular Customer
-            payment_entry = doc.createPayment(total_amount, sales_invoice)
-
-            frappe.msgprint(
-                _(
-                    f"Sales Invoice {sales_invoice.name} and Payment Entry {payment_entry.name} created."
+                # print(f"asdkjas kdlkjaskdj {doc.si}")
+            else:
+                sales_invoice = doc.createSalesInvoice(
+                    discount, total_amount, customer=doc.to_company
                 )
-            )
+                doc.si = sales_invoice.name
+                doc.status = "Unpaid"
+            doc.save()
+            doc.submit()
+            frappe.db.commit()
+
+            if doc.to == "Customer":
+                # ! payment should be made only for regular Customer
+                payment_entry = doc.createPayment(total_amount, sales_invoice)
+
+                frappe.msgprint(
+                    _(
+                        f"Sales Invoice {sales_invoice.name} and Payment Entry {payment_entry.name} created."
+                    )
+                )
+        except Exception as e:
+            # Handle the insufficient stock error
+            frappe.msgprint(f"Error: {e}")
+            frappe.throw(f"Error: {e}")
 
     def createPayment(doc, total_amount, sales_invoice):
         branch_account = get_main_account(doc.branch)
