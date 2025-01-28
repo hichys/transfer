@@ -1,0 +1,361 @@
+[
+ {
+  "accounts": [
+   {
+    "account": "1014 - خزنة العالمية الفرناج - A",
+    "description": null,
+    "parent": "العالمية الفرناج",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2014 - عمولات العالمية الفرناج - A",
+    "description": null,
+    "parent": "العالمية الفرناج",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3014 - معلقات العالمية الفرناج - A",
+    "description": null,
+    "parent": "العالمية الفرناج",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "1111 - الخزنة الرئيسية - A",
+    "description": null,
+    "parent": "العالمية الفرناج",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1014",
+  "branch_name": "العالمية الفرناج",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-16 13:38:52.045870",
+  "name": "العالمية الفرناج"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1013 - خزنة العالمية وادي الربيع - A",
+    "description": null,
+    "parent": "العالمية وادي الربيع",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2013 - عمولات العالمية وادي الربيع - A",
+    "description": null,
+    "parent": "العالمية وادي الربيع",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3013 - معلقات العالمية وادي الربيع - A",
+    "description": null,
+    "parent": "العالمية وادي الربيع",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1013",
+  "branch_name": "العالمية وادي الربيع",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.408461",
+  "name": "العالمية وادي الربيع"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1012 - خزنة العالمية الخمس - A",
+    "description": null,
+    "parent": "العالمية الخمس",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2012 - عمولات العالمية الخمس - A",
+    "description": null,
+    "parent": "العالمية الخمس",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3012 - معلقات العالمية الخمس - A",
+    "description": null,
+    "parent": "العالمية الخمس",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1012",
+  "branch_name": "العالمية الخمس",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.448325",
+  "name": "العالمية الخمس"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1010 - خزنة العالمية سوق الاحد - A",
+    "description": null,
+    "parent": "العالمية سوق الاحد",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2010 - عمولات العالمية سوق الاحد - A",
+    "description": null,
+    "parent": "العالمية سوق الاحد",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3010 - معلقات العالمية سوق الاحد - A",
+    "description": null,
+    "parent": "العالمية سوق الاحد",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1010",
+  "branch_name": "العالمية سوق الاحد",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.482783",
+  "name": "العالمية سوق الاحد"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1006 - خزنة العالمية مصراته - A",
+    "description": null,
+    "parent": "العالمية مصراته",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2006 - عمولات العالمية مصراته - A",
+    "description": null,
+    "parent": "العالمية مصراته",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3006 - معلقات العالمية مصراته - A",
+    "description": null,
+    "parent": "العالمية مصراته",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1006",
+  "branch_name": "العالمية مصراته",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.507368",
+  "name": "العالمية مصراته"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1005 - خزنة العالمية زليتن - A",
+    "description": null,
+    "parent": "العالمية زليتن",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2005 - عمولات العالمية زليتن - A",
+    "description": null,
+    "parent": "العالمية زليتن",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3005 - معلقات العالمية زليتن - A",
+    "description": null,
+    "parent": "العالمية زليتن",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1005",
+  "branch_name": "العالمية زليتن",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.532557",
+  "name": "العالمية زليتن"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1004 - خزنة العالمية اجدابيا - A",
+    "description": null,
+    "parent": "العالمية اجدابيا",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2004 - عمولات العالمية اجدابيا - A",
+    "description": null,
+    "parent": "العالمية اجدابيا",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3004 - معلقات العالمية اجدابيا - A",
+    "description": null,
+    "parent": "العالمية اجدابيا",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1004",
+  "branch_name": "العالمية اجدابيا",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.557297",
+  "name": "العالمية اجدابيا"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1003 - خزنة العالمية بن جواد - A",
+    "description": null,
+    "parent": "العالمية بن جواد",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2003 - عمولات العالمية بن جواد - A",
+    "description": null,
+    "parent": "العالمية بن جواد",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3003 - معلقات العالمية بن جواد - A",
+    "description": null,
+    "parent": "العالمية بن جواد",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1003",
+  "branch_name": "العالمية بن جواد",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.582121",
+  "name": "العالمية بن جواد"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1002 - خزنة العالمية الكفرة - A",
+    "description": null,
+    "parent": "العالمية الكفرة",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2002 - عمولات العالمية الكفرة - A",
+    "description": null,
+    "parent": "العالمية الكفرة",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3002 - معلقات العالمية الكفرة - A",
+    "description": null,
+    "parent": "العالمية الكفرة",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1002",
+  "branch_name": "العالمية الكفرة",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.606215",
+  "name": "العالمية الكفرة"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1001 - خزنة ابوسليم - A",
+    "description": null,
+    "parent": "ابوسليم",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2001 - عمولات ابوسليم - A",
+    "description": null,
+    "parent": "ابوسليم",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3001 - معلقات ابوسليم - A",
+    "description": null,
+    "parent": "ابوسليم",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1001",
+  "branch_name": "ابوسليم",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.632238",
+  "name": "ابوسليم"
+ },
+ {
+  "accounts": [
+   {
+    "account": "1000 - خزنة غريان - A",
+    "description": null,
+    "parent": "غريان",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "2000 - عمولات غريان - A",
+    "description": null,
+    "parent": "غريان",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   },
+   {
+    "account": "3000 - معلقات غريان - A",
+    "description": null,
+    "parent": "غريان",
+    "parentfield": "accounts",
+    "parenttype": "BranchAccounts"
+   }
+  ],
+  "amended_from": null,
+  "branch_code": "1000",
+  "branch_name": "غريان",
+  "docstatus": 1,
+  "doctype": "BranchAccounts",
+  "modified": "2025-01-03 18:47:12.657301",
+  "name": "غريان"
+ }
+]
