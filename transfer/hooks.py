@@ -10,17 +10,16 @@ app_license = "mit"
 boot_session = "transfer.startup.boot_session"
 
 # required_apps = []
-
+required_apps = ["erpnext"]
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "transfer",
-# 		"logo": "/assets/transfer/logo.png",
-# 		"title": "transfer",
-# 		"route": "/transfer",
-# 		"has_permission": "transfer.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+    {
+        "name": "transfer",
+        "logo": "/assets/transfer/logo.png",
+        "title": "transfer",
+        "route": "/transfer",
+    }
+]
 
 # Includes in <head>
 # ------------------
@@ -43,6 +42,12 @@ fixtures = [
     "Custom Field",
     "Property Setter",
     "Print Format",
+    "Account",
+    "Branch",
+    "Customer",
+    "Item",
+    "BranchAccounts",
+    "Role",
 ]
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
@@ -92,13 +97,13 @@ home_page = "/app/alalmiatransfer"
 # ------------
 
 # before_install = "transfer.install.before_install"
-# after_install = "transfer.install.after_install"
+after_install = "transfer.install.after_install"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "transfer.uninstall.before_uninstall"
-# after_uninstall = "transfer.uninstall.after_uninstall"
+before_uninstall = "transfer.install.after_uninstall"
+# after_uninstall = "transfer.install.after_uninstall"
 
 # Integration Setup
 # ------------------
