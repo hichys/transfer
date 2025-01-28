@@ -42,7 +42,6 @@ fixtures = [
     "Workflow",
     "Custom Field",
     "Property Setter",
-    "Custom Script",
     "Print Format",
 ]
 # include js, css files in header of web form
