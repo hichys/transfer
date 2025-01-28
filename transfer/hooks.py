@@ -30,15 +30,21 @@ boot_session = "transfer.startup.boot_session"
 app_include_js = [
     "/assets/transfer/js/utils.js",
     "/assets/transfer/js/redirect.js",
-    "/assets/transfer/js/custom.js"
-] 
+    "/assets/transfer/js/custom.js",
+]
 # include js, css files in header of web template
 # web_include_css = "/assets/transfer/css/transfer.css"
 # web_include_js = "/assets/transfer/js/transfer.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "transfer/public/scss/website"
-fixtures = ["Workflow"]
+fixtures = [
+    "Workflow",
+    "Custom Field",
+    "Property Setter",
+    "Custom Script",
+    "Print Format",
+]
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
 # webform_include_css = {"doctype": "public/css/doctype.css"}
@@ -142,12 +148,12 @@ home_page = "/app/alalmiatransfer"
 # Hook on document methods and events
 
 doc_events = {
-	"transfer between branches": {
-	    # "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
-	    # "on_cancel": "method",
-		#"on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc",
-	}
-} 
+    "transfer between branches": {
+        # "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
+        # "on_cancel": "method",
+        # "on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc",
+    }
+}
 # Scheduled Tasks
 # ---------------
 
@@ -230,10 +236,8 @@ doc_events = {
 # 		"doctype": "{doctype_4}"
 # 	}
 # ]
-#loading screen
-website_context = {
-	"splash_image": "/assets/transfer/images/logo.png"
-}
+# loading screen
+website_context = {"splash_image": "/assets/transfer/images/logo.png"}
 # Authentication and authorization
 # --------------------------------
 
@@ -247,4 +251,3 @@ website_context = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
