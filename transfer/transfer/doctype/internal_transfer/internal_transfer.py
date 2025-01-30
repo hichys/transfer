@@ -119,7 +119,7 @@ def create_journal_entry(self,temp=False):
 		# Prepare accounts for the Journal Entry
 		accounts = [
 			{
-				"account": self.debit,  # Specify the debit account
+				"account": debit,  # Specify the debit account
 				"branch": branch,
 				"party_type": from_type,
 				"party": from_party_type,
@@ -127,7 +127,7 @@ def create_journal_entry(self,temp=False):
 				"credit_in_account_currency": 0,
 			},
 			{
-				"account": self.credit,  # Specify the credit account
+				"account": credit,  # Specify the credit account
 				"branch": branch,
 				"party_type": to_type,
 				"party": to_party_type,
@@ -191,7 +191,7 @@ def create_journal_entry(self,temp=False):
 		}
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Error in Creating Journal Entry")
-		frappe.throw(f"An error occurred while creating the Journal Entry: {str(e)}")
+		frappe.throw(f"An error(888) occurred while creating the Journal Entry: {str(e)}")
  
 
 @frappe.whitelist()

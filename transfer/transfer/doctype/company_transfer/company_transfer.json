@@ -171,7 +171,6 @@
    "allow_on_submit": 1,
    "fieldname": "credit",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "credit",
    "options": "Account",
    "print_hide": 1,
@@ -194,7 +193,6 @@
    "allow_on_submit": 1,
    "fieldname": "debit",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "debit",
    "options": "Account",
    "print_hide": 1,
@@ -347,7 +345,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-24 01:01:15.530070",
+ "modified": "2025-01-30 05:40:51.185431",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "company transfer",

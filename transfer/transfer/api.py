@@ -373,7 +373,7 @@ def get_document(doc_or_docname, doctype):
 
 
 @frappe.whitelist()
-def get_customer_account(customer):
+def get_customer_account(customer=None):
     # Get the default accounts for the company
     company = frappe.defaults.get_user_default("Company")
     accounts = frappe.get_doc("Company", company)
