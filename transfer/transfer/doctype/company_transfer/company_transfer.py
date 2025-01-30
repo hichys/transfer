@@ -4,7 +4,7 @@
 # import frappe
 from frappe.model.document import Document
 import frappe
-from transfer.transfer.api import create_journal_entry_preview, validate_linked_journal_entries,get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
+from transfer.transfer.api import get_customer_account,create_journal_entry_preview, validate_linked_journal_entries,get_journal_entries_by_cheque, get_account_for_branch , is_posting_day_today, reverse_journal_entry
 from frappe.utils import getdate, nowdate 
 from frappe import _
 class companytransfer(Document):
@@ -146,7 +146,7 @@ def create_journal_entry(self):
 				"credit_in_account_currency": 0
 			}, 
 			{
-				"account": self.credit,  # Specify the credit account
+				"account": get_customer_account(),  # Specify the credit account
 				"branch": branch,
 				"party_type": "Customer",
 				"party": to_party_name,
@@ -159,7 +159,7 @@ def create_journal_entry(self):
 		# Prepare accounts for the Journal Entry
 			accounts = [
 				{
-					"account": self.debit,  # Specify the debit account
+					"account": get_customer_account(),  # Specify the debit account
 					"branch": branch,
 					"party_type": "Customer",
 					"party": from_party_name,
@@ -167,7 +167,7 @@ def create_journal_entry(self):
 					"credit_in_account_currency": 0,
 				},
 				{
-					"account": self.credit,  # Specify the credit account
+					"account":get_customer_account() ,  # Specify the credit account
 					"branch": branch,
 					"party_type": "Customer",
 					"party": to_party_name,

@@ -3,7 +3,7 @@
 let type = 1;
 let per_branch = null;
 //transfer.transfer.doctype.company_transfer.company_transfer.get_profit_account
-
+let customer_account = null;
 
 frappe.ui.form.on('company transfer', {
     create_journal_entry: function (frm) {
@@ -86,10 +86,9 @@ function fetchBranch(callback) {
         },
         callback: function (response) {
             if (response.message) {
-                console.log("Branch value retrieved:", response.message);
                 callback(null, response.message); // Pass value to callback
             } else {
-                const errorMsg = __('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 85247');
+                const errorMsg = __('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 853247');
                 console.error(errorMsg);
                 callback(errorMsg, null); // Pass error to callback
             }
@@ -144,6 +143,25 @@ frappe.ui.form.on('company transfer', {
         validate = true
     },
     onload: function (frm) {
+        //get custmoer account from api
+        if (customer_account === null) {
+            frappe.call({
+                method: "transfer.transfer.doctype.company_transfer.company_transfer.get_customer_account",
+                args: {
+                    // Pass any parameters needed
+                },
+                callback: function (response) {
+                    if (response.message) {
+                        customer_account = response.message; // Store value globally
+                        console.log("Customer account retrieved:", customer_account);
+                    } else {
+                        frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 85247'));
+                    }
+                }
+            });
+        }
+        // Subscribe to doc_update event
+
 
         frappe.realtime.on('doc_update', function (data) {
             if (cur_frm && cur_frm.docname === data.docname) {
@@ -154,7 +172,6 @@ frappe.ui.form.on('company transfer', {
             if (err) {
                 frappe.msgprint(err); // Display error to the user
             } else {
-                console.log("Branch value in onload:", branchValue);
                 frm.set_value('branch', branchValue); // Use the retrieved value
                 frm.trigger('branch');
             }
@@ -168,7 +185,6 @@ frappe.ui.form.on('company transfer', {
             callback: function (response) {
                 if (response.message) {
                     per_branch = response.message; // Store value globally
-                    console.log("Value retrieved and stored:", per_branch);
                 } else {
                     frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 85247'));
                 }
@@ -179,8 +195,8 @@ frappe.ui.form.on('company transfer', {
 
             //default setting is من شركة الي شركة(شركات) Debtors - A
             frm.set_value("status", "غير مسجلة");
-            frm.set_value("debit", "Debtors - A");
-            frm.set_value("credit", "Debtors - A");
+            frm.set_value("debit", customer_account);
+            frm.set_value("credit", customer_account);
             frm.set_value("to_type", "Customer");
             frm.set_value("from_type", "Customer");
             frm.set_value("branch", per_branch);
@@ -190,8 +206,8 @@ frappe.ui.form.on('company transfer', {
         }
         if (frm.doc.amended_from) {
             frappe.show_alert("تم تعديل الحوالة");
-            frm.set_value("profit_account", ""); // Replace with your fieldname
-            frm.set_value("journal_entry", ""); // Replace with your fieldname
+            frm.set_value("profit_account", ""); 
+            frm.set_value("journal_entry", "");
 
         }
     },
@@ -284,12 +300,28 @@ frappe.ui.form.on('company transfer', {
         }
     },
     select_external: function (frm) {
-
+        if(customer_account === null){
+            frappe.call({
+                method: "transfer.transfer.doctype.company_transfer.company_transfer.get_customer_account",
+                args: {
+                    // Pass any parameters needed  
+                },
+                callback: function (response) {
+                    if (response.message) {
+                        customer_account = response.message; // Store value globally
+                        frappe.show_alert(customer_account);
+                        console.log("Customer account retrieved:", customer_account);
+                    } else {
+                        frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 85247'));
+                    }
+                }
+            });
+        }
         if (frm.doc.select_external === "شركات") {
             frm.fields_dict['branch'].set_value(per_branch);
             frm.set_df_property("branch", "read_only", 1);
             frm.fields_dict['from_company'].set_value('');
-            frm.set_value("debit", "Debtors - A")
+            frm.set_value("debit", customer_account)
 
         }
         else {
