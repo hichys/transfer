@@ -204,12 +204,18 @@ def create_journal_entry(self):
 			"mode_of_payment": "Cash",
    			"cheque_no": self.name,
 			"cheque_date": frappe.utils.nowdate(),
-			"user_remark":self.whatsapp_desc
+			"user_remark":self.whatsapp_desc,
+   			#"remark":self.whatsapp_desc,
 		})
-
+		
 		# Save and Submit the Journal Entry
 		journal_entry.insert(ignore_permissions=True)
 		journal_entry.submit()
+	
+		
+
+  
+
 		self.journal_entry = journal_entry.name
 
 		# frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
