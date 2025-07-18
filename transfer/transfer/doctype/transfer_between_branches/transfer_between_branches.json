@@ -116,7 +116,6 @@
    "fieldname": "debit",
    "fieldtype": "Data",
    "label": "debit",
-   "not_nullable": 1,
    "permlevel": 2,
    "read_only": 1
   },
@@ -125,7 +124,6 @@
    "fieldname": "credit",
    "fieldtype": "Data",
    "label": "credit",
-   "not_nullable": 1,
    "permlevel": 2,
    "read_only": 1
   },
@@ -252,7 +250,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-01-24 01:01:42.390585",
+ "modified": "2025-07-17 16:51:39.401692",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",
@@ -289,6 +287,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

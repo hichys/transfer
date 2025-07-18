@@ -1,0 +1,9 @@
+
+company name fixed to (alalmia) change as needed
+accounts added for alalmia purpose only change as needed
+
+
+when first install  : there is workflow not found error :
+fix like this :
+    go the transfer between branches workflow and create the states.
+

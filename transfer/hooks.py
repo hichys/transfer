@@ -5,6 +5,8 @@ app_description = "transfer"
 app_email = "awd@hotmail.it"
 app_license = "mit"
 
+
+app_logo_url = "/assets/transfer/images/logo.png"
 # Apps
 # ------------------
 boot_session = "transfer.startup.boot_session"
@@ -15,9 +17,9 @@ required_apps = ["erpnext"]
 add_to_apps_screen = [
     {
         "name": "transfer",
-        "logo": "/assets/transfer/logo.png",
+        "logo": "/assets/transfer/images/logo.png",
         "title": "transfer",
-        "route": "/transfer",
+        "route": "/app/alalmiatransfer",
     }
 ]
 
@@ -31,6 +33,9 @@ app_include_js = [
     "/assets/transfer/js/redirect.js",
     "/assets/transfer/js/custom.js",
 ]
+
+app_include_css = "/assets/transfer/css/custom.css"
+
 # include js, css files in header of web template
 # web_include_css = "/assets/transfer/css/transfer.css"
 # web_include_js = "/assets/transfer/js/transfer.js"
@@ -241,7 +246,11 @@ doc_events = {
 # 	}
 # ]
 # loading screen
-website_context = {"splash_image": "/assets/transfer/images/logo.png"}
+website_context = {
+    "splash_image": "/assets/transfer/images/logo.png",
+    "favicon": "/assets/transfer/images/favicon.ico"
+}
+
 # Authentication and authorization
 # --------------------------------
 

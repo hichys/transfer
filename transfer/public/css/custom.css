@@ -1,0 +1,7 @@
+/* Replace ERPNext top-left logo with alalmia logo */
+.app-logo {
+    content: url('/assets/transfer/images/logo.png') !important;
+    height: 40px !important;
+    width: auto !important;
+    margin-left: 8px;
+}

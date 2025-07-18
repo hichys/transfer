@@ -28,3 +28,25 @@ frappe.ui.keys.add_shortcut(
 }
 
 )
+frappe.ui.toolbar.setup_logo = function() {
+    const logo = $(".app-logo-link img");
+    const logoLink = $(".app-logo-link");
+
+    if (logo.length) {
+        logo.attr("src", "/assets/transfer/images/logo.png");
+        logo.css({ height: "32px" }); // optional styling
+
+        logoLink.attr("href", "/app/alalmiatransfer");  // internal route
+        logoLink.attr("target", "_self");               // or "_blank" for new tab
+    }
+};
+
+frappe.after_ajax(() => {
+    // If the user lands on /app/home, bounce them to /app/alalmiatransfer
+    if (window.location.pathname === "/app/home") {
+        window.location.replace("/app/alalmiatransfer");
+    }
+    if (window.location.pathname === "/app") {
+        window.location.replace("/app/alalmiatransfer");
+    }
+});
