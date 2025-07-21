@@ -314,11 +314,13 @@ def handle_cancel_transfer(docname,method="cancel"):
 			frappe.msgprint(f"attempt to cancel {doc.docstatus}")
 			doc.status = "ملغية"
 			doc.save()
+			doc.docstatus = 2
 			doc.cancel()
 			frappe.db.commit()
 		else :
 			handel_reverse(doc)
 			doc.status = "ملغية"
+			doc.docstatus = 2
 			doc.save()
 			frappe.db.commit()
 			

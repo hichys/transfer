@@ -591,7 +591,7 @@ frappe.ui.form.on('company transfer', {
         //         );
         //     });
         // }
-        if (frm.doc.docstatus == 1) {
+        if (frm.doc.docstatus == 1 && frm.doc.status !== "ملغية") {
             frm.add_custom_button(__('إلغاء الحوالة'), function () {
                 frappe.confirm(
                     'هل انت متاكد من ان الحوالة ألغيت ؟',

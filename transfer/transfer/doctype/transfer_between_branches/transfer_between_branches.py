@@ -58,6 +58,28 @@ class transferbetweenbranches(Document):
 	def on_save(self):
 		frappe.msgprint("تم تسجيل الحوالة في المنظومة بنجاح")
 
+	def before_trash(self):
+		if self.workflow_state != "ملغيه":
+			frappe.throw("لا يمكن حذف المستند إلا إذا كانت حالته 'ملغيه'.")
+
+		journal_entries = frappe.get_all("Journal Entry", filters={"cheque_no": self.name})
+
+		for je in journal_entries:
+			doc = frappe.get_doc("Journal Entry", je.name)
+
+			if doc.docstatus == 1:
+				try:
+					doc.cancel()
+					doc.reload()  # Important: refreshes docstatus = 2
+				except Exception as e:
+					frappe.throw(f"تعذر إلغاء قيد اليومية {doc.name}: {str(e)}")
+
+			if doc.docstatus == 2:
+				try:
+					doc.delete()
+				except Exception as e:
+					frappe.throw(f"تعذر حذف قيد اليومية {doc.name}: {str(e)}")
+
 
 @frappe.whitelist()
 def manual_submit(docname):

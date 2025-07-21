@@ -1,5 +1,6 @@
 
 frappe.ui.form.on('transfer between branches', {
+	
 	before_workflow_action: async (frm) => {
 		console.log("Triggered before_workflow_action");
 		frappe.dom.unfreeze();
@@ -107,7 +108,8 @@ frappe.ui.form.on('transfer between branches', {
 
 frappe.ui.form.on('transfer between branches', {
 
-
+       
+ 
 
 	validate: function (frm) {
 		///ensure that the amount is greater than 0
@@ -253,6 +255,25 @@ frappe.ui.form.on('transfer between branches', {
 					);
 				});
 			}
+		}
+
+		if(frm.doc.docstatus === 2)
+		{
+			 if (frm.doc.workflow_state == 'ملغية') {
+            frm.add_custom_button(__('Delete'), function() {
+                frappe.call({
+                    method: 'frappe.client.delete',
+                    args: {
+                        doctype: frm.doc.doctype,
+                        name: frm.doc.name
+                    },
+                    callback: function() {
+                        frappe.msgprint(__('Document deleted'));
+                        frappe.set_route('List', frm.doc.doctype);
+                    }
+                });
+            }, 'Actions');
+        }
 		}
 
 	}
