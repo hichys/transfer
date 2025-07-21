@@ -22,9 +22,6 @@ class transferbetweenbranches(Document):
 		if self.delivery_date and self.posting_date:
 			if getdate(self.delivery_date) < getdate(self.posting_date):
 				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
-
-	def on_trash(self):
-		frappe.msgprint("This document has been trashed")
 	def before_cancel(self):
 		validate_linked_journal_entries(self.name)
 	def on_cancel(self):
@@ -58,28 +55,32 @@ class transferbetweenbranches(Document):
 	def on_save(self):
 		frappe.msgprint("تم تسجيل الحوالة في المنظومة بنجاح")
 
-	def before_trash(self):
-		if self.workflow_state != "ملغيه":
-			frappe.throw("لا يمكن حذف المستند إلا إذا كانت حالته 'ملغيه'.")
+#delete the doctype and its linked journal entries fillters cheque_no
+@frappe.whitelist()
+def delete_doc_with_links(docname):
+	doc = frappe.get_doc("transfer between branches", docname)
+	frappe.msgprint(f"Deleting document: {docname}")
+	if doc.workflow_state != "ملغية":
+		frappe.throw(_("Only documents in 'ملغيه' state can be deleted."))
 
-		journal_entries = frappe.get_all("Journal Entry", filters={"cheque_no": self.name})
+	journal_entries = frappe.get_all("Journal Entry", filters={"cheque_no": docname})
+	for je in journal_entries:
+		je_doc = frappe.get_doc("Journal Entry", je.name)
 
-		for je in journal_entries:
-			doc = frappe.get_doc("Journal Entry", je.name)
+		if je_doc.docstatus == 1:
+			je_doc.cancel()
+			je_doc.reload()
 
-			if doc.docstatus == 1:
-				try:
-					doc.cancel()
-					doc.reload()  # Important: refreshes docstatus = 2
-				except Exception as e:
-					frappe.throw(f"تعذر إلغاء قيد اليومية {doc.name}: {str(e)}")
+		if je_doc.docstatus == 2:
+			je_doc.delete()
 
-			if doc.docstatus == 2:
-				try:
-					doc.delete()
-				except Exception as e:
-					frappe.throw(f"تعذر حذف قيد اليومية {doc.name}: {str(e)}")
+	doc.delete()
+	frappe.db.commit()
 
+	if frappe.db.exists("transfer between branches", docname):
+		frappe.throw(_("Failed to delete the document."))
+
+	return "Deleted successfully"
 
 @frappe.whitelist()
 def manual_submit(docname):

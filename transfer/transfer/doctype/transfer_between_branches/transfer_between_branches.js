@@ -259,13 +259,14 @@ frappe.ui.form.on('transfer between branches', {
 
 		if(frm.doc.docstatus === 2)
 		{
+			//delete_doc_with_linked_js
 			 if (frm.doc.workflow_state == 'ملغية') {
             frm.add_custom_button(__('Delete'), function() {
                 frappe.call({
-                    method: 'frappe.client.delete',
+                    method:"transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_doc_with_links",
                     args: {
                         doctype: frm.doc.doctype,
-                        name: frm.doc.name
+                        docname: frm.doc.name
                     },
                     callback: function() {
                         frappe.msgprint(__('Document deleted'));
