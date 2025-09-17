@@ -1,6 +1,6 @@
 
 frappe.ui.form.on('transfer between branches', {
-	
+
 	before_workflow_action: async (frm) => {
 		console.log("Triggered before_workflow_action");
 		frappe.dom.unfreeze();
@@ -9,7 +9,7 @@ frappe.ui.form.on('transfer between branches', {
 				// Display the confirmation dialog
 				let userConfirmed = await new Promise((resolve) => {
 					frappe.confirm(
-						
+
 						__("هل انت متاكد من التسليم قد تم ؟"),
 						() => {
 							// User clicked "Yes"
@@ -21,13 +21,13 @@ frappe.ui.form.on('transfer between branches', {
 						}
 					);
 				});
-	
+
 				if (!userConfirmed) {
 					// Stop the workflow by throwing an error
 					frappe.msgprint(__("تم الإلغاء"));
 					throw new Error("Workflow action cancelled by user.");
 				}
-	
+
 			} catch (error) {
 				throw error; // Ensure workflow doesn't proceed
 			}
@@ -35,7 +35,7 @@ frappe.ui.form.on('transfer between branches', {
 			console.log("Conditions not met. No confirmation required.");
 		}
 	},
-	
+
 	create_journal_entry: function (frm) {
 		frappe.call({
 			method: 'transfer.transfer.doctype.internal_transfer.internal_transfer.create_journal_entry_preview',
@@ -108,8 +108,8 @@ frappe.ui.form.on('transfer between branches', {
 
 frappe.ui.form.on('transfer between branches', {
 
-       
- 
+
+
 
 	validate: function (frm) {
 		///ensure that the amount is greater than 0
@@ -138,7 +138,14 @@ frappe.ui.form.on('transfer between branches', {
 
 
 	},
+	onload: function (frm) {
+		//retrieve profit_per_thousand from transfer setting doctype
+		frappe.db.get_single_value("transfer setting", "profit_per_thousand").then(value => {
+			frm.set_value('profit_per_thousand', value);
+		});
+	},
 	refresh: function (frm) {
+
 
 		if (frm.doc.to_branch && frm.doc.from_branch && frm.doc.to_branch != null && frm.doc.from_branch != null) {
 			if (frm.doc.to_branch === frm.doc.from_branch) {
@@ -257,24 +264,23 @@ frappe.ui.form.on('transfer between branches', {
 			}
 		}
 
-		if(frm.doc.docstatus === 2)
-		{
+		if (frm.doc.docstatus === 2) {
 			//delete_doc_with_linked_js
-			 if (frm.doc.workflow_state == 'ملغية') {
-            frm.add_custom_button(__('Delete'), function() {
-                frappe.call({
-                    method:"transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_doc_with_links",
-                    args: {
-                        doctype: frm.doc.doctype,
-                        docname: frm.doc.name
-                    },
-                    callback: function() {
-                        frappe.msgprint(__('Document deleted'));
-                        frappe.set_route('List', frm.doc.doctype);
-                    }
-                });
-            }, 'Actions');
-        }
+			if (frm.doc.workflow_state == 'ملغية') {
+				frm.add_custom_button(__('Delete'), function () {
+					frappe.call({
+						method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_doc_with_links",
+						args: {
+							doctype: frm.doc.doctype,
+							docname: frm.doc.name
+						},
+						callback: function () {
+							frappe.msgprint(__('Document deleted'));
+							frappe.set_route('List', frm.doc.doctype);
+						}
+					});
+				}, 'Actions');
+			}
 		}
 
 	}
@@ -492,6 +498,7 @@ frappe.ui.form.on('transfer between branches', {
 		}
 	},
 	profit_per_thousand: function (frm) {
+
 		var valid = validate_float_fields(frm.doc.profit_per_thousand);
 		if (!valid) {
 			profit_per_thousand = 0;
@@ -537,12 +544,11 @@ frappe.ui.form.on('transfer between branches', {
 		}
 	},
 	check_tslmfrommain: function (frm) {
+		frappe.msgprint({ message: 'جاري جلب الحساب من الفرع الرئيسي', indicator: 'blue' });
 		let prev_debit = frm.doc.debit;
 		if (frm.doc.check_tslmfrommain) {
-			// Define the account index you want to fetch
 			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
-			let company_main = "العالمية الفرناج";
-			// Call the Python method to get the account for the selected branch and index
+			let company_main = "الزاوية";
 			frappe.call({
 				method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
 				args: {

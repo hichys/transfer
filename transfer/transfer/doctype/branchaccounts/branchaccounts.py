@@ -39,9 +39,8 @@ def generate_accounts():
 		
 		branch_accounts = frappe.get_all("Account", filters={"account_name": ["like", f"%{branch.branch}%"]}, fields=["name", "account_number"])
 		frappe.msgprint(f"{branch_accounts}")
+		
 		# check if branch accounts are valid
-		
-		
 		#configm branch accounts all contains the same same branch name and series number #1001,2001,3001
 		#branch_accounts[0] is the main account
 		#branch_accounts[1] is the profit account
@@ -61,9 +60,9 @@ def generate_accounts():
 		#append bracnh accounts to the child table
 		#save the doc
 		#commit the transaction
-		branch_accounts_doc.append("accounts", {"account": branch_accounts[0].name, "desc": "Main Account"})
-		branch_accounts_doc.append("accounts", {"account": branch_accounts[1].name, "desc": "Profit Account"})
-		branch_accounts_doc.append("accounts", {"account": branch_accounts[2].name, "desc": "Temporary Account"})
+		branch_accounts_doc.append("accounts", {"account": branch_accounts[0].name, "description": "Main Account"})
+		branch_accounts_doc.append("accounts", {"account": branch_accounts[1].name, "description": "Profit Account"})
+		branch_accounts_doc.append("accounts", {"account": branch_accounts[2].name, "description": "Temporary Account"})
 		branch_accounts_doc.insert()
 		#save and submit the doc
 		branch_accounts_doc.submit()
