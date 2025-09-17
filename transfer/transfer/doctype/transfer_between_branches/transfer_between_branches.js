@@ -544,36 +544,45 @@ frappe.ui.form.on('transfer between branches', {
 		}
 	},
 	check_tslmfrommain: function (frm) {
-		frappe.msgprint({ message: 'جاري جلب الحساب من الفرع الرئيسي', indicator: 'blue' });
 		let prev_debit = frm.doc.debit;
 		if (frm.doc.check_tslmfrommain) {
 			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
-			let company_main = "الزاوية";
-			frappe.call({
-				method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
-				args: {
-					branch_name: company_main, // Pass the selected branch name
-					account_index: company_main_account_index       // Pass the account index
-				},
-				callback: function (r) {
-					console.log('Account response:', r.message); // Log the response for debugging
-
-					if (r.message) {
-						// Set the account from the response to the fbfbfb field
-						frm.set_value('debit', r.message);
-						frm.refresh_field('debit');
-						//frappe.msgprint(__('Account for branch {0} is {1}', 
-						//[frm.doc.from_branch, r.message]));
-					} else {
-						// Clear the fbfbfb field if no account is found
-						frm.set_value('debit', null);
-						frm.refresh_field('debit');
-						frappe.msgprint(__('No account found for the selected branch.'));
-					}
-				},
-				error: function (error) {
-					console.error('Error fetching account:', error); // Log any errors
+			let company_main = "";
+			frappe.get_cached_doc("transfer setting", "main_branch").then(value => {
+				company_main = value;
+				console.log('Main branch from settings:', company_main);
+				if (!company_main) {
+					frappe.msgprint(__('Main branch is not set in Transfer Setting'));
+					frm.set_value('check_tslmfrommain', 0);
+					frm.refresh_field('check_tslmfrommain');
+					return;
 				}
+				frappe.call({
+					method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
+					args: {
+						branch_name: company_main, // Pass the selected branch name
+						account_index: company_main_account_index       // Pass the account index
+					},
+					callback: function (r) {
+						console.log('Account response:', r.message); // Log the response for debugging
+	
+						if (r.message) {
+							// Set the account from the response to the fbfbfb field
+							frm.set_value('debit', r.message);
+							frm.refresh_field('debit');
+							//frappe.msgprint(__('Account for branch {0} is {1}', 
+							//[frm.doc.from_branch, r.message]));
+						} else {
+							// Clear the fbfbfb field if no account is found
+							frm.set_value('debit', null);
+							frm.refresh_field('debit');
+							frappe.msgprint(__('No account found for the selected branch.'));
+						}
+					},
+					error: function (error) {
+						console.error('Error fetching account:', error); // Log any errors
+					}
+				});
 			});
 		} else {
 			// Clear the fbfbfb field if no branch is selected

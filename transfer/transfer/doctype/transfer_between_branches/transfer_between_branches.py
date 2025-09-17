@@ -421,7 +421,8 @@ def create_journal_entry_from_handed_transfer(doc, method):
 
 	if(doc.check_tslmfrommain): 
 		#validate to_branch is actually "العالمية الفرناج"
-		if doc.to_branch == "العالمية الفرناج":
+		settings = frappe.get_cached_doc("Transfer Setting")
+		if doc.to_branch == settings.main_branch:
 			credit_to_account = get_company_main_account()
 			from_account_balance = get_balance_on(credit_to_account,date=nowdate())
 			if from_account_balance < doc.amount:
