@@ -5,13 +5,13 @@ frappe.query_reports["Transfer Between Branches"] = {
 	"filters": [
 		{
 			fieldname : "from_branch",
-			label : __("Branch"),
+			label : __("Sender Branch"),
 			fieldtype: "Link",
 			options : ('Branch')
 		},
 		{
 			fieldname : "to_branch",
-			label : __("Branch"),
+			label : __("Reciver Branch"),
 			fieldtype: "Link",
 			options : ('Branch')
 		},
