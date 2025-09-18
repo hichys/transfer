@@ -4,7 +4,13 @@
 frappe.query_reports["Transfer Between Branches"] = {
 	"filters": [
 		{
-			fieldname : "branch",
+			fieldname : "from_branch",
+			label : __("Branch"),
+			fieldtype: "Link",
+			options : ('Branch')
+		},
+		{
+			fieldname : "to_branch",
 			label : __("Branch"),
 			fieldtype: "Link",
 			options : ('Branch')
@@ -36,6 +42,15 @@ frappe.query_reports["Transfer Between Branches"] = {
 			default : frappe.datetime.get_today(),
 			reqd : 1
 		},
+		{
+			fieldname : "reciver_or_sender",
+			label : __("filter by Reciver or Sender"),
+			fieldtype: "Select",
+			options : ['Reciver','Sender'],
+			default : "Sender",
+			reqd : 1
+		},
+		
 
 	]
 };
