@@ -54,7 +54,7 @@ frappe.ui.form.on('transfer between branches', {
 								options: `
                                     <div style="direction: rtl; text-align: right; font-family: 'Cairo', sans-serif; line-height: 1.8;">
                                         <h4 style="color: #333;">تفاصيل العملية:</h4>
-                                        <p><strong>الفرع:</strong> ${details.branch}</p>
+                                        <p><strong>الكود:</strong> ${frm.doc.name}</p>
                                         <p><strong>المرسل:</strong> ${details.from_company}</p>
                                         <p><strong>المستقبل:</strong> ${details.to_company}</p>
                                         <p><strong>القيمة:</strong> ${details.amount}</p>
@@ -87,7 +87,7 @@ frappe.ui.form.on('transfer between branches', {
 					// Add "copy details" functionality
 					dialog.$wrapper.on('click', '#copy-details', function () {
 						const detailsText = `
-                            الفرع: ${details.branch}
+                            الكود: ${frm.doc.name}
                             المرسل: ${details.from_company}
                             المستقبل: ${details.to_company}
                             القيمة: ${details.amount}
