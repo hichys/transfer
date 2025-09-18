@@ -138,7 +138,7 @@ frappe.ui.form.on('transfer between branches', {
 
 
 	},
-	onload: function (frm) {
+	onload: function (frm) { 
 		//retrieve profit_per_thousand from transfer setting doctype
 		frappe.db.get_single_value("transfer setting", "profit_per_thousand").then(value => {
 			frm.set_value('profit_per_thousand', value);

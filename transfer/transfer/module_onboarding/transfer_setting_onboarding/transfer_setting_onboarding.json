@@ -1,0 +1,32 @@
+{
+ "allow_roles": [
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "alalmia transfer"
+  },
+  {
+   "role": "Administrator"
+  }
+ ],
+ "creation": "2025-09-17 21:16:16.255837",
+ "docstatus": 0,
+ "doctype": "Module Onboarding",
+ "documentation_url": "https://google.com",
+ "idx": 0,
+ "is_complete": 0,
+ "modified": "2025-09-17 21:22:13.837552",
+ "modified_by": "Administrator",
+ "module": "transfer",
+ "name": "Transfer Setting OnBoarding",
+ "owner": "Administrator",
+ "steps": [
+  {
+   "step": "update setting"
+  }
+ ],
+ "subtitle": "transfer setting",
+ "success_message": "Transfer Setting Updated",
+ "title": "Transfer Setup"
+}
