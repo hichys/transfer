@@ -274,7 +274,7 @@ def transfer_completed(docname):
 		
 		# Validate if transfer is from the main account and to the correct branch
 		if doc.check_tslmfrommain:
-			if doc.to_company== "العالمية الفرناج":
+			if doc.to_company== frappe.get_cached_doc("Transfer Setting").main_branch:
 				from_acc = get_company_main_account()
 				to_acc = get_temp_account(doc.branch)
 			# Validate if the from_account has sufficient balance

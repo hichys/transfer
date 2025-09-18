@@ -391,7 +391,7 @@ frappe.ui.form.on("Internal Transfer", {
             prv_acc = frm.doc.credit;
 			// Define the account index you want to fetch
 			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
-			let company_main = "العالمية الفرناج";
+			let company_main = frappe.get_cached_doc("Transfer Setting").main_branch;
 			// Call the Python method to get the account for the selected branch and index
 			frappe.call({
 				method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method

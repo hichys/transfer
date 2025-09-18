@@ -96,7 +96,7 @@ class companytransfer(Document):
 			frappe.throw(f"An error occurred during cancellation: {str(main_error)}")
 @frappe.whitelist()
 def get_branch():
-	return "العالمية الفرناج"
+	return   frappe.get_cached_doc("Transfer Setting").main_branch
 def getSelf(docname):
 	return frappe.get_doc('company transfer', docname)
 @frappe.whitelist()

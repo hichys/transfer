@@ -240,7 +240,7 @@ def get_temp_account(branch):
 
 # حساب الشركة الرئسي
 @frappe.whitelist()
-def get_company_main_account(branch="العالمية الفرناج"):
+def get_company_main_account(branch):
     return get_account_for_branch(branch, 3)
 
 

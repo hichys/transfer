@@ -420,10 +420,10 @@ def create_journal_entry_from_handed_transfer(doc, method):
 	credit_to_account = get_main_account(doc.to_branch)# حساب الفرع الرئيسي
 
 	if(doc.check_tslmfrommain): 
-		#validate to_branch is actually "العالمية الفرناج"
+		#validate to_branch is actually main branch
 		settings = frappe.get_cached_doc("Transfer Setting")
 		if doc.to_branch == settings.main_branch:
-			credit_to_account = get_company_main_account()
+			credit_to_account = get_company_main_account(settings.main_branch)
 			from_account_balance = get_balance_on(credit_to_account,date=nowdate())
 			if from_account_balance < doc.amount:
 				frappe.throw(f"الرصيد غير كافي في الحساب. الرصيد الحالي: {from_account_balance}, المبلغ المطلوب: {doc.amount}")
