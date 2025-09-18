@@ -10,6 +10,8 @@ def execute(filters=None):
     columns = get_columns()
     data, chart = get_data_chart(filters=filters)
     return columns, data, None, chart
+
+
 def get_data_chart(filters=None):
     data = []
     from_date = filters.pop("from_date", None)
@@ -104,11 +106,17 @@ def get_data_chart(filters=None):
     chart = {
         "data": {
             "labels": branches_list,
-            "datasets": [{"name": filters.get("workflow_state") or "Count", "values": values_list}],
+            "datasets": [
+                {
+                    "name": filters.get("workflow_state") or "Count",
+                    "values": values_list,
+                }
+            ],
         },
         "type": "bar",
     }
     return data, chart
+
 
 def get_columns():
     columns = [
