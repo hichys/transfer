@@ -40,11 +40,11 @@ frappe.ui.form.on('Internal Transfer', {
                                 callback: function (r) {
                                     if (r.message.status === 'success') {
                                         frappe.msgprint('تم إنشاء القيد بنجاح.');
+                                        dialog.hide();
                                         frm.reload_doc();
                                     }
                                 }
                             });
-                            dialog.hide();
                         }
                     });
 
@@ -225,10 +225,16 @@ frappe.ui.form.on("Internal Transfer", {
             }
         }
     },
-    without_profit: function (frm) {
-        if (frm.doc.without_profit) {
-            frappe.show_alert(frm.doc.our_profit);
-            frappe.show_alert(frm.doc.other_party_profit);
+    profit_is_splited: function (frm) {
+        console.log(frm.doc.profit_is_splited);
+        //make our_profit and other_party_profit same
+        if (frm.doc.profit_is_splited) {
+
+            const profit = frm.doc.profit || 0;
+            const our_profit = frm.doc.profit / 2 || 0;
+
+            frm.set_value('our_profit', our_profit);
+            frm.set_value('other_party_profit', our_profit);
         }
     },
     amount: function (frm) {
@@ -236,12 +242,14 @@ frappe.ui.form.on("Internal Transfer", {
     execution_amount: function (frm) {
     },
     other_party_profit: function (frm) {
+        adjust_profits(frm, 'other_party_profit');
     },
     our_profit: function (frm) {
+        adjust_profits(frm, 'our_profit');
     },
     profit: function (frm) {
-        frm.set_value('our_profit', frm.doc.profit);
-        frm.set_value('other_party_profit', 0);
+        frm.set_value('our_profit', frm.doc.profit/2);
+        frm.set_value('other_party_profit', frm.doc.profit/2);
     },
     select_internal: function (frm) {
 
@@ -307,9 +315,25 @@ frappe.ui.form.on("Internal Transfer", {
         }
     },
     without_profit: function (frm) {
+        if(frm.doc.without_profit){
+            frm.set_value('our_profit', 0)
+            frm.set_value('other_party_profit', 0)
+            frm.set_value('profit', 0)
+            frm.set_value('profit_is_splited', 0);
+            frm.set_df_property('other_party_profit', 'read_only', 1);
+            frm.set_df_property('our_profit', 'read_only', 1);
+            frm.set_df_property('profit', 'read_only', 1);
+            frm.set_df_property('profit_is_splited', 'read_only', 1);
+            frm.refresh_fields();
+        }
+        else{
+            frm.set_df_property('other_party_profit', 'read_only', 0);
+            frm.set_df_property('our_profit', 'read_only', 0);
+            frm.set_df_property('profit', 'read_only', 0);
+            frm.set_df_property('profit_is_splited', 'read_only', 0);
+            frm.refresh_fields();
+        }
 
-        frm.set_value('our_profit', 0)
-        frm.set_value('other_party_profit', 0)
     },
     branch: function (frm) {
         if (frm.doc.branch) {
@@ -439,3 +463,53 @@ function reset_fields(frm) {
     frm.set_value("credit", "");
     frm.refresh_fields();
 }
+
+function adjust_profits(frm, changed_field) {
+    const profit = frm.doc.profit || 0;
+    let our_profit = frm.doc.our_profit || 0;
+    let other_party_profit = frm.doc.other_party_profit || 0;
+
+    // Adjust the other field to ensure the total equals profit
+    if (changed_field === 'our_profit') {
+        other_party_profit = profit - our_profit;
+
+        // Prevent invalid adjustments
+        if (other_party_profit < 0 && profit >= 0) {
+            frappe.msgprint("The other party's profit cannot be negative when total profit is positive.");
+            other_party_profit = 0;
+            our_profit = profit;
+        } else if (other_party_profit > 0 && profit < 0) {
+            frappe.msgprint("The other party's profit cannot be positive when total profit is negative.");
+            other_party_profit = 0;
+            our_profit = profit;
+        }
+    } else if (changed_field === 'other_party_profit') {
+        our_profit = profit - other_party_profit;
+
+        // Prevent invalid adjustments
+        if (our_profit < 0 && profit >= 0) {
+            frappe.msgprint("Our profit cannot be negative when total profit is positive.");
+            our_profit = 0;
+            other_party_profit = profit;
+        } else if (our_profit > 0 && profit < 0) {
+            frappe.msgprint("Our profit cannot be positive when total profit is negative.");
+            our_profit = 0;
+            other_party_profit = profit;
+        }
+    }
+
+    // Update the fields
+    frm.set_value('our_profit', our_profit);
+    frm.set_value('other_party_profit', other_party_profit);
+
+    if (our_profit === other_party_profit) {
+        frm.set_value('profit_is_splited', 1);
+    }
+    else {
+        frm.set_value('profit_is_splited', 0);
+    }
+
+    // Refresh fields to reflect changes
+    frm.refresh_fields();
+}
+
