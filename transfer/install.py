@@ -4,10 +4,10 @@ from openpyxl import load_workbook
 
 
 def after_install():
-    print("after_install script is running...")
+    print("Creating Account script is running...")
     frappe.log_error("after_install script is running...", "Custom App Installation")
     import_accounts_from_excel("roots_accounts.xlsx")
-    import_accounts_from_excel()
+    # import_accounts_from_excel()
 
 
 def import_accounts_from_excel(filename="accounts.xlsx"):
