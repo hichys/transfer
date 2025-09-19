@@ -43,6 +43,7 @@ app_include_css = "/assets/transfer/css/custom.css"
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "transfer/public/scss/website"
 fixtures = [
+    "Accounting Dimension",
     "Workflow",
     "Workflow State",
     "Workflow Action",

@@ -24,7 +24,7 @@
   {
    "fieldname": "bramch_setting_section",
    "fieldtype": "Section Break",
-   "label": "Bramch Setting"
+   "label": "Branch Setting"
   },
   {
    "fieldname": "main_branch",
