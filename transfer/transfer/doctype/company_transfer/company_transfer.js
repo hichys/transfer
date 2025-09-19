@@ -5,6 +5,20 @@ let per_branch = null;
 //transfer.transfer.doctype.company_transfer.company_transfer.get_profit_account
 let customer_account = null;
 
+// frappe.listview_settings['company transfer'] = {
+//     get_indicator: function (doc) {
+//         console.log("listview_settings");
+
+//         if (doc.docstatus === 0) {
+//             return [__("غير مسجل"), "orange", "docstatus,=,0"];
+//         } else if (doc.docstatus === 1) {
+//             return [__("Submitted"), "green", "docstatus,=,1"];
+//         } else if (doc.docstatus === 2) {
+//             return [__("Cancelled"), "red", "docstatus,=,2"];
+//         }
+//     }
+// };
+
 frappe.ui.form.on('company transfer', {
     create_journal_entry: function (frm) {
         frappe.call({
@@ -43,11 +57,12 @@ frappe.ui.form.on('company transfer', {
                                 callback: function (r) {
                                     if (r.message.status === 'success') {
                                         frappe.show_alert(__('تم التسجيل'));
+                                        dialog.hide();
                                         frm.reload_doc();
                                     }
                                 }
                             });
-                            dialog.hide();
+                            
                         }
                     });
 
@@ -206,7 +221,7 @@ frappe.ui.form.on('company transfer', {
         }
         if (frm.doc.amended_from) {
             frappe.show_alert("تم تعديل الحوالة");
-            frm.set_value("profit_account", ""); 
+            frm.set_value("profit_account", "");
             frm.set_value("journal_entry", "");
 
         }
@@ -300,7 +315,7 @@ frappe.ui.form.on('company transfer', {
         }
     },
     select_external: function (frm) {
-        if(customer_account === null){
+        if (customer_account === null) {
             frappe.call({
                 method: "transfer.transfer.doctype.company_transfer.company_transfer.get_customer_account",
                 args: {
@@ -530,6 +545,12 @@ function adjust_profits(frm, changed_field) {
 // لم يضغط علي تم التسليم في الدوكيومتت غير مستلمة
 frappe.ui.form.on('company transfer', {
     refresh: function (frm) {
+        if (frm.doc.docstatus === 0) {
+            frm.page.set_indicator(__('غير مسجلة'), 'orange');
+        }
+        else if (frm.doc.docstatus === 2) {
+            frm.page.set_indicator(__('ملغية'), 'red');
+        }
         // const button = frm.fields_dict['go_to']?.$wrapper.find('button');
         if (frm.doc.docstatus == 1 && frm.doc.status === "غير مستلمة") {
             frm.add_custom_button(__('تم التسليم'), function () {
