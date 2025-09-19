@@ -1,0 +1,30 @@
+[
+    {
+        "doctype": "Workflow State",
+        "name": "غير مسجلة",
+        "workflow_state_name": "غير مسجلة",
+        "icon": "edit",
+        "style": "Warning"
+    },
+    {
+        "doctype": "Workflow State",
+        "name": "غير مستلمة",
+        "workflow_state_name": "غير مستلمة",
+        "icon": "share",
+        "style": "Primary"
+    },
+    {
+        "doctype": "Workflow State",
+        "name": "مستلمة",
+        "workflow_state_name": "مستلمة",
+        "icon": "check",
+        "style": "Success"
+    },
+    {
+        "doctype": "Workflow State",
+        "name": "ملغية",
+        "workflow_state_name": "ملغية",
+        "icon": "close",
+        "style": "Danger"
+    }
+]

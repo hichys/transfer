@@ -121,7 +121,7 @@ def create_account(account_data):
 
 def after_uninstall():
     """Clean up accounts on uninstall"""
-    print("Uninstalling transfer app...")
+    print("Uninstalling transfer app accounts...")
 
     # Get accounts to delete from both files
     accounts_to_delete = []
@@ -150,4 +150,4 @@ def after_uninstall():
         except Exception as e:
             print(f"Failed to delete account {account_name}: {e}")
 
-    print("Uninstallation completed")
+    print("removing accounts completed")
