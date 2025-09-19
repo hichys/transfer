@@ -381,24 +381,6 @@ def get_customer_account(customer=None):
     return customer_account
 
 
-# @frappe.whitelist()
-# def extract_phone_number(whatsapp_desc):
-#     try:
-#         # Clean the text to remove spaces and hyphens
-#         cleaned_text = whatsapp_desc.replace(" ", "").replace("-", "")  # Remove spaces and hyphens
-
-#         # Match a phone number pattern with or without the country code
-#         match = re.match(r'(?:\+?218)?0?(9[1234]\d{7})', cleaned_text)
-
-#         if match:
-#             return '0' + match.group(1)  # Return the matched phone number
-#         else:
-#             return "ادخل يدويا"  # Fallback if no match
-#     except Exception as error:
-#         print("Error in extract_phone_number:", error)
-#         return "ادخل يدويا"  # Fallback for unexpected errors
-
-
 @frappe.whitelist()
 def get_item_qty(item_code, warehouse):
     """
