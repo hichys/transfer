@@ -110,7 +110,7 @@ frappe.ui.form.on("Internal Transfer", {
      * 
      */
     validate: function (frm) {
-        
+
         if (type === 1) { //من شركة الي فرع
 
             if (frm.doc.branch !== frm.doc.to_company)
@@ -147,10 +147,12 @@ frappe.ui.form.on("Internal Transfer", {
     },
     refresh: function (frm) {
 
-        if (frm.doc.docstatus === 0 || frm.doc.status === "غير مسجلة") {  // Show the delete button only for draft documents
-            frm.add_custom_button('مسح الحوالة', function () {
-                frm.trigger('delete_draft');
-            });
+        if (!frm.doc.__islocal) {
+            if (frm.doc.docstatus === 0 || frm.doc.status === "غير مسجلة") {  // Show the delete button only for draft documents
+                frm.add_custom_button('مسح الحوالة', function () {
+                    frm.trigger('delete_draft');
+                });
+            }
         }
 
         if (frm.doc.docstatus === 1 && frm.doc.status === "غير مسجلة") {
@@ -212,7 +214,7 @@ frappe.ui.form.on("Internal Transfer", {
 
         }
     },
-    delivery_date: function(frm) {
+    delivery_date: function (frm) {
         if (frm.doc.delivery_date && frm.doc.posting_date) {
             const deliveryDate = frappe.datetime.str_to_obj(frm.doc.delivery_date);
             const postingDate = frappe.datetime.str_to_obj(frm.doc.posting_date);
@@ -249,7 +251,7 @@ frappe.ui.form.on("Internal Transfer", {
 
 
         if (frm.doc.select_internal == "من شركة الي فرع") {
-            frappe.show_alert("من شركة الي فرع 2525");
+            frappe.show_alert("من شركة الي فرع");
             // frm.fields_dict['from_type'].set_value("Customer");
             // frm.fields_dict['to_type'].set_value("Branch");
             frm.set_value('from_type', 'Customer');
@@ -272,11 +274,7 @@ frappe.ui.form.on("Internal Transfer", {
         if (frm.doc.select_internal == "من فرع الي شركة") {
             frappe.show_alert("من فرع الي شركة ");
 
-            //الطرف الاخر لا نحسب عمولتة
-            frm.doc.other_party_profit = 0;
-            frm.set_df_property('other_party_profit', 'read_only', 1);
-
-
+            frm.set_df_property('other_party_profit', 'read_only', 0);
 
             frm.set_value('from_type', 'Branch');
             frm.set_value('to_type', 'Customer');
@@ -386,49 +384,49 @@ frappe.ui.form.on("Internal Transfer", {
         }
     },
     check_tslmfrommain: function (frm) {
-		let prev_debit = frm.doc.credit;
-		if (frm.doc.check_tslmfrommain ) {
+        let prev_debit = frm.doc.credit;
+        if (frm.doc.check_tslmfrommain) {
             prv_acc = frm.doc.credit;
-			// Define the account index you want to fetch
-			let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
-			let company_main = frappe.get_cached_doc("Transfer Setting").main_branch;
-			// Call the Python method to get the account for the selected branch and index
-			frappe.call({
-				method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
-				args: {
-					branch_name: company_main, // Pass the selected branch name
-					account_index: company_main_account_index       // Pass the account index
-				},
-				callback: function (r) {
-					console.log('Account response:', r.message); // Log the response for debugging
+            // Define the account index you want to fetch
+            let company_main_account_index = 3;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
+            let company_main = frappe.get_cached_doc("Transfer Setting").main_branch;
+            // Call the Python method to get the account for the selected branch and index
+            frappe.call({
+                method: "transfer.transfer.api.get_account_for_branch", // Path to the Python method
+                args: {
+                    branch_name: company_main, // Pass the selected branch name
+                    account_index: company_main_account_index       // Pass the account index
+                },
+                callback: function (r) {
+                    console.log('Account response:', r.message); // Log the response for debugging
 
-					if (r.message) {
-						// Set the account from the response to the fbfbfb field
-						frm.set_value('credit', r.message);
-						frm.set_value('profit_account', r.message);
-                        
-						frm.refresh_field('credit');
-						//frappe.msgprint(__('Account for branch {0} is {1}', 
-						//[frm.doc.from_branch, r.message]));
-					} else {
-						// Clear the fbfbfb field if no account is found
-						
-						frm.refresh_field('credit');
-						frappe.msgprint(__('No account found for the selected branch.'));
-					}
-				},
-				error: function (error) {
-					console.error('Error fetching account:', error); // Log any errors
-				}
-			});
-            
-		} else {
-			// Clear the fbfbfb field if no branch is selected
-			
-		}
+                    if (r.message) {
+                        // Set the account from the response to the fbfbfb field
+                        frm.set_value('credit', r.message);
+                        frm.set_value('profit_account', r.message);
 
-       
-	}
+                        frm.refresh_field('credit');
+                        //frappe.msgprint(__('Account for branch {0} is {1}', 
+                        //[frm.doc.from_branch, r.message]));
+                    } else {
+                        // Clear the fbfbfb field if no account is found
+
+                        frm.refresh_field('credit');
+                        frappe.msgprint(__('No account found for the selected branch.'));
+                    }
+                },
+                error: function (error) {
+                    console.error('Error fetching account:', error); // Log any errors
+                }
+            });
+
+        } else {
+            // Clear the fbfbfb field if no branch is selected
+
+        }
+
+
+    }
 
 });
 
