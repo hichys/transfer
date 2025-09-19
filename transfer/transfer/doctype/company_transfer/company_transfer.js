@@ -103,9 +103,7 @@ function fetchBranch(callback) {
             if (response.message) {
                 callback(null, response.message); // Pass value to callback
             } else {
-                const errorMsg = __('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 853247');
-                console.error(errorMsg);
-                callback(errorMsg, null); // Pass error to callback
+                showCreateSettingsDialog()
             }
         },
         error: function (err) {
@@ -170,14 +168,12 @@ frappe.ui.form.on('company transfer', {
                         customer_account = response.message; // Store value globally
                         console.log("Customer account retrieved:", customer_account);
                     } else {
-                        frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 85247'));
+                        frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 99666'));
                     }
                 }
             });
         }
         // Subscribe to doc_update event
-
-
         frappe.realtime.on('doc_update', function (data) {
             if (cur_frm && cur_frm.docname === data.docname) {
                 cur_frm.reload_doc();  // Reload the document to reflect changes
@@ -192,19 +188,7 @@ frappe.ui.form.on('company transfer', {
             }
         });
 
-        frappe.call({
-            method: "transfer.transfer.doctype.company_transfer.company_transfer.get_branch",
-            args: {
-                // Pass any parameters needed
-            },
-            callback: function (response) {
-                if (response.message) {
-                    per_branch = response.message; // Store value globally
-                } else {
-                    frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 85247'));
-                }
-            }
-        });
+       
 
         if (frm.doc.__islocal) {
 
@@ -327,7 +311,7 @@ frappe.ui.form.on('company transfer', {
                         frappe.show_alert(customer_account);
                         console.log("Customer account retrieved:", customer_account);
                     } else {
-                        frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 85247'));
+                        frappe.throw(__('حدث الخطاء الرجاء مراجعة الادمن كود الخطا 111111'));
                     }
                 }
             });
@@ -657,7 +641,25 @@ frappe.ui.form.on('company transfer', {
 
 
 // utils
-
+function showCreateSettingsDialog() {
+    frappe.confirm(
+        __('إعدادات التحويل غير موجودة أو غير مكتملة. هل تريد إنشاء الإعدادات الآن؟'),
+        function () {
+            // Yes - Create or open settings
+            openOrCreateTransferSettings();
+        },
+        function () {
+            // No - Show warning
+            frappe.set_route("List","company transfer").then( () => {
+                
+            })
+            
+        }
+    );
+}
+function openOrCreateTransferSettings() {
+        frappe.set_route('Form', 'Transfer Setting', 'Transfer Setting');
+}
 function reset_fields(frm) {
     frm.set_value('from_company', '');
     frm.set_value('to_company', '');
