@@ -34,7 +34,7 @@ frappe.query_reports["company transfer"] = {
 			}
 		},
 		{
-			fieldname: "workflow_state",
+			fieldname: "status",
 			label: __("Status"),
 			fieldtype: "Select",
 			options: [
