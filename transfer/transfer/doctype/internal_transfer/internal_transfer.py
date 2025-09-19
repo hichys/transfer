@@ -56,6 +56,8 @@ def handel_journal_entries_creation(docname):
     if doc.select_internal == "من شركة الي فرع":
         # frappe.msgprint("#######")
         create_journal_entry(doc, temp=True)
+        
+    return {"status": "success"}
 
 
 @frappe.whitelist()
