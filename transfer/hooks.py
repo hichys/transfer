@@ -44,6 +44,8 @@ app_include_css = "/assets/transfer/css/custom.css"
 # website_theme_scss = "transfer/public/scss/website"
 fixtures = [
     "Workflow",
+    "Workflow State",
+    "Workflow Action",
     "Custom Field",
     "Property Setter",
     "Print Format",
