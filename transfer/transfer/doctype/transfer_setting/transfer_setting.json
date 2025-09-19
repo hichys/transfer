@@ -5,7 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "bramch_setting_section",
+  "branch_setting_section",
   "main_branch",
   "commissions_section",
   "profit_per_thousand"
@@ -22,22 +22,22 @@
    "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0644\u0643\u0644 1000"
   },
   {
-   "fieldname": "bramch_setting_section",
-   "fieldtype": "Section Break",
-   "label": "Branch Setting"
-  },
-  {
    "fieldname": "main_branch",
    "fieldtype": "Link",
    "label": "Main Branch",
    "options": "Branch"
+  },
+  {
+   "fieldname": "branch_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Branch Setting"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-09-17 18:27:59.484522",
+ "modified": "2025-09-19 21:04:22.696988",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Transfer Setting",
