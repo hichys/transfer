@@ -1,11 +1,126 @@
 import frappe
 import os
 from openpyxl import load_workbook
+from frappe import _
+
+
+def check_and_set_branch_dimension():
+    """Check if Branch accounting dimension is set, otherwise configure it"""
+
+    # Check if Branch dimension exists
+    branch_dimension = frappe.db.exists("Accounting Dimension", "Branch")
+
+    if not branch_dimension:
+        print("Branch accounting dimension not found. Creating it...")
+        create_branch_dimension()
+    else:
+        print("Branch accounting dimension already exists.")
+        # Verify it's properly configured
+        verify_branch_dimension()
+
+
+def create_branch_dimension():
+    """Create Branch accounting dimension"""
+    try:
+        dimension = frappe.get_doc(
+            {
+                "doctype": "Accounting Dimension",
+                "document_type": "Branch",
+                "dimension_name": "Branch",
+                "disabled": 0,
+                "company": "",  # Applies to all companies
+            }
+        )
+        dimension.insert(ignore_permissions=True)
+        frappe.db.commit()
+        print("✓ Branch accounting dimension created successfully")
+
+        # Enable dimension in Company settings
+        enable_dimension_in_companies()
+
+    except Exception as e:
+        print(f"✗ Failed to create Branch dimension: {str(e)}")
+        frappe.log_error(f"Failed to create Branch dimension: {str(e)}")
+
+
+def verify_branch_dimension():
+    """Verify Branch dimension is properly configured"""
+    dimension = frappe.get_doc("Accounting Dimension", "Branch")
+
+    if dimension.disabled:
+        print("Branch dimension is disabled. Enabling it...")
+        dimension.disabled = 0
+        dimension.save(ignore_permissions=True)
+        frappe.db.commit()
+        print("✓ Branch dimension enabled")
+
+    # Check if dimension is enabled in companies
+    enable_dimension_in_companies()
+
+
+def enable_dimension_in_companies():
+    """Enable Branch dimension in all companies"""
+    companies = frappe.get_all("Company", pluck="name")
+
+    for company in companies:
+        company_doc = frappe.get_doc("Company", company)
+
+        # Check if Branch is in accounting dimensions
+        dimension_exists = False
+        for dim in company_doc.accounting_dimensions:
+            if dim.dimension == "Branch":
+                dimension_exists = True
+                if dim.disabled:
+                    dim.disabled = 0
+                    print(f"✓ Enabled Branch dimension in {company}")
+                break
+
+        # Add Branch dimension if not exists
+        if not dimension_exists:
+            company_doc.append(
+                "accounting_dimensions", {"dimension": "Branch", "disabled": 0}
+            )
+            print(f"✓ Added Branch dimension to {company}")
+
+        company_doc.save(ignore_permissions=True)
+
+    frappe.db.commit()
+    print("✓ Branch dimension enabled in all companies")
+
+
+def set_default_dimension_values():
+    """Set default dimension values for existing accounts"""
+    try:
+        # Get all accounts
+        accounts = frappe.get_all(
+            "Account", filters={"company": ["!=", ""]}, fields=["name", "company"]
+        )
+
+        for account in accounts:
+            account_doc = frappe.get_doc("Account", account.name)
+
+            # Check if branch dimension field exists and is empty
+            if hasattr(account_doc, "branch") and not account_doc.branch:
+                # Set default branch based on company
+                default_branch = frappe.db.get_value(
+                    "Branch", {"company": account.company, "is_default": 1}, "name"
+                )
+
+                if default_branch:
+                    account_doc.branch = default_branch
+                    account_doc.save(ignore_permissions=True)
+                    print(f"✓ Set default branch for account: {account.name}")
+
+        frappe.db.commit()
+
+    except Exception as e:
+        print(f"Note: Could not set default dimension values: {str(e)}")
 
 
 def after_install():
     print("Starting account import...")
-
+    # Ensure Branch dimension is set up
+    check_and_set_branch_dimension()
     # Get the default company
     default_company = frappe.db.get_single_value("Global Defaults", "default_company")
     if not default_company:
