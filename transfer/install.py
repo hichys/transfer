@@ -2,15 +2,36 @@ import frappe
 import os
 from openpyxl import load_workbook
 
+default_company = None
 
 def after_install():
     print("Creating Account script is running...")
-    frappe.log_error("after_install script is running...", "Custom App Installation")
     import_accounts_from_excel("roots_accounts.xlsx")
-    # import_accounts_from_excel()
+
+    # Fetch default company if set
+    default_company = frappe.db.get_single_value("Global Defaults", "default_company")
+
+    if not default_company:
+        # If no default company, just pick the first one
+        default_company = frappe.db.get_value("Company", {}, "name")
+
+    else:
+        default_company = input("Enter the company name for accounts (imported from public folder): ")
+
+    if(default_company):
+        print(f"Default company set to: {default_company} importing accounts...")
+        import_accounts_from_excel(default_company)
+
+    if not default_company:
+        frappe.throw(
+            "No Company found. Please create a Company before installing this app."
+        )
+        frappe.log_error("after_install script is running...", "Custom App Installation")
+
+    # Example: create some Accounts under this company
 
 
-def import_accounts_from_excel(filename="accounts.xlsx"):
+def import_accounts_from_excel(default_company=None, filename="accounts.xlsx"):
     file_path = frappe.get_app_path("transfer", "public", "asset", "xlsx", filename)
 
     if not os.path.exists(file_path):
@@ -58,7 +79,8 @@ def import_accounts_from_excel(filename="accounts.xlsx"):
     for account in sorted(accounts, key=lambda x: x["is_group"], reverse=True):
         # Check if account already exists
         if not frappe.db.exists(
-            "Account", {"account_name": account["account_name"], "company": "alalmia"}
+            "Account",
+            {"account_name": account["account_name"], "company": default_company},
         ):
             # Insert parent accounts first (where is_group = 1)
             frappe.get_doc(account).insert(
