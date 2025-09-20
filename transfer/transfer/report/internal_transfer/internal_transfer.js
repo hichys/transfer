@@ -1,35 +1,11 @@
-// Copyright (c) 2025, awad mohamed & atta almanan
+// Copyright (c) 2025
 // For license information, please see license.txt
 
 frappe.query_reports["internal transfer"] = {
 	onload: function (report) {
+		// Apply filter display logic when the report loads
 		const type = frappe.query_report.get_filter_value('type');
-
-		console.log(type)
-		if (type === 'من فرع الي شركة') {
-			// Clear and hide irrelevant filters
-			frappe.query_report.set_filter_value({
-				'from_company': null,
-				'to_company': null,
-				'from_branch': null,
-				'to_branch': null,
-			});
-			frappe.query_report.toggle_filter_display('from_branch', false);
-			frappe.query_report.toggle_filter_display('to_company', false);
-
-			frappe.query_report.toggle_filter_display('from_company', true);
-			frappe.query_report.toggle_filter_display('to_branch', true);
-
-		} else {
-			frappe.query_report.toggle_filter_display('to_company', true);
-			frappe.query_report.toggle_filter_display('from_branch', true);
-
-			frappe.query_report.toggle_filter_display('from_company', true);
-			frappe.query_report.toggle_filter_display('to_branch', true);
-		}
-
-		// Refresh only after user changes type
-		frappe.query_report.refresh();
+		toggle_filters(type);
 	},
 
 	"filters": [
@@ -38,76 +14,27 @@ frappe.query_reports["internal transfer"] = {
 			label: __("Type"),
 			fieldtype: "Select",
 			options: [
+				'',
 				'من فرع الي شركة',
 				'من شركة الي فرع',
 			],
-			reqd: 1,
+			default: 'من فرع الي شركة',
 			on_change: function () {
 				const type = frappe.query_report.get_filter_value('type');
-				console.log(type)
-				if (type === 'من فرع الي شركة') {
-					// Clear and hide irrelevant filters
-					frappe.query_report.set_filter_value({
-						'from_company': null,
-						'to_company': null,
-						'from_branch': null,
-						'to_branch': null,
-					});
-					frappe.query_report.toggle_filter_display('from_branch', false);
-					frappe.query_report.toggle_filter_display('to_company', );
-
-					frappe.query_report.toggle_filter_display('from_company', true);
-					frappe.query_report.toggle_filter_display('to_branch', true);
-
-				} else  {
-					frappe.query_report.toggle_filter_display('to_company', true);
-					frappe.query_report.toggle_filter_display('from_branch', true);
-					
-					frappe.query_report.toggle_filter_display('from_company', false);
-					frappe.query_report.toggle_filter_display('to_branch', false);
-				}
-
-				// Refresh only after user changes type
+				toggle_filters(type);
 				frappe.query_report.refresh();
 			}
 		},
-		{
-			fieldname: "from_branch",
-			label: __("From Branch"),
-			fieldtype: "Link",
-			options: "Branch",
-		},
-		{
-			fieldname: "to_company",
-			label: __("To Company"),
-			fieldtype: "Link",
-			options: "Customer",
-		},
-		{
-			fieldname: "from_company",
-			label: __("From Company"),
-			fieldtype: "Link",
-			options: "Customer",
-		},
-		
-		{
-			fieldname: "to_branch",
-			label: __("To Branch"),
-			fieldtype: "Link",
-			options: "Branch",
-		},
+		{ fieldname: "from_branch", label: __("From Branch"), fieldtype: "Link", options: "Branch" },
+		{ fieldname: "to_company", label: __("To Company"), fieldtype: "Link", options: "Customer" },
+		{ fieldname: "from_company", label: __("From Company"), fieldtype: "Link", options: "Customer" },
+		{ fieldname: "to_branch", label: __("To Branch"), fieldtype: "Link", options: "Branch" },
 		{
 			fieldname: "status",
 			label: __("Status"),
 			fieldtype: "Select",
-			options: [
-				'مستلمة',
-				'غير مستلمة',
-				'ملغية',
-				'غير مسجلة'
-			],
-			default: 'غير مستلمة',
-			reqd: 1
+			options: ['','مستلمة', 'غير مستلمة', 'ملغية', 'غير مسجلة'],
+			default: '',
 		},
 		{
 			fieldname: "from_date",
@@ -133,3 +60,20 @@ frappe.query_reports["internal transfer"] = {
 		},
 	]
 };
+
+// Helper function to toggle filters
+function toggle_filters(type) {
+	if (type === 'من فرع الي شركة') {
+		frappe.query_report.toggle_filter_display('from_branch', false);
+		frappe.query_report.toggle_filter_display('to_company', false);
+
+		frappe.query_report.toggle_filter_display('from_company', true);
+		frappe.query_report.toggle_filter_display('to_branch', true);
+	} else {
+		frappe.query_report.toggle_filter_display('from_company', false);
+		frappe.query_report.toggle_filter_display('to_branch', false);
+
+		frappe.query_report.toggle_filter_display('from_branch', true);
+		frappe.query_report.toggle_filter_display('to_company', true);
+	}
+}
