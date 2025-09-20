@@ -204,9 +204,9 @@ def reverse_journal_entry(self, docname):
             journal_entry.custom_reversed_by = reversed_je.name
             journal_entry.save()
             frappe.db.commit()
-            frappe.msgprint(
-                f"Journal Entry {reversed_je.name} has been reversed successfully."
-            )
+            # frappe.msgprint(
+            #     f"Journal Entry {reversed_je.name} has been reversed successfully."
+            # )
 
             return {"status": "success", "journal_entry": reversed_je.name}
 
@@ -305,7 +305,7 @@ def create_journal_entry(
         journal_entry.insert()
         journal_entry.submit()
 
-        frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
+        # frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
         return journal_entry.name
 
     except Exception as e:

@@ -115,7 +115,7 @@ def create_journal_entry(self, temp=False):
         # company credit 25 + out_profit(2)
 
         if self.from_type == "Customer":
-            frappe.msgprint("من شركة الي فرع")
+            # frappe.msgprint("من شركة الي فرع")
             from_type = "Customer"
             from_party_type = from_party_name
             to_type = ""
@@ -201,7 +201,7 @@ def create_journal_entry(self, temp=False):
         self.save()
 
         # frappe.msgprint(f"Journal Entry {journal_entry.name} created successfully.")
-        frappe.msgprint(f"تم انشاء الحوالة بنجاح")
+        # frappe.msgprint(f"تم انشاء الحوالة بنجاح")
         return {"status": "success", "journal_entry": journal_entry.name}
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Error in Creating Journal Entry")
@@ -255,9 +255,9 @@ def reverse_journal_entry(self, docname):
             journal_entry.custom_reversed_by = reversed_je.name
             journal_entry.save()
             frappe.db.commit()
-            frappe.msgprint(
-                f"Journal Entry {reversed_je.name} has been reversed successfully."
-            )
+            # frappe.msgprint(
+            #     f"Journal Entry {reversed_je.name} has been reversed successfully."
+            # )
 
             return {"status": "success", "journal_entry": reversed_je.name}
 
@@ -279,9 +279,13 @@ def handel_cancellation(docname):
     if is_posting_day_today(doc.posting_date):
         if it_cancel_journal_entries(doc):
             doc.cancel()
-            frappe.msgprint("تم إلغاء الحوالة بنجاح")
+            # frappe.msgprint("تم إلغاء الحوالة بنجاح")
     else:
-        it_reverse_journal_entries(doc)
+        is_reversed = it_reverse_journal_entries(doc)
+        if is_reversed:
+            doc.status = "ملغية"
+            doc.docstatus = 2
+            doc.save()
 
 
 @frappe.whitelist()

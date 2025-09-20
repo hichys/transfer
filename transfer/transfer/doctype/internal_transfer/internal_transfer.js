@@ -39,7 +39,7 @@ frappe.ui.form.on('Internal Transfer', {
                                 args: { docname: frm.doc.name },
                                 callback: function (r) {
                                     if (r.message.status === 'success') {
-                                        frappe.msgprint('تم إنشاء القيد بنجاح.');
+                                        frappe.show_alert('تم إنشاء القيد بنجاح.');
                                         dialog.hide();
                                         frm.reload_doc();
                                     }
@@ -78,7 +78,7 @@ frappe.ui.form.on("Internal Transfer", {
 
     onload: function (frm) {
         if (frm.doc.__islocal) {
-            frappe.show_alert("جديدة");
+            // frappe.show_alert("حالة داخليه جديده");
             // frm.set_value("select_internal","من فرع الي شركة");
             // frm.set_value("to_type","Customer");
             // frm.set_value("from_type","Branch");
@@ -148,7 +148,7 @@ frappe.ui.form.on("Internal Transfer", {
     refresh: function (frm) {
 
         if (!frm.doc.__islocal) {
-            if (frm.doc.docstatus === 0 || frm.doc.status === "غير مسجلة") {  // Show the delete button only for draft documents
+            if (frm.doc.docstatus === 0 && frm.doc.status === "غير مسجلة") {  // Show the delete button only for draft documents
                 frm.add_custom_button('مسح الحوالة', function () {
                     frm.trigger('delete_draft');
                 });
@@ -174,7 +174,7 @@ frappe.ui.form.on("Internal Transfer", {
                             },
                             callback: function (r) {
                                 if (!r.exc) {
-                                    frappe.msgprint(__('تم تغير حالة الحوالة بنجاح'));
+                                    frappe.show_alert(__('تم تغير حالة الحوالة بنجاح'));
                                     frm.reload_doc(); // Reload document to reflect changes
                                 }
                             }
@@ -200,7 +200,7 @@ frappe.ui.form.on("Internal Transfer", {
                             },
                             callback: function (r) {
                                 if (!r.exc) {
-                                    frappe.msgprint(__('Action completed successfully.'));
+                                    frappe.show_alert(__('تم الإلغاء بنجاح'));
                                     frm.reload_doc(); // Reload document to reflect changes
                                 }
                             }
@@ -259,7 +259,7 @@ frappe.ui.form.on("Internal Transfer", {
 
 
         if (frm.doc.select_internal == "من شركة الي فرع") {
-            frappe.show_alert("من شركة الي فرع");
+            frappe.show_alert('تم انشاء الحوالة ( غير مسجلة)');
             // frm.fields_dict['from_type'].set_value("Customer");
             // frm.fields_dict['to_type'].set_value("Branch");
             frm.set_value('from_type', 'Customer');
@@ -280,7 +280,7 @@ frappe.ui.form.on("Internal Transfer", {
 
         }
         if (frm.doc.select_internal == "من فرع الي شركة") {
-            frappe.show_alert("من فرع الي شركة ");
+            // frappe.show_alert("من فرع الي شركة ");
 
             frm.set_df_property('other_party_profit', 'read_only', 0);
 
