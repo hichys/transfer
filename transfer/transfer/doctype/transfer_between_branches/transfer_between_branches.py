@@ -55,7 +55,7 @@ class transferbetweenbranches(Document):
 	def on_save(self):
 		frappe.msgprint("تم تسجيل الحوالة في المنظومة بنجاح")
 
-#delete the doctype and its linked journal entries fillters cheque_no
+# delete the doctype and its linked journal entries fillters cheque_no
 @frappe.whitelist()
 def delete_doc_with_links(docname):
 	doc = frappe.get_doc("transfer between branches", docname)
@@ -84,13 +84,14 @@ def delete_doc_with_links(docname):
 
 @frappe.whitelist()
 def manual_submit(docname):
-	try:
-		doc = frappe.get_doc("transfer between branches", docname)
-		doc.submit()
-		frappe.db.commit()
-		return "success"
-	except Exception as e:
-		frappe.log_error(frappe.get_traceback(), "Error 6695 in manual_submit")
+    try:
+        doc = frappe.get_doc("transfer between branches", docname)
+        doc.submit()
+        frappe.db.commit()
+        return {"status": "success", "message": "Document submitted successfully"}
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Error 6695 in manual_submit")
+        return {"status": "error", "message": str(e)}
 
 @frappe.whitelist()
 def test(docname,method="cancel"):
@@ -128,7 +129,7 @@ def is_document_from_yesterday(docname):
 
 @frappe.whitelist()
 def handel_canceled_docs(docname, method):
-	frappe.msgprint("create_journal_entry_from_canceled_transfer is called")
+	# frappe.msgprint("create_journal_entry_from_canceled_transfer is called")
 	try:
 		doc = frappe.get_doc('transfer between branches', docname)
 
@@ -137,13 +138,13 @@ def handel_canceled_docs(docname, method):
 			if doc.notyet:
 				notyet_entry = frappe.get_doc('Journal Entry', doc.notyet)
 				notyet_entry.cancel()
-				frappe.msgprint(f"Journal Entry {notyet_entry.name} canceled successfully.")
+				# frappe.msgprint(f"Journal Entry {notyet_entry.name} canceled successfully.")
 
 			if doc.handed:
 				handed_entry = frappe.get_doc('Journal Entry', doc.handed)
 				handed_entry.cancel()
-				frappe.msgprint(f"Journal Entry {handed_entry.name} canceled successfully.")
-			frappe.msgprint("this document 1111has been canceled")
+				# frappe.msgprint(f"Journal Entry {handed_entry.name} canceled successfully.")
+			# frappe.msgprint("this document 1111has been canceled")
 			return
 
 		try:
@@ -153,7 +154,7 @@ def handel_canceled_docs(docname, method):
 				doc.notyet = ""
 				doc.save(ignore_permissions=True)
 				notyet.cancel()
-				frappe.msgprint(f"Journal Entry {notyet.name} canceled successfully.")
+				# frappe.msgprint(f"Journal Entry {notyet.name} canceled successfully.")
 			
 			
 			elif(doc.workflow_state == "مستلمة" and doc.handed and doc.notyet):
@@ -164,18 +165,18 @@ def handel_canceled_docs(docname, method):
 				doc.save(ignore_permissions=True)
 				notyet.cancel()
 				handed.cancel()
-				frappe.msgprint(f"Journal Entry(2) 1-{notyet.name} 2-{handed.name} canceled successfully.")
+				# frappe.msgprint(f"Journal Entry(2) 1-{notyet.name} 2-{handed.name} canceled successfully.")
 				
 			doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
 			doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
-			frappe.msgprint("Transfer document workflow updated successfully.")
+			# frappe.msgprint("Transfer document workflow updated successfully.")
 			# Update the workflow state explicitly
 			# Cancel the document
 
 			if doc.docstatus != 2 and doc.workflow_state != "ملغية" :
 				frappe.throw("cant cancel yet")
 			
-			frappe.msgprint("Journal Entries canceled successfully.")
+			# frappe.msgprint("Journal Entries canceled successfully.")
 		except frappe.DoesNotExistError:
 			frappe.throw("Journal Entrieseeee do not exist.")
 		except Exception as je_error:
@@ -184,7 +185,7 @@ def handel_canceled_docs(docname, method):
 
 
 		frappe.log_error(f"Document {docname} cancelled.", "Document Cancellation")
-		frappe.msgprint(f"Document {docname} and its linked Journal Entry (if any) have been successfully cancelled.")
+		# frappe.msgprint(f"Document {docname} and its linked Journal Entry (if any) have been successfully cancelled.")
 
 		return {"status": "success", "message": "Document and linked Journal Entry have been cancelled."}
 
@@ -291,7 +292,7 @@ def create_journal_entry_from_pending_transfer(doc, method):
 
 @frappe.whitelist()
 def handel_reversal(docname, method):
-	frappe.msgprint("handel_reversal is called")
+	# frappe.msgprint("handel_reversal is called")
 	try:
 		# Fetch the document
 		doc = frappe.get_doc('transfer between branches', docname)
@@ -317,13 +318,13 @@ def handel_reversal(docname, method):
 		# Handling the notyet journal entry
 		if doc.notyet:
 			if method == "reversal":
-				frappe.msgprint(f"Reversing NotYet Journal Entry: {doc.notyet}")
+				# frappe.msgprint(f"Reversing NotYet Journal Entry: {doc.notyet}")
 				notyet = doc.notyet
 				doc.notyet = ""
 				reverse_journal_entry(notyet,doc.posting_date)  # Reverse the journal entry
-				frappe.msgprint(f"NotYet Journal Entry {notyet} has been reversed")
+				# frappe.msgprint(f"NotYet Journal Entry {notyet} has been reversed")
 			if method == "cancel":
-				frappe.msgprint(f"Cancelling NotYet Journal Entry: {doc.notyet}")
+				# frappe.msgprint(f"Cancelling NotYet Journal Entry: {doc.notyet}")
 				notyet = doc.notyet
 				doc.notyet = ""
 				# Cancel the journal entry
@@ -337,15 +338,15 @@ def handel_reversal(docname, method):
 				doc.workflow_state = "ملغية"
 				doc.save()
 				
-				frappe.msgprint(f"NotYet Journal Entry {notyet} has been canceled")
+				# frappe.msgprint(f"NotYet Journal Entry {notyet} has been canceled")
 
 		# Cancel the transfer document
 		doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
 		doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
-		frappe.msgprint("Transfer document workflow updated successfully.")
+		# frappe.msgprint("Transfer document workflow updated successfully.")
 
 		frappe.db.commit()  # Commit changes to the database after all actions
-		frappe.msgprint("Document has been successfully updated to 'إلغاء'.")
+		# frappe.msgprint("Document has been successfully updated to 'إلغاء'.")
 		
 		return {"status": "success", "message": "Document and linked Journal Entries have been processed."}
 
@@ -357,7 +358,7 @@ def handel_reversal(docname, method):
 
 
 ###
-# إلغاء الحوالة  المسلمة بعد 24 ساعة 
+# إلغاء الحوالة  المسلمة بعد 24 ساعة
 # يتم عبر عكس القيود المتعلقة بالحوالة
 # ###
 @frappe.whitelist()
@@ -408,8 +409,6 @@ def cancel_handed_transfer_after_a_day(docname, method=None):
 		frappe.throw(f"An unexpected error occurred: {e}")
 		return {"status": "error", "message": str(e)}
 
-
-	
 
 @frappe.whitelist()
 def create_journal_entry_from_handed_transfer(doc, method):
@@ -511,7 +510,7 @@ def reverse_journal_entry(docname,reversal_date):
 		original_entry.db_set("custom_reversed_by", reversal_entry.name)
 
 		
-		frappe.msgprint(f"Reversal Journal Entry {reversal_entry.name} created successfully for {original_entry.name}.")
+		# frappe.msgprint(f"Reversal Journal Entry {reversal_entry.name} created successfully for {original_entry.name}.")
 		return {"status": "success", "message": f"Reversal Journal Entry {reversal_entry.name} created successfully."}
 
 	except Exception as e:

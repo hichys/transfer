@@ -114,7 +114,7 @@ def get_data_chart(filters=None):
 			"labels": branches_list,
 			"datasets": [
 				{
-					"name": status or "Count",
+					"name": status or "Internal Transfers",
 					"values": values_list,
 				}
 			],

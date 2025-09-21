@@ -71,13 +71,24 @@ frappe.ui.form.on('transfer between branches', {
 								method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
 								args: { docname: frm.doc.name },
 								callback: function (r) {
+									dialog.hide();
+
 									if (r.message.status === 'success') {
 										frappe.show_alert(__('تم التسجيل'));
 										frm.reload_doc();
 									}
+									else {
+										let error_msg = r.message?.message || __('فشل في التسجيل');
+										frappe.show_alert({ message: error_msg, indicator: 'red' });
+									}
+								},
+								error: function (err) {
+									$dialog.hide();
+									frappe.msgprint(__('حدث خطأ في الشبكة الرجاء تحديث الصفحه'));
+									console.error(err);
 								}
 							});
-							dialog.hide();
+
 						}
 					});
 
@@ -108,9 +119,6 @@ frappe.ui.form.on('transfer between branches', {
 
 frappe.ui.form.on('transfer between branches', {
 
-
-
-
 	validate: function (frm) {
 		///ensure that the amount is greater than 0
 		if (frm.doc.amount <= 0) {
@@ -138,14 +146,38 @@ frappe.ui.form.on('transfer between branches', {
 
 
 	},
-	onload: function (frm) { 
+	onload: function (frm) {
 		//retrieve profit_per_thousand from transfer setting doctype
-		frappe.db.get_single_value("transfer setting", "profit_per_thousand").then(value => {
-			frm.set_value('profit_per_thousand', value);
-		});
+		if(frm.is_new())
+		{
+			frappe.db.get_single_value("transfer setting", "profit_per_thousand").then(value => {
+				frm.set_value('profit_per_thousand', value);
+			});
+		}
 	},
 	refresh: function (frm) {
 
+
+		//set filter so that to and from branch cant be the same
+		frm.set_query("from_branch", function () {
+			return {
+				filters: [
+					["name", "!=", frm.doc.to_branch]
+				]
+			};
+		});
+		frm.set_query("to_branch", function () {
+			return {
+				filters: [
+					["name", "!=", frm.doc.from_branch]
+				]
+			};
+		});
+
+
+		if (frm.total_profit === 0 || !frm.total_profit) {
+			frm.set_df_property("split_profit", "read_only", 1);
+		}
 
 		if (frm.doc.to_branch && frm.doc.from_branch && frm.doc.to_branch != null && frm.doc.from_branch != null) {
 			if (frm.doc.to_branch === frm.doc.from_branch) {
@@ -162,41 +194,12 @@ frappe.ui.form.on('transfer between branches', {
 		if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
 			frm.add_custom_button(__('تسجيل'), function () {
 				frm.trigger('create_journal_entry');
-				frm.reload_doc(); // Reload to reflect changes
 			});
 		}
 		else {
 			// If the document is saved or in any other workflow state, don't show the button
 			frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
 		}
-
-		// if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
-		// 	frm.add_custom_button(__('تسجيل'), function () {
-		// 		frappe.confirm(
-		// 			"هل تم استلام المبلغ ؟",
-		// 			() => {
-		// 				frappe.call({
-		// 					method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.manual_submit',
-		// 					args: {
-		// 						docname: frm.doc.name,
-		// 					},
-		// 					callback: function (r) {
-		// 						if (!r.exc) {
-		// 							frappe.msgprint(__('تم التسجيل'));
-		// 							frm.reload_doc(); // Reload to reflect changes
-		// 						}
-		// 					}
-		// 				});
-		// 			},
-		// 			() => {
-		// 				frappe.msgprint(__('تم إلغاء الإجراء.'));
-		// 			}
-		// 		);
-		// 	});
-		// } else {
-		// 	// If the document is saved or in any other workflow state, don't show the button
-		// 	frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
-		// }
 		// Check if the document is in the "غير مستلمة" workflow state
 		if (frm.doc.docstatus === 1) {
 			// Get the creation date (posting_date) and strip the time part
@@ -225,14 +228,28 @@ frappe.ui.form.on('transfer between branches', {
 								},
 								callback: function (r) {
 									if (!r.exc) {
-										frappe.msgprint(__('تم عكس الحوالة بنجاح.'));
+										frappe.show_alert({ message: __('تم عكس الحوالة بنجاح'), indicator: 'green' });
 										frm.reload_doc(); // Reload to reflect changes
+									} else {
+										// Show error message if there's an exception
+										frappe.msgprint({
+											title: __('Error'),
+											message: __('فشل في عكس الحوالة: ') + (r.exc || __('خطأ غير معروف'))
+										});
 									}
+								},
+								error: function (err) {
+									// Handle network/connection errors
+									frappe.msgprint({
+										title: __('Network Error'),
+										message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
+									});
+									console.error(err);
 								}
 							});
 						},
 						() => {
-							frappe.msgprint(__('تم إلغاء الإجراء.'));
+							frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
 						}
 					);
 				});
@@ -250,14 +267,28 @@ frappe.ui.form.on('transfer between branches', {
 								},
 								callback: function (r) {
 									if (!r.exc) {
-										frappe.msgprint(__('تم إلغاء الحوالة بنجاح.'));
+										frappe.show_alert({ message: __('تم إلغاء الحوالة بنجاح'), indicator: 'green' });
 										frm.reload_doc(); // Reload to reflect changes
+									} else {
+										// Show error message if there's an exception
+										frappe.msgprint({
+											title: __('Error'),
+											message: __('فشل في إلغاء الحوالة: ') + (r.exc || __('خطأ غير معروف'))
+										});
 									}
+								},
+								error: function (err) {
+									// Handle network/connection errors
+									frappe.msgprint({
+										title: __('Network Error'),
+										message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
+									});
+									console.error(err);
 								}
 							});
 						},
 						() => {
-							frappe.msgprint(__('تم إلغاء الإجراء.'));
+							frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
 						}
 					);
 				});
@@ -472,47 +503,79 @@ function custom_action_on_status_change(frm) {
 frappe.ui.form.on('transfer between branches', {
 	amount: function (frm) {
 		var valid = validate_float_fields(frm.doc.amount);
+
 		if (valid) {
 			calculate_profit(frm);
 		}
 
+		frm.trigger('split_profit')
+
 
 	},
 	total_profit: function (frm) {
+		if (frm.doc.total_profit > 0) {
+			frm.set_df_property("split_profit", "read_only", 0);
+			frm.refresh_field('split_profit')
+		}
 		var valid = validate_float_fields(frm.doc.total_profit);
 		if (valid) {
 			adjust_profits(frm, frm.doc.total_profit);
 		}
 		frm.set_value('our_profit', frm.doc.total_profit);
+		frm.trigger('split_profit');
+		
+		
 	},
 	our_profit: function (frm) {
 		var valid = validate_float_fields(frm.doc.our_profit);
 		if (valid) {
 			adjust_profits(frm, 'our_profit');
 		}
+		if (frm.doc.our_profit !== frm.doc.other_party_profit)
+		{
+			frm.set_value('split_profit',0);
+		}
+		else{
+			frm.set_value('split_profit',1);
+		}
+
+	 
 	},
 	other_party_profit: function (frm) {
 		var valid = validate_float_fields(frm.doc.other_party_profit);
 		if (valid) {
 			adjust_profits(frm, 'other_party_profit');
 		}
+		if (frm.doc.our_profit !== frm.doc.other_party_profit) {
+			frm.set_value('split_profit', 0);
+		}
+		else {
+			frm.set_value('split_profit', 1);
+		}
 	},
 	profit_per_thousand: function (frm) {
 
-		var valid = validate_float_fields(frm.doc.profit_per_thousand);
-		if (!valid) {
-			profit_per_thousand = 0;
-			frm.doc.set_value('profit_per_thousand', 0);
-			frm.refresh_field('profit_per_thousand');
+		if (frm.doc.profit_per_thousand === 0)
+		{
+			frm.trigger('without_profit');
 		}
-		calculate_profit(frm);
+		else{
+			var valid = validate_float_fields(frm.doc.profit_per_thousand);
+			if (!valid) {
+				profit_per_thousand = 0;
+				frm.doc.set_value('profit_per_thousand', 0);
+				frm.refresh_field('profit_per_thousand');
+			}
+			calculate_profit(frm);
+		}
+		
 
 	},
 	without_profit: function (frm) {
 		// 0 the profit fields if without_profit is checked
 		// uncheck split profit
 		// check without profit
-		if (frm.doc.without_profit) {
+		if (frm.doc.without_profit || frm.doc.profit_per_thousand === 0) {
 			frm.set_value('our_profit', 0);
 			frm.set_value('other_party_profit', 0);
 			frm.set_value('total_profit', 0);
@@ -522,6 +585,8 @@ frappe.ui.form.on('transfer between branches', {
 
 	},
 	split_profit: function (frm) {
+
+
 		if (frm.doc.split_profit) {
 
 			frm.set_value('without_profit', 0);
@@ -565,7 +630,7 @@ frappe.ui.form.on('transfer between branches', {
 					},
 					callback: function (r) {
 						console.log('Account response:', r.message); // Log the response for debugging
-	
+
 						if (r.message) {
 							// Set the account from the response to the fbfbfb field
 							frm.set_value('debit', r.message);
@@ -609,6 +674,13 @@ frappe.ui.form.on('transfer between branches', {
 
 function calculate_profit(frm) {
 
+	if (frm.doc.profit_per_thousand === 0)
+	{
+		frm.set_value('without_profit', 1);
+		frm.set_value('split_profit', 0);
+		return 0;
+	}
+else
 	if (frm.doc.profit_per_thousand === 0 && frm.doc.amount === 0) {
 		frm.set_value('without_profit', 1);
 		frm.set_value('split_profit', 0);
