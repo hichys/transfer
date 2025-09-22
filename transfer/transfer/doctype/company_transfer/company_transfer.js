@@ -259,6 +259,7 @@ frappe.ui.form.on('company transfer', {
     },
     amount: function (frm) {
         calculate_profit_or_loss(frm);
+        frm.trigger('without_profit');
     },
     execution_amount: function (frm) {
         calculate_profit_or_loss(frm);
@@ -454,6 +455,13 @@ frappe.ui.form.on('company transfer', {
 
         }
     },
+    without_profit: function(frm)
+    {
+        if(frm.doc.without_profit)
+        {
+            frm.set_value('execution_amount',frm.doc.amount);
+        }
+    }
 
 });
 
