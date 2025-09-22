@@ -7,7 +7,7 @@ import re
 
 @frappe.whitelist()
 def create_journal_entry_preview(doctype, docname):
-    doc = frappe.get_doc(doctype, docname)
+    doc = frappe.get_cached_doc(doctype, docname)
     # Prepare transaction details
 
     if doctype == "transfer between branches":
