@@ -558,7 +558,10 @@ function adjust_profits(frm, changed_field) {
 
 // لم يضغط علي تم التسليم في الدوكيومتت غير مستلمة
 frappe.ui.form.on('company transfer', {
+
+    
     refresh: function (frm) {
+ 
         if (frm.doc.docstatus === 0) {
             frm.page.set_indicator(__('غير مسجلة'), 'orange');
         }
