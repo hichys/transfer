@@ -31,7 +31,35 @@ frappe.ui.form.on('transfer between branches', {
 			} catch (error) {
 				throw error; // Ensure workflow doesn't proceed
 			}
-		} else {
+		}
+		if (frm.selected_workflow_action === "إلغاء الحوالة") {
+			return new Promise(async (resolve, reject) => {
+				try {
+					const userConfirmed = await new Promise((confirmResolve) => {
+						frappe.confirm(
+							__("هل انت متأكد من إلغاء الحوالة؟ سيتم أيضًا إلغاء قيود اليومية المرتبطة."),
+							() => confirmResolve(true),
+							() => confirmResolve(false)
+						);
+					});
+
+					if (!userConfirmed) {
+						frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
+						reject(new Error('Cancellation aborted by user'));
+						return;
+					}
+
+					// Check if created today and handle accordingly
+						await handelCancelAction(frm);
+
+					resolve(); // Resolve the promise if everything succeeded
+
+				} catch (error) {
+					reject(error); // Reject if any error occurred
+				}
+			});
+		}
+		else {
 			console.log("Conditions not met. No confirmation required.");
 		}
 	},
@@ -87,7 +115,7 @@ frappe.ui.form.on('transfer between branches', {
 									frappe.msgprint(__('حدث خطأ في الشبكة الرجاء تحديث الصفحه'));
 									console.error(err);
 								},
-								 
+
 
 							});
 
@@ -623,118 +651,44 @@ function loadButtons(frm) {
 	}
 	else {
 		// If the document is saved or in any other workflow state, don't show the button
-		frm.remove_custom_button(__('تسجيل')); 
+		frm.remove_custom_button(__('تسجيل'));
 	}
-	// Check if the document is in the "غير مستلمة" workflow state
-	if (frm.doc.docstatus === 1) {
-		// Get the creation date (posting_date) and strip the time part
-		const creation_date = new Date(frm.doc.posting_date);
-		const current_date = new Date();
-
-		// Strip time from both dates by setting the time to midnight (00:00)
-		creation_date.setHours(0, 0, 0, 0);
-		current_date.setHours(0, 0, 0, 0);
-
-		// Calculate the difference in milliseconds
-		const day_diff = (current_date - creation_date) / (1000 * 3600 * 24); // Convert milliseconds to days
-
-		// Check if the difference is greater than or equal to 1 day
-		if (day_diff >= 1) {
-			// Add "Reverse" button for documents created more than 24 hours ago
-			frm.add_custom_button(__('عكس الحوالــة'), function () {
-				frappe.confirm(
-					"هل أنت متأكد أنك تريد عكس الحوالة؟",
-					() => {
-						frappe.call({
-							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
-							args: {
-								docname: frm.doc.name,
-								method: "reversal"
-							},
-							callback: function (r) {
-								if (!r.exc) {
-									frappe.show_alert({ message: __('تم عكس الحوالة بنجاح'), indicator: 'green' });
-									frm.reload_doc(); // Reload to reflect changes
-								} else {
-									// Show error message if there's an exception
-									frappe.msgprint({
-										title: __('Error'),
-										message: __('فشل في عكس الحوالة: ') + (r.exc || __('خطأ غير معروف'))
-									});
-								}
-							},
-							error: function (err) {
-								// Handle network/connection errors
-								frappe.msgprint({
-									title: __('Network Error'),
-									message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
-								});
-								console.error(err);
-							}
-						});
-					},
-					() => {
-						frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
-					}
-				);
-			});
-		} else {
-			// Add "إلغاء الحوالة" button for documents created less than 24 hours ago
-			frm.add_custom_button(__('إلغاء الحوالة'), function () {
-				frappe.confirm(
-					"هل أنت متأكد أنك تريد إلغاء الحوالة؟",
-					() => {
-						frappe.call({
-							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
-							args: {
-								docname: frm.doc.name,
-								method: "cancel"
-							},
-							callback: function (r) {
-								if (!r.exc) {
-									frappe.show_alert({ message: __('تم إلغاء الحوالة بنجاح'), indicator: 'green' });
-									frm.reload_doc(); // Reload to reflect changes
-								} else {
-									// Show error message if there's an exception
-									frappe.msgprint({
-										title: __('Error'),
-										message: __('فشل في إلغاء الحوالة: ') + (r.exc || __('خطأ غير معروف'))
-									});
-								}
-							},
-							error: function (err) {
-								// Handle network/connection errors
-								frappe.msgprint({
-									title: __('Network Error'),
-									message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
-								});
-								console.error(err);
-							}
-						});
-					},
-					() => {
-						frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
-					}
-				);
-			});
-		}
-	}
-
+	 
 	if (frm.doc.workflow_state == 'غير مستلمة') {
 		frm.add_custom_button(__('تم التسليم'), function () {
-			frappe.call({
-				method: "frappe.model.workflow.apply_workflow",
-				args: {
-					doc: frm.doc,
-					action: "تم التسليم"   // the workflow action name
+			// Create a new dialog instance
+			let dialog = new frappe.ui.Dialog({
+				title: __('تأكيد'), // Title of the dialog
+				fields: [], // You can add fields here if needed
+				primary_action_label: __('نعم، تم التسليم'), // Your custom "Yes" button label
+				secondary_action_label: __('لا، إلغاء'), // Your custom "No" button label
+				primary_action(values) {
+					// This function is executed when the custom "Yes" button is clicked
+					frappe.call({
+						method: "frappe.model.workflow.apply_workflow",
+						args: {
+							doc: frm.doc,
+							action: "تم التسليم" // The workflow action name
+						},
+						callback: function (r) {
+							if (!r.exc) {
+								frappe.show_alert(__('تمت العملية بنجاح'));
+								frm.reload_doc();
+							}
+						}
+					});
+					dialog.hide();
 				},
-				callback: function (r) {
-					if (!r.exc) {
-						frappe.show_alert(__('تم العمليه بنجاح'));
-						frm.reload_doc();
-					}
+				secondary_action(values) {
+					// This function is executed when the custom "No" button is clicked
+					frappe.show_alert("تم الإلغاء");
+					dialog.hide();
 				}
 			});
+
+			// Show the custom dialog to the user
+			dialog.show();
+
 		});
 	}
 	if (frm.doc.docstatus === 2) {
@@ -755,4 +709,55 @@ function loadButtons(frm) {
 		// 	}, 'Actions');
 		// }
 	}
+}
+ 
+function handelCancelAction(frm) {
+	const cancel_method = is_created_today(frm.doc.posting_date) ? "cancel" : "reversal";
+	const cancel_msg = cancel_method === "cancel" ? "إلغاء" : "عكس";
+	return new Promise((resolve, reject) => {
+		frappe.call({
+			method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
+			args: {
+				docname: frm.doc.name,
+				method: cancel_method
+			},
+			callback: function (r) {
+				if (!r.exc) {
+					frappe.show_alert({ message: __('تم {0} الحوالة بنجاح', [cancel_msg]), indicator: 'green' });
+					frm.reload_doc(); // Reload to reflect changes
+					resolve(true);
+				} else {
+					// Show error message if there's an exception
+					frappe.msgprint({
+						title: __('Error'),
+						message: __('فشل في إلغاء الحوالة: ') + (r.exc || __('خطأ غير معروف'))
+					});
+					reject(r.exc);
+				}
+			},
+			error: function (err) {
+				// Handle network/connection errors
+				frappe.msgprint({
+					title: __('Network Error'),
+					message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
+				});
+				console.error(err);
+				reject(err);
+			}
+		});
+	});
+}
+function is_created_today(posting_date)
+{
+	const creation_date = new Date(posting_date);
+	const current_date = new Date();
+
+	// Strip time from both dates by setting the time to midnight (00:00)
+	creation_date.setHours(0, 0, 0, 0);
+	current_date.setHours(0, 0, 0, 0);
+
+	// Calculate the difference in milliseconds
+	const day_diff = (current_date - creation_date) / (1000 * 3600 * 24); // Convert milliseconds to days
+
+	return day_diff <= 1;
 }

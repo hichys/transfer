@@ -22,8 +22,7 @@ class transferbetweenbranches(Document):
 		if self.delivery_date and self.posting_date:
 			if getdate(self.delivery_date) < getdate(self.posting_date):
 				frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
-	def before_cancel(self):
-		validate_linked_journal_entries(self.name)
+	 
 	def on_cancel(self):
 		pass
 	def after_insert(self):
@@ -166,14 +165,14 @@ def handel_canceled_docs(docname, method):
 				handed.cancel()
 				# frappe.msgprint(f"Journal Entry(2) 1-{notyet.name} 2-{handed.name} canceled successfully.")
 				
-			doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
-			doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
-			# frappe.msgprint("Transfer document workflow updated successfully.")
-			# Update the workflow state explicitly
-			# Cancel the document
+			# doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
+			# doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
+			# # frappe.msgprint("Transfer document workflow updated successfully.")
+			# # Update the workflow state explicitly
+			# # Cancel the document
 
-			if doc.docstatus != 2 and doc.workflow_state != "ملغية" :
-				frappe.throw("cant cancel yet")
+			# if doc.docstatus != 2 and doc.workflow_state != "ملغية" :
+			# 	frappe.throw("cant cancel yet")
 			
 			# frappe.msgprint("Journal Entries canceled successfully.")
 		except frappe.DoesNotExistError:
@@ -195,15 +194,15 @@ def handel_canceled_docs(docname, method):
 
 @frappe.whitelist()
 def handel_cancelation(docname, method):
-	# if method == "reversal": revese it
-	# else if method == cancel then cancel it
+    # if method == "reversal": revese it
+    # else if method == cancel then cancel it
 
-	if method == "reversal":
-		handel_reversal(docname, method="reversal")
-	elif method == "cancel":
-		handel_canceled_docs(docname, method="cancel")
-	else:
-		frappe.throw("Invalid method. Please provide a valid method.")
+    if method == "reversal":
+        return handel_reversal(docname, method="reversal")
+    elif method == "cancel":
+        return handel_canceled_docs(docname, method="cancel")
+    else:
+        frappe.throw("Invalid method. Please provide a valid method.")
 
 
 @frappe.whitelist()
@@ -340,8 +339,8 @@ def handel_reversal(docname, method):
 				# frappe.msgprint(f"NotYet Journal Entry {notyet} has been canceled")
 
 		# Cancel the transfer document
-		doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
-		doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
+		# doc.db_set("workflow_state", "ملغية")  # Set to 'Cancelled' workflow state
+		# doc.db_set("docstatus", 2)  # Set to 'Cancelled' status
 		# frappe.msgprint("Transfer document workflow updated successfully.")
 
 		frappe.db.commit()  # Commit changes to the database after all actions
