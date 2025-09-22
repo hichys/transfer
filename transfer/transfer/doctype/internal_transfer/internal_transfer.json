@@ -128,18 +128,18 @@
   {
    "fieldname": "from_type",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "from_type",
    "options": "DocType",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "to_type",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "to_type",
    "options": "DocType",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_glph",
@@ -171,6 +171,7 @@
    "allow_on_submit": 1,
    "fieldname": "credit",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "credit",
    "options": "Account",
    "read_only": 1
@@ -191,6 +192,7 @@
    "allow_on_submit": 1,
    "fieldname": "debit",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "debit",
    "options": "Account",
    "read_only": 1
@@ -212,6 +214,7 @@
    "allow_on_submit": 1,
    "fieldname": "profit_account",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "\u0627\u0644\u062e\u0632\u0646\u0629",
    "options": "Account",
    "read_only": 1
@@ -364,7 +367,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-09-19 21:49:27.242889",
+ "modified": "2025-09-22 07:28:36.366463",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Internal Transfer",

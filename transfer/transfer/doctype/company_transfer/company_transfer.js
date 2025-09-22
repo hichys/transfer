@@ -475,16 +475,16 @@ function calculate_profit_or_loss(frm) {
 
         // Determine without profit status
         frm.set_value('without_profit', profit === 0 ? 1 : 0);
-        frappe.show_alert(profit === 0 ? "بدون عمولة" : "بعمولة");
+        // frappe.show_alert(profit === 0 ? "بدون عمولة" : "بعمولة");
 
         // Show profit/loss status
-        if (profit < 0) {
-            frappe.show_alert("الحوالة منفذه بالخسارة");
-        } else if (profit > 0) {
-            frappe.show_alert("الحوالة منفذه بالربح");
-        } else {
-            frappe.show_alert("الحوالة بدون ربح أو خسارة");
-        }
+        // if (profit < 0) {
+        //     frappe.show_alert("الحوالة منفذه بالخسارة");
+        // } else if (profit > 0) {
+        //     frappe.show_alert("الحوالة منفذه بالربح");
+        // } else {
+        //     frappe.show_alert("الحوالة بدون ربح أو خسارة");
+        // }
     } else {
         // Reset profit fields if values are missing
         frm.set_value('profit', 0);
