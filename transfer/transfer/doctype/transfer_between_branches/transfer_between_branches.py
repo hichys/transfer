@@ -35,7 +35,6 @@ class transferbetweenbranches(Document):
 		# check previous state
 		if(self.get_doc_before_save() and not self.get_doc_before_save().workflow_state == "مستلمة"):
 			if self.workflow_state == "مستلمة" and not self.handed:
-				frappe.msgprint("تم التسليم **3434***")
 				create_journal_entry_from_handed_transfer(self, method="submit")
 
 
@@ -309,11 +308,11 @@ def handel_reversal(docname, method):
 		# Handling the handed journal entry
 		if doc.handed:
 			if method == "reversal":
-				frappe.msgprint(f"Reversing Handed Journal Entry: {doc.handed}")
+				# frappe.msgprint(f"Reversing Handed Journal Entry: {doc.handed}")
 				handed = doc.handed
 				doc.handed = ""
 				reverse_journal_entry(handed,doc.posting_date)  # Reverse the journal entry
-				frappe.msgprint(f"Handed Journal Entry {handed} has been reversed")
+				# frappe.msgprint(f"Handed Journal Entry {handed} has been reversed")
 
 		# Handling the notyet journal entry
 		if doc.notyet:

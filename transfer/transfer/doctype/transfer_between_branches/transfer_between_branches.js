@@ -24,7 +24,7 @@ frappe.ui.form.on('transfer between branches', {
 
 				if (!userConfirmed) {
 					// Stop the workflow by throwing an error
-					frappe.msgprint(__("تم الإلغاء"));
+					frappe.show_alert(__("تم الإلغاء"));
 					throw new Error("Workflow action cancelled by user.");
 				}
 
@@ -86,7 +86,9 @@ frappe.ui.form.on('transfer between branches', {
 									$dialog.hide();
 									frappe.msgprint(__('حدث خطأ في الشبكة الرجاء تحديث الصفحه'));
 									console.error(err);
-								}
+								},
+								 
+
 							});
 
 						}
@@ -98,19 +100,37 @@ frappe.ui.form.on('transfer between branches', {
 					// Add "copy details" functionality
 					dialog.$wrapper.on('click', '#copy-details', function () {
 						const detailsText = `
-                            الكود: ${frm.doc.name}
-                            المرسل: ${details.from_company}
-                            المستقبل: ${details.to_company}
-                            القيمة: ${details.amount}
-                            عمولة ${details.from_company}: ${details.profit}
-                            عمولة ${details.to_company}: ${details.other_party_profit}
-                        `;
-						navigator.clipboard.writeText(detailsText).then(() => {
-							frappe.show_alert('تم نسخ التفاصيل إلى الحافظة.');
-						}).catch(err => {
-							frappe.msgprint('حدث خطأ أثناء نسخ النص.');
-						});
+						الكود: ${frm.doc.name}
+						المرسل: ${details.from_company}
+						المستقبل: ${details.to_company}
+						القيمة: ${details.amount}
+						عمولة ${details.from_company}: ${details.profit}
+						عمولة ${details.to_company}: ${details.other_party_profit}
+					`;
+
+						if (navigator.clipboard && navigator.clipboard.writeText) {
+							navigator.clipboard.writeText(detailsText).then(() => {
+								frappe.show_alert('تم نسخ التفاصيل إلى الحافظة.');
+							}).catch(err => {
+								frappe.msgprint('حدث خطأ أثناء نسخ النص.');
+								console.error(err);
+							});
+						} else {
+							// fallback for insecure contexts
+							let textarea = document.createElement("textarea");
+							textarea.value = detailsText;
+							document.body.appendChild(textarea);
+							textarea.select();
+							try {
+								document.execCommand('copy');
+								frappe.show_alert('تم نسخ التفاصيل .');
+							} catch (err) {
+								frappe.msgprint('حدث خطأ أثناء نسخ النص .');
+							}
+							document.body.removeChild(textarea);
+						}
 					});
+
 				}
 			}
 		});
@@ -148,15 +168,14 @@ frappe.ui.form.on('transfer between branches', {
 	},
 	onload: function (frm) {
 		//retrieve profit_per_thousand from transfer setting doctype
-		if(frm.is_new())
-		{
+		if (frm.is_new()) {
 			frappe.db.get_single_value("transfer setting", "profit_per_thousand").then(value => {
 				frm.set_value('profit_per_thousand', value);
 			});
 		}
 	},
 	refresh: function (frm) {
-
+		loadButtons(frm);
 
 		//set filter so that to and from branch cant be the same
 		frm.set_query("from_branch", function () {
@@ -191,168 +210,8 @@ frappe.ui.form.on('transfer between branches', {
 			}
 		}
 
-		if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
-			frm.add_custom_button(__('تسجيل'), function () {
-				frm.trigger('create_journal_entry');
-			});
-		}
-		else {
-			// If the document is saved or in any other workflow state, don't show the button
-			frm.remove_custom_button(__('تسجيل'));  // Optionally remove any previously added button
-		}
-		// Check if the document is in the "غير مستلمة" workflow state
-		if (frm.doc.docstatus === 1) {
-			// Get the creation date (posting_date) and strip the time part
-			const creation_date = new Date(frm.doc.posting_date);
-			const current_date = new Date();
-
-			// Strip time from both dates by setting the time to midnight (00:00)
-			creation_date.setHours(0, 0, 0, 0);
-			current_date.setHours(0, 0, 0, 0);
-
-			// Calculate the difference in milliseconds
-			const day_diff = (current_date - creation_date) / (1000 * 3600 * 24); // Convert milliseconds to days
-
-			// Check if the difference is greater than or equal to 1 day
-			if (day_diff >= 1) {
-				// Add "Reverse" button for documents created more than 24 hours ago
-				frm.add_custom_button(__('عكس الحوالــة'), function () {
-					frappe.confirm(
-						"هل أنت متأكد أنك تريد عكس الحوالة؟",
-						() => {
-							frappe.call({
-								method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
-								args: {
-									docname: frm.doc.name,
-									method: "reversal"
-								},
-								callback: function (r) {
-									if (!r.exc) {
-										frappe.show_alert({ message: __('تم عكس الحوالة بنجاح'), indicator: 'green' });
-										frm.reload_doc(); // Reload to reflect changes
-									} else {
-										// Show error message if there's an exception
-										frappe.msgprint({
-											title: __('Error'),
-											message: __('فشل في عكس الحوالة: ') + (r.exc || __('خطأ غير معروف'))
-										});
-									}
-								},
-								error: function (err) {
-									// Handle network/connection errors
-									frappe.msgprint({
-										title: __('Network Error'),
-										message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
-									});
-									console.error(err);
-								}
-							});
-						},
-						() => {
-							frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
-						}
-					);
-				});
-			} else {
-				// Add "إلغاء الحوالة" button for documents created less than 24 hours ago
-				frm.add_custom_button(__('إلغاء الحوالة'), function () {
-					frappe.confirm(
-						"هل أنت متأكد أنك تريد إلغاء الحوالة؟",
-						() => {
-							frappe.call({
-								method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
-								args: {
-									docname: frm.doc.name,
-									method: "cancel"
-								},
-								callback: function (r) {
-									if (!r.exc) {
-										frappe.show_alert({ message: __('تم إلغاء الحوالة بنجاح'), indicator: 'green' });
-										frm.reload_doc(); // Reload to reflect changes
-									} else {
-										// Show error message if there's an exception
-										frappe.msgprint({
-											title: __('Error'),
-											message: __('فشل في إلغاء الحوالة: ') + (r.exc || __('خطأ غير معروف'))
-										});
-									}
-								},
-								error: function (err) {
-									// Handle network/connection errors
-									frappe.msgprint({
-										title: __('Network Error'),
-										message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
-									});
-									console.error(err);
-								}
-							});
-						},
-						() => {
-							frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
-						}
-					);
-				});
-			}
-		}
-
-		if (frm.doc.docstatus === 2) {
-			//delete_doc_with_linked_js
-			if (frm.doc.workflow_state == 'ملغية') {
-				frm.add_custom_button(__('Delete'), function () {
-					frappe.call({
-						method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_doc_with_links",
-						args: {
-							doctype: frm.doc.doctype,
-							docname: frm.doc.name
-						},
-						callback: function () {
-							frappe.msgprint(__('Document deleted'));
-							frappe.set_route('List', frm.doc.doctype);
-						}
-					});
-				}, 'Actions');
-			}
-		}
-
-	}
+	},
 });
-
-frappe.ui.form.on('transfer between branches', {
-	// refresh: function (frm) {
-
-	// Add a custom button for workflow_state "تم التسليم"
-
-
-	// frm.add_custom_button(__('حــذف نهائي'), function () {
-	// 	frappe.confirm(
-	// 		'هل انت متاكد ?',
-	// 		function () {
-	// 			// Call the server-side method to delete the current document
-	// 			frappe.call({
-	// 				method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc',
-	// 				args: {
-	// 					docname: frm.doc.name,
-	// 					method : "submit"
-	// 				},
-	// 				callback: function (response) {
-	// 					if (response.message.status === 'success') {
-	// 						frappe.msgprint(response.message.message);
-	// 						frappe.set_route('List', 'transfer between branches');
-	// 					} else {
-	// 						frappe.msgprint({
-	// 							title: __('Error'),
-	// 							message: response.message.message,
-	// 							indicator: 'red'
-	// 						});
-	// 					}
-	// 				}
-	// 			});
-	// 		}
-	// 	);
-	// });
-	// }
-});
-
 frappe.ui.form.on('transfer between branches', {
 	delivery_date: function (frm) {
 		if (frm.doc.delivery_date && frm.doc.posting_date) {
@@ -446,61 +305,7 @@ frappe.ui.form.on('transfer between branches', {
 			frm.set_value('credit', null);
 			frm.refresh_field('credit');
 		}
-	}
-});
-
-//create journal entery
-
-frappe.ui.form.on('transfer between branches', {
-	// status: function (frm) {
-	//     if (frm.doc.docstatus === 1) { // Ensure the document is submitted
-	//         frappe.msgprint({
-	//             title: __('Status Changed'),
-	//             message: __('The status has been updated to {0}', [frm.doc.status]),
-	//             indicator: 'blue'
-	//         });
-
-	//         // create journal entery based on status change
-	//         custom_action_on_status_change(frm);
-
-	//     }
-	//     else {
-	//         frappe.show_alert({ message: __("Documetns is not Submitted Please submit it first"), indicator: "green" });
-	//     }
-	// },
-	after_save: function (frm) {
-		// Reload the document to reflect changes
-
 	},
-	on_submit: function (frm) {
-		// Reload the document to reflect changes
-		//custom_action_on_status_change(frm);
-
-	}
-});
-
-function custom_action_on_status_change(frm) {
-	// Example: Log the new status
-	// console.log(`New Status: ${frm.doc.status}`);
-
-	// Add your custom actions here
-	// Example: Call a server-side method
-	frappe.call({
-		method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.on_status_change",
-		args: {
-			docname: frm.doc.name,
-			from_branch: frm.doc.from_branch,
-			to_branch: frm.doc.to_branch
-		},
-		callback: function (response) {
-			if (!response.exc) {
-				frappe.show_alert({ message: __("Action completed successfully"), indicator: "green" });
-			}
-		}
-
-	});
-}
-frappe.ui.form.on('transfer between branches', {
 	amount: function (frm) {
 		var valid = validate_float_fields(frm.doc.amount);
 
@@ -523,23 +328,22 @@ frappe.ui.form.on('transfer between branches', {
 		}
 		frm.set_value('our_profit', frm.doc.total_profit);
 		frm.trigger('split_profit');
-		
-		
+
+
 	},
 	our_profit: function (frm) {
 		var valid = validate_float_fields(frm.doc.our_profit);
 		if (valid) {
 			adjust_profits(frm, 'our_profit');
 		}
-		if (frm.doc.our_profit !== frm.doc.other_party_profit)
-		{
-			frm.set_value('split_profit',0);
+		if (frm.doc.our_profit !== frm.doc.other_party_profit) {
+			frm.set_value('split_profit', 0);
 		}
-		else{
-			frm.set_value('split_profit',1);
+		else {
+			frm.set_value('split_profit', 1);
 		}
 
-	 
+
 	},
 	other_party_profit: function (frm) {
 		var valid = validate_float_fields(frm.doc.other_party_profit);
@@ -555,11 +359,10 @@ frappe.ui.form.on('transfer between branches', {
 	},
 	profit_per_thousand: function (frm) {
 
-		if (frm.doc.profit_per_thousand === 0)
-		{
+		if (frm.doc.profit_per_thousand === 0) {
 			frm.trigger('without_profit');
 		}
-		else{
+		else {
 			var valid = validate_float_fields(frm.doc.profit_per_thousand);
 			if (!valid) {
 				profit_per_thousand = 0;
@@ -568,7 +371,7 @@ frappe.ui.form.on('transfer between branches', {
 			}
 			calculate_profit(frm);
 		}
-		
+
 
 	},
 	without_profit: function (frm) {
@@ -655,9 +458,37 @@ frappe.ui.form.on('transfer between branches', {
 			frm.refresh_field('debit');
 		}
 	},
+	phone_number: function (frm) {
+		if (frm.doc.phone_number) {
+			let today = frappe.datetime.get_today(); // format: YYYY-MM-DD
+			frappe.call({
+				method: "frappe.client.get_list",
+				args: {
+					doctype: "transfer between branches",
+					filters: [
+						["phone_number", "=", frm.doc.phone_number],
+						["name", "!=", frm.doc.name],
+						["posting_date", "between", [
+							today + " 00:00:00",
+							today + " 23:59:59"
+						]]
+					],
+					fields: ["phone_number"],
+				},
+				callback: function (r) {
+					if (r.message && r.message.length > 1) {
+						frappe.show_alert({
+							message: `⚠️ ${r.message.length} record(s) created today with this phone number`,
+							indicator: 'green'
+						});
+					}
+				}
+			});
+		}
+	},
 	whatsapp_desc: function (frm) {
 		clearTimeout(frm.delayTimeout);
-		if (frm.doc.whatsapp_desc) {
+		if (frm.doc.whatsapp_desc && !frm.doc.phone_number) {
 			frm.delayTimeout = setTimeout(() => {
 				let phoneNumber = extract_phone_number(frm.doc.whatsapp_desc);
 				if (phoneNumber !== "ادخل يدويا") {
@@ -674,18 +505,17 @@ frappe.ui.form.on('transfer between branches', {
 
 function calculate_profit(frm) {
 
-	if (frm.doc.profit_per_thousand === 0)
-	{
+	if (frm.doc.profit_per_thousand === 0) {
 		frm.set_value('without_profit', 1);
 		frm.set_value('split_profit', 0);
 		return 0;
 	}
-else
-	if (frm.doc.profit_per_thousand === 0 && frm.doc.amount === 0) {
-		frm.set_value('without_profit', 1);
-		frm.set_value('split_profit', 0);
-		return 0;
-	}
+	else
+		if (frm.doc.profit_per_thousand === 0 && frm.doc.amount === 0) {
+			frm.set_value('without_profit', 1);
+			frm.set_value('split_profit', 0);
+			return 0;
+		}
 
 	if (frm.doc.amount && frm.doc.profit_per_thousand) {
 		let profit = 0;
@@ -782,4 +612,147 @@ function adjust_profits(frm, changed_field) {
 
 	// Refresh fields to reflect changes
 	frm.refresh_fields();
+}
+
+
+function loadButtons(frm) {
+	if (frm.doc.docstatus === 0 && !frm.is_new() && frm.doc.workflow_state === "غير مسجلة") {
+		frm.add_custom_button(__('تسجيل'), function () {
+			frm.trigger('create_journal_entry');
+		});
+	}
+	else {
+		// If the document is saved or in any other workflow state, don't show the button
+		frm.remove_custom_button(__('تسجيل')); 
+	}
+	// Check if the document is in the "غير مستلمة" workflow state
+	if (frm.doc.docstatus === 1) {
+		// Get the creation date (posting_date) and strip the time part
+		const creation_date = new Date(frm.doc.posting_date);
+		const current_date = new Date();
+
+		// Strip time from both dates by setting the time to midnight (00:00)
+		creation_date.setHours(0, 0, 0, 0);
+		current_date.setHours(0, 0, 0, 0);
+
+		// Calculate the difference in milliseconds
+		const day_diff = (current_date - creation_date) / (1000 * 3600 * 24); // Convert milliseconds to days
+
+		// Check if the difference is greater than or equal to 1 day
+		if (day_diff >= 1) {
+			// Add "Reverse" button for documents created more than 24 hours ago
+			frm.add_custom_button(__('عكس الحوالــة'), function () {
+				frappe.confirm(
+					"هل أنت متأكد أنك تريد عكس الحوالة؟",
+					() => {
+						frappe.call({
+							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
+							args: {
+								docname: frm.doc.name,
+								method: "reversal"
+							},
+							callback: function (r) {
+								if (!r.exc) {
+									frappe.show_alert({ message: __('تم عكس الحوالة بنجاح'), indicator: 'green' });
+									frm.reload_doc(); // Reload to reflect changes
+								} else {
+									// Show error message if there's an exception
+									frappe.msgprint({
+										title: __('Error'),
+										message: __('فشل في عكس الحوالة: ') + (r.exc || __('خطأ غير معروف'))
+									});
+								}
+							},
+							error: function (err) {
+								// Handle network/connection errors
+								frappe.msgprint({
+									title: __('Network Error'),
+									message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
+								});
+								console.error(err);
+							}
+						});
+					},
+					() => {
+						frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
+					}
+				);
+			});
+		} else {
+			// Add "إلغاء الحوالة" button for documents created less than 24 hours ago
+			frm.add_custom_button(__('إلغاء الحوالة'), function () {
+				frappe.confirm(
+					"هل أنت متأكد أنك تريد إلغاء الحوالة؟",
+					() => {
+						frappe.call({
+							method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
+							args: {
+								docname: frm.doc.name,
+								method: "cancel"
+							},
+							callback: function (r) {
+								if (!r.exc) {
+									frappe.show_alert({ message: __('تم إلغاء الحوالة بنجاح'), indicator: 'green' });
+									frm.reload_doc(); // Reload to reflect changes
+								} else {
+									// Show error message if there's an exception
+									frappe.msgprint({
+										title: __('Error'),
+										message: __('فشل في إلغاء الحوالة: ') + (r.exc || __('خطأ غير معروف'))
+									});
+								}
+							},
+							error: function (err) {
+								// Handle network/connection errors
+								frappe.msgprint({
+									title: __('Network Error'),
+									message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
+								});
+								console.error(err);
+							}
+						});
+					},
+					() => {
+						frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
+					}
+				);
+			});
+		}
+	}
+
+	if (frm.doc.workflow_state == 'غير مستلمة') {
+		frm.add_custom_button(__('تم التسليم'), function () {
+			frappe.call({
+				method: "frappe.model.workflow.apply_workflow",
+				args: {
+					doc: frm.doc,
+					action: "تم التسليم"   // the workflow action name
+				},
+				callback: function (r) {
+					if (!r.exc) {
+						frappe.show_alert(__('Workflow action applied'));
+						frm.reload_doc();
+					}
+				}
+			});
+		});
+	}
+	if (frm.doc.docstatus === 2) {
+		//delete_doc_with_linked_js
+		// if (frm.doc.workflow_state == 'ملغية') {
+		// 	frm.add_custom_button(__('مسح'), function () {
+		// 		frappe.call({
+		// 			method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_doc_with_links",
+		// 			args: {
+		// 				doctype: frm.doc.doctype,
+		// 				docname: frm.doc.name
+		// 			},
+		// 			callback: function () {
+		// 				frappe.msgprint(__('Document deleted'));
+		// 				frappe.set_route('List', frm.doc.doctype);
+		// 			}
+		// 		});
+		// 	}, 'Actions');
+		// }
+	}
 }
