@@ -730,7 +730,7 @@ function loadButtons(frm) {
 				},
 				callback: function (r) {
 					if (!r.exc) {
-						frappe.show_alert(__('Workflow action applied'));
+						frappe.show_alert(__('تم العمليه بنجاح'));
 						frm.reload_doc();
 					}
 				}
