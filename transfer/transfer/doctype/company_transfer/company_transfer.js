@@ -39,6 +39,7 @@ frappe.ui.form.on('company transfer', {
                                     <div style="direction: rtl; text-align: right; font-family: 'Cairo', sans-serif; line-height: 1.8;">
                                         <h4 style="color: #333;">تفاصيل العملية:</h4>
                                         <p><strong>الفرع:</strong> ${details.branch}</p>
+                                        <p><strong>الكود:</strong> ${frm.doc.name}</p>
                                         <p><strong>المرسل:</strong> ${details.from_company}</p>
                                         <p><strong>المستقبل:</strong> ${details.to_company}</p>
                                         <p><strong>القيمة:</strong> ${details.amount}</p>
@@ -72,19 +73,40 @@ frappe.ui.form.on('company transfer', {
                     // Add "copy details" functionality
                     dialog.$wrapper.on('click', '#copy-details', function () {
                         const detailsText = `
-                            الفرع: ${details.branch}
-                            المرسل: ${details.from_company}
-                            المستقبل: ${details.to_company}
-                            القيمة: ${details.amount}
-                            عمولة ${details.from_company}: ${details.profit}
-                            عمولة ${details.to_company}: ${details.other_party_profit}
-                        `;
-                        navigator.clipboard.writeText(detailsText).then(() => {
-                            frappe.show_alert('تم نسخ التفاصيل إلى الحافظة.');
-                        }).catch(err => {
-                            frappe.msgprint('حدث خطأ أثناء نسخ النص.');
-                        });
+                        الفرع: ${details.branch}
+                        الكود: ${frm.doc.name}
+                        المرسل: ${details.from_company}
+                        المستقبل: ${details.to_company}
+                        القيمة: ${details.amount}
+                        عمولة ${details.from_company}: ${details.profit}
+                        عمولة ${details.to_company}: ${details.other_party_profit}
+                    `;
+
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            //  Modern API (works only on https or localhost)
+                            navigator.clipboard.writeText(detailsText).then(() => {
+                                frappe.show_alert('✅✅تم نسخ التفاصيل إلى الحافظة.');
+                            }).catch(err => {
+                                frappe.msgprint('حدث خطأ أثناء نسخ النص.');
+                                console.error(err);
+                            });
+                        } else {
+                            //  Fallback for http / older browsers
+                            let textarea = document.createElement("textarea");
+                            textarea.value = detailsText;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            try {
+                                document.execCommand("copy");
+                                frappe.show_alert('تم نسخ التفاصيل ✅');
+                            } catch (err) {
+                                frappe.msgprint('حدث خطأ أثناء نسخ النص.');
+                                console.error(err);
+                            }
+                            document.body.removeChild(textarea);
+                        }
                     });
+
                 }
             }
         });
