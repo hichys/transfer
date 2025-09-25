@@ -2,7 +2,7 @@
 frappe.ui.form.on('transfer between branches', {
 
 	before_workflow_action: async (frm) => {
-		console.log("Triggered before_workflow_action");
+		// console.log("Triggered before_workflow_action");
 		frappe.dom.unfreeze();
 		if (frm.doc.workflow_state === "غير مستلمة" && frm.selected_workflow_action === "تم التسليم") {
 			try {
@@ -50,7 +50,7 @@ frappe.ui.form.on('transfer between branches', {
 					}
 
 					// Check if created today and handle accordingly
-						await handelCancelAction(frm);
+					await handelCancelAction(frm);
 
 					resolve(); // Resolve the promise if everything succeeded
 
@@ -190,17 +190,16 @@ frappe.ui.form.on('transfer between branches', {
 			frappe.validated = false;
 		}
 
-
-
-
 	},
 	onload: function (frm) {
 		//retrieve profit_per_thousand from transfer setting doctype
 		if (frm.is_new()) {
 			frappe.db.get_single_value("transfer setting", "profit_per_thousand").then(value => {
-				frm.set_value('profit_per_thousand', value);
+				frm.doc.profit_per_thousand = value;
+				frm.refresh_field('profit_per_thousand');
 			});
 		}
+		
 	},
 	refresh: function (frm) {
 		loadButtons(frm);
@@ -254,7 +253,7 @@ frappe.ui.form.on('transfer between branches', {
 	},
 	from_branch: function (frm) {
 		if (frm.doc.from_branch) {
-			console.log('Selected branch:', frm.doc.from_branch, frm.doc.to_branch); // Log the selected branch
+			// console.log('Selected branch:', frm.doc.from_branch, frm.doc.to_branch); // Log the selected branch
 
 			// Define the account index you want to fetch
 			let accountIndex = 0;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
@@ -267,7 +266,7 @@ frappe.ui.form.on('transfer between branches', {
 					account_index: accountIndex       // Pass the account index
 				},
 				callback: function (r) {
-					console.log('Account response:', r.message); // Log the response for debugging
+					// console.log('Account response:', r.message); // Log the response for debugging
 
 					if (r.message) {
 						// Set the account from the response to the fbfbfb field
@@ -296,7 +295,7 @@ frappe.ui.form.on('transfer between branches', {
 
 		if (frm.doc.to_branch) {
 
-			console.log('Selected branch:', frm.doc.to_branch); // Log the selected branch
+			// console.log('Selected branch:', frm.doc.to_branch); // Log the selected branch
 
 			// Define the account index you want to fetch
 			let accountIndex = 1;  // Change this index as needed, e.g., 0 for the first account, 1 for the second
@@ -309,7 +308,7 @@ frappe.ui.form.on('transfer between branches', {
 					account_index: accountIndex       // Pass the account index
 				},
 				callback: function (r) {
-					console.log('Account response:', r.message); // Log the response for debugging
+					// console.log('Account response:', r.message); // Log the response for debugging
 
 					if (r.message) {
 						// Set the account from the response to the fbfbfb field
@@ -346,13 +345,16 @@ frappe.ui.form.on('transfer between branches', {
 
 	},
 	total_profit: function (frm) {
+
+		// frm.trigger('profit_per_thousand');
+
 		if (frm.doc.total_profit > 0) {
 			frm.set_df_property("split_profit", "read_only", 0);
 			frm.refresh_field('split_profit')
 		}
 		var valid = validate_float_fields(frm.doc.total_profit);
 		if (valid) {
-			adjust_profits(frm, frm.doc.total_profit);
+			adjust_profits(frm, 'total_profit');
 		}
 		frm.set_value('our_profit', frm.doc.total_profit);
 		frm.trigger('split_profit');
@@ -394,10 +396,12 @@ frappe.ui.form.on('transfer between branches', {
 			var valid = validate_float_fields(frm.doc.profit_per_thousand);
 			if (!valid) {
 				profit_per_thousand = 0;
-				frm.doc.set_value('profit_per_thousand', 0);
+				frm.set_value('profit_per_thousand', 0);
 				frm.refresh_field('profit_per_thousand');
 			}
-			calculate_profit(frm);
+
+			// calculate_profit(frm);
+			adjust_profits(frm, 'profit_per_thousand')
 		}
 
 
@@ -446,7 +450,7 @@ frappe.ui.form.on('transfer between branches', {
 			let company_main = "";
 			frappe.get_cached_doc("transfer setting", "main_branch").then(value => {
 				company_main = value;
-				console.log('Main branch from settings:', company_main);
+				// console.log('Main branch from settings:', company_main);
 				if (!company_main) {
 					frappe.msgprint(__('Main branch is not set in Transfer Setting'));
 					frm.set_value('check_tslmfrommain', 0);
@@ -460,7 +464,7 @@ frappe.ui.form.on('transfer between branches', {
 						account_index: company_main_account_index       // Pass the account index
 					},
 					callback: function (r) {
-						console.log('Account response:', r.message); // Log the response for debugging
+						// console.log('Account response:', r.message); // Log the response for debugging
 
 						if (r.message) {
 							// Set the account from the response to the fbfbfb field
@@ -566,7 +570,28 @@ function calculate_profit(frm) {
 
 	}
 }
+function calculate_profit_per_thousand(frm) {
+	if (!frm.doc.total_profit || !frm.doc.amount || frm.doc.amount === 0) {
+		return 0;
+	}
 
+	if (frm.doc.total_profit === 0) {
+		return 0;
+	}
+
+	let profit_per_thousand = 0;
+
+	if (frm.doc.amount < 1100) {
+		// For amounts less than 1100, profit_per_thousand equals total_profit
+		profit_per_thousand = frm.doc.total_profit;
+	} else {
+		// For amounts >= 1100, reverse the calculation
+		let rounded_amount = Math.ceil(frm.doc.amount / 1000);
+		profit_per_thousand = frm.doc.total_profit / rounded_amount;
+	}
+
+	return profit_per_thousand;
+}
 function validate_float_fields(value) {
 	// Validate the amount and profit_per_thousand fields
 
@@ -601,7 +626,17 @@ function adjust_profits(frm, changed_field) {
 	let other_party_profit = frm.doc.other_party_profit || 0;
 
 	// Adjust the other field to ensure the total equals profit
-	if (changed_field === 'our_profit') {
+		
+	if (changed_field === 'total_profit') {
+		frm.set_value('profit_per_thousand', calculate_profit_per_thousand(frm));
+	}
+	else if (changed_field === 'profit_per_thousand') {
+		let rounded_amount = Math.ceil(frm.doc.amount / 1000); // Round up to nearest 1000
+		const profit = rounded_amount * frm.doc.profit_per_thousand; 
+		// console.log(profit)
+		frm.set_value('total_profit', profit)
+	}
+	else if (changed_field === 'our_profit') {
 		other_party_profit = profit - our_profit;
 		if (other_party_profit < 0) {
 			other_party_profit = 0;
@@ -653,7 +688,7 @@ function loadButtons(frm) {
 		// If the document is saved or in any other workflow state, don't show the button
 		frm.remove_custom_button(__('تسجيل'));
 	}
-	 
+
 	if (frm.doc.workflow_state == 'غير مستلمة') {
 		frm.add_custom_button(__('تم التسليم'), function () {
 			// Create a new dialog instance
@@ -710,7 +745,7 @@ function loadButtons(frm) {
 		// }
 	}
 }
- 
+
 function handelCancelAction(frm) {
 	const cancel_method = is_created_today(frm.doc.posting_date) ? "cancel" : "reversal";
 	const cancel_msg = cancel_method === "cancel" ? "إلغاء" : "عكس";
@@ -747,8 +782,7 @@ function handelCancelAction(frm) {
 		});
 	});
 }
-function is_created_today(posting_date)
-{
+function is_created_today(posting_date) {
 	const creation_date = new Date(posting_date);
 	const current_date = new Date();
 
