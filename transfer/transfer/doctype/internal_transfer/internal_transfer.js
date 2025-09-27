@@ -25,8 +25,8 @@ frappe.ui.form.on('Internal Transfer', {
                                         <p><strong>المرسل:</strong> ${details.from_company}</p>
                                         <p><strong>المستقبل:</strong> ${details.to_company}</p>
                                         <p><strong>القيمة:</strong> ${details.amount}</p>
-                                        <p><strong>عمولة <span style="color: #007bff;">${details.from_company}</span>:</strong> ${details.profit}</p>
-                                        <p><strong>عمولة <span style="color: #007bff;">${details.to_company}</span>:</strong> ${details.other_party_profit}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.from_company}</span>:</strong> ${details.other_party_profit}</p>
+                                        <p><strong>عمولة <span style="color: #007bff;">${details.to_company}</span>:</strong> ${details.profit}</p>
                                         <button id="copy-details" class="btn btn-secondary" style="margin-top: 15px;">نسخ التفاصيل</button>
                                     </div>
                                 `,
@@ -288,8 +288,8 @@ frappe.ui.form.on("Internal Transfer", {
             frm.set_df_property('to_company', 'label', 'الي فرع ال');
             frm.set_df_property('branch', 'label', 'الفرع (المستقبل)');
 
-            frm.set_df_property('our_profit', 'label', "عمولة الشركة");
-            frm.set_df_property('other_party_profit', 'label', 'عمولة الفرع');
+            // frm.set_df_property('our_profit', 'label', "عمولة الشركة");
+            // frm.set_df_property('other_party_profit', 'label', 'عمولة الفرع');
 
             type = 1;
             frm.set_df_property('to_comapny', 'read_only', 1);
@@ -309,8 +309,8 @@ frappe.ui.form.on("Internal Transfer", {
             frm.set_df_property('branch', 'label', 'الفرع (المرسل)');
 
 
-            frm.set_df_property('our_profit', 'label', "عمولة الفرع")
-            frm.set_df_property('other_party_profit', 'label', "عمولة الشركة")
+            // frm.set_df_property('our_profit', 'label', "عمولة الفرع")
+            // frm.set_df_property('other_party_profit', 'label', "عمولة الشركة")
 
             type = 2;
 
