@@ -277,15 +277,15 @@ def create_journal_entry(
 
         accounts = [
             {
-                "account": from_account,
-                "debit_in_account_currency": 0,
-                "credit_in_account_currency": amount,
-            },
-            {
                 "account": to_account,
                 "credit_in_account_currency": 0,
                 "debit_in_account_currency": amount,
             },
+            {
+                "account": from_account,
+                "debit_in_account_currency": 0,
+                "credit_in_account_currency": amount,
+            }
         ]
 
         journal_entry = frappe.get_doc(
