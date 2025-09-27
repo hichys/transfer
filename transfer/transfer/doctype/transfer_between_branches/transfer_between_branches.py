@@ -82,14 +82,14 @@ def delete_doc_with_links(docname):
 
 @frappe.whitelist()
 def manual_submit(docname):
-    try:
-        doc = frappe.get_doc("transfer between branches", docname)
-        doc.submit()
-        frappe.db.commit()
-        return {"status": "success", "message": "Document submitted successfully"}
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Error 6695 in manual_submit")
-        return {"status": "error", "message": str(e)}
+	try:
+		doc = frappe.get_doc("transfer between branches", docname)
+		doc.submit()
+		frappe.db.commit()
+		return {"status": "success", "message": "Document submitted successfully"}
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "Error 6695 in manual_submit")
+		return {"status": "error", "message": str(e)}
 
 @frappe.whitelist()
 def test(docname,method="cancel"):
@@ -194,15 +194,15 @@ def handel_canceled_docs(docname, method):
 
 @frappe.whitelist()
 def handel_cancelation(docname, method):
-    # if method == "reversal": revese it
-    # else if method == cancel then cancel it
+	# if method == "reversal": revese it
+	# else if method == cancel then cancel it
 
-    if method == "reversal":
-        return handel_reversal(docname, method="reversal")
-    elif method == "cancel":
-        return handel_canceled_docs(docname, method="cancel")
-    else:
-        frappe.throw("Invalid method. Please provide a valid method.")
+	if method == "reversal":
+		return handel_reversal(docname, method="reversal")
+	elif method == "cancel":
+		return handel_canceled_docs(docname, method="cancel")
+	else:
+		frappe.throw("Invalid method. Please provide a valid method.")
 
 
 @frappe.whitelist()
@@ -290,7 +290,7 @@ def create_journal_entry_from_pending_transfer(doc, method):
 
 @frappe.whitelist()
 def handel_reversal(docname, method):
-	# frappe.msgprint("handel_reversal is called")
+	frappe.msgprint("handel_reversal is called")
 	try:
 		# Fetch the document
 		doc = frappe.get_doc('transfer between branches', docname)

@@ -99,8 +99,7 @@
    "fieldtype": "Date",
    "in_filter": 1,
    "in_standard_filter": 1,
-   "label": "\u0627\u0644\u062a\u0627\u0631\u064a\u062e",
-   "read_only_depends_on": "eval:doc.workflow_state === \"\u0645\u0633\u062a\u0644\u0645\u0629\""
+   "label": "\u0627\u0644\u062a\u0627\u0631\u064a\u062e"
   },
   {
    "allow_on_submit": 1,
@@ -258,7 +257,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-09-25 18:41:42.391799",
+ "modified": "2025-09-27 13:24:00.487058",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",
