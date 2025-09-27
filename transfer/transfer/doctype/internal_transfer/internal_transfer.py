@@ -120,8 +120,8 @@ def create_journal_entry(self, temp=False):
             from_party_type = from_party_name
             to_type = ""
             to_party_type = ""
-            debit_in_account_currency = self.amount + other_party_profit
-            credit_in_account_currency = self.amount
+            debit_in_account_currency = self.amount + our_profit
+            credit_in_account_currency = self.amount  
         else:
             if self.to_type == "Customer" and self.from_type != "Customer":
                 to_type = "Customer"
@@ -153,19 +153,19 @@ def create_journal_entry(self, temp=False):
             },
         ]
         # Add an entry for out_proft if not 0
-        if self.from_type == "Customer":
-            if other_party_profit != 0:
-                accounts.append(
-                    {
-                        "account": profit_account,
-                        "branch": branch,
-                        "debit_in_account_currency": 0,
-                        "credit_in_account_currency": other_party_profit,
-                    }
-                )
-        else:
-            if our_profit != 0:
-                accounts.append(
+        # if self.from_type == "Customer":
+        #     if other_party_profit != 0:
+        #         accounts.append(
+        #             {
+        #                 "account": profit_account,
+        #                 "branch": branch,
+        #                 "debit_in_account_currency": 0,
+        #                 "credit_in_account_currency": other_party_profit,
+        #             }
+        #         )
+
+        if our_profit != 0:
+            accounts.append(
                     {
                         "account": profit_account,
                         "branch": branch,
@@ -295,8 +295,8 @@ def transfer_completed(docname):
         doc = frappe.get_doc("Internal Transfer", docname)
 
         # Get the target account
-        from_acc = get_temp_account(doc.branch)
-        to_acc = get_main_account(doc.branch)
+        to_acc = get_temp_account(doc.branch)   # Debit
+        from_acc = get_main_account(doc.branch) # credit
 
         # Validate if transfer is from the main account and to the correct branch
         if doc.check_tslmfrommain:
