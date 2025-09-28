@@ -56,6 +56,7 @@ fixtures = [
     "Item",
     "BranchAccounts",
     "Role",
+    "Custom DocPerm",
 ]
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
