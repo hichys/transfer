@@ -195,26 +195,26 @@
    "allow_on_submit": 1,
    "fieldname": "credit",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "credit",
-   "permlevel": 2,
    "read_only": 1
   },
   {
    "allow_on_submit": 1,
    "fieldname": "debit",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "debit",
-   "permlevel": 2,
    "read_only": 1
   },
   {
    "allow_on_submit": 1,
    "fieldname": "notyet",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "\u0642\u064a\u062f -\u0627\u0644\u062a\u0633\u062c\u064a\u0644",
    "no_copy": 1,
    "options": "Journal Entry",
-   "permlevel": 2,
    "placeholder": "\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645 \u0628\u0639\u062c",
    "read_only": 1
   },
@@ -222,27 +222,26 @@
    "allow_on_submit": 1,
    "fieldname": "handed",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "\u0642\u064a\u062f - \u062a\u0645 \u0627\u0644\u062a\u0633\u0644\u064a\u0645",
    "no_copy": 1,
    "options": "Journal Entry",
-   "permlevel": 2,
    "read_only": 1
   },
   {
    "fieldname": "journal_entry_link",
    "fieldtype": "HTML",
    "label": "journal_entry_link",
-   "no_copy": 1,
-   "permlevel": 2
+   "no_copy": 1
   },
   {
    "allow_on_submit": 1,
    "fieldname": "canceld_journal_entry",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "\u0642\u064a\u062f - \u0627\u0644\u0625\u0644\u063a\u0627\u0621",
    "no_copy": 1,
    "options": "Journal Entry",
-   "permlevel": 2,
    "read_only": 1,
    "set_only_once": 1
   }
@@ -256,7 +255,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-09-27 13:24:00.487058",
+ "modified": "2025-09-28 04:51:25.308804",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",
@@ -280,6 +279,20 @@
   {
    "amend": 1,
    "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "alalmia transfer",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
    "create": 1,
    "delete": 1,
    "email": 1,
