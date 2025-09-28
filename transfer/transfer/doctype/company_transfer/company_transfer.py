@@ -36,7 +36,8 @@ class companytransfer(Document):
     # 			user=frappe.session.user
     # 		)
     def create_company_transfer():
-        frappe.msgprint("Company Transfer Created")
+        # frappe.msgprint("Company Transfer Created")
+        pass
 
     def before_cancel(self):
         pass
@@ -93,15 +94,15 @@ class companytransfer(Document):
                     je.cancel()
                     if not validate_linked_journal_entries(self.name):
                         frappe.throw("ERRROR on_cancel CODE COM888")
-                    frappe.msgprint(f"Journal Entry {je.name} has been cancelled.")
+                    # frappe.msgprint(f"Journal Entry {je.name} has been cancelled.")
                 else:
                     # If the journal entry is older than today, reverse it
                     reverse_journal_entry(je, self.name)
-                    frappe.msgprint(f"Journal Entry {je.name} has been reversed.")
+                    # frappe.msgprint(f"Journal Entry {je.name} has been reversed.")
 
                     # Update the status and docstatus of the document
 
-                    frappe.msgprint("Document canceled successfully from Draft state.")
+                    # frappe.msgprint("Document canceled successfully from Draft state.")
 
             except Exception as journal_error:
                 frappe.log_error(frappe.get_traceback(), "Error handling Journal Entry")
@@ -302,9 +303,9 @@ def reverse_journal_entry(self, docname):
             journal_entry.custom_reversed_by = reversed_je.name
             journal_entry.save()
             frappe.db.commit()
-            frappe.msgprint(
-                f"Journal Entry {reversed_je.name} has been reversed successfully."
-            )
+            # frappe.msgprint(
+            #     f"Journal Entry {reversed_je.name} has been reversed successfully."
+            # )
 
             return {"status": "success", "journal_entry": reversed_je.name}
 

@@ -290,7 +290,7 @@ def create_journal_entry_from_pending_transfer(doc, method):
 
 @frappe.whitelist()
 def handel_reversal(docname, method):
-	frappe.msgprint("handel_reversal is called")
+	# frappe.msgprint("handel_reversal is called")
 	try:
 		# Fetch the document
 		doc = frappe.get_doc('transfer between branches', docname)
