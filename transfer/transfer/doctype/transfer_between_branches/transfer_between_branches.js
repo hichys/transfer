@@ -749,39 +749,60 @@ function loadButtons(frm) {
 function handelCancelAction(frm) {
 	const cancel_method = is_created_today(frm.doc.posting_date) ? "cancel" : "reversal";
 	const cancel_msg = cancel_method === "cancel" ? "إلغاء" : "عكس";
+
 	return new Promise((resolve, reject) => {
-		frappe.call({
-			method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
-			args: {
-				docname: frm.doc.name,
-				method: cancel_method
-			},
-			callback: function (r) {
-				if (!r.exc) {
-					frappe.show_alert({ message: __('تم {0} الحوالة بنجاح', [cancel_msg]), indicator: 'green' });
-					frm.reload_doc(); // Reload to reflect changes
-					resolve(true);
-				} else {
-					// Show error message if there's an exception
-					frappe.msgprint({
-						title: __('Error'),
-						message: __('فشل في إلغاء الحوالة: ') + (r.exc || __('خطأ غير معروف'))
-					});
-					reject(r.exc);
-				}
-			},
-			error: function (err) {
-				// Handle network/connection errors
-				frappe.msgprint({
-					title: __('Network Error'),
-					message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
+		// ✅ تأكيد إضافي قبل استدعاء السيرفر
+		frappe.confirm(
+			__(`هل أنت متأكد أنك تريد {0} الحوالة بتاريخ {1}؟`, [
+				cancel_msg,
+				frm.doc.posting_date
+			]),
+			() => {
+				// لو المستخدم أكد
+				frappe.call({
+					method: 'transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.handel_cancelation',
+					args: {
+						docname: frm.doc.name,
+						method: cancel_method
+					},
+					callback: function (r) {
+						if (!r.exc) {
+							frappe.show_alert({
+								message: __('تم {0} الحوالة بنجاح', [cancel_msg]),
+								indicator: 'green'
+							});
+							frm.reload_doc();
+							resolve(true);
+						} else {
+							frappe.msgprint({
+								title: __('Error'),
+								message: __('فشل في {0} الحوالة: {1}', [
+									cancel_msg,
+									(r.exc || __('خطأ غير معروف'))
+								])
+							});
+							reject(r.exc);
+						}
+					},
+					error: function (err) {
+						frappe.msgprint({
+							title: __('Network Error'),
+							message: __('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.')
+						});
+						console.error(err);
+						reject(err);
+					}
 				});
-				console.error(err);
-				reject(err);
+			},
+			() => {
+				// لو المستخدم لغى من الـ confirm
+				frappe.show_alert({ message: __('تم إلغاء الإجراء'), indicator: 'yellow' });
+				reject(new Error("User cancelled the action"));
 			}
-		});
+		);
 	});
 }
+
 function is_created_today(posting_date) {
 	const creation_date = new Date(posting_date);
 	const current_date = new Date();
