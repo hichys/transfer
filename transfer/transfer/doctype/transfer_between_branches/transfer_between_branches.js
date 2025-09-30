@@ -202,6 +202,8 @@ frappe.ui.form.on('transfer between branches', {
 		
 	},
 	refresh: function (frm) {
+		 
+			
 		loadButtons(frm);
 
 		//set filter so that to and from branch cant be the same
@@ -726,7 +728,68 @@ function loadButtons(frm) {
 
 		});
 	}
-	if (frm.doc.docstatus === 2) {
+	if (frm.doc.docstatus === 1) {
+		frappe.db.get_value(
+			"company transfer",
+			"name",
+			{ transfer_between_branches: frm.doc.name },
+			(r) => {
+				if (!r.name) {
+					frm.add_custom_button(__('تنفيذ علي شركة'), function () {
+						let selectCompany = new frappe.ui.Dialog({
+							title: 'Company Details',
+							fields: [
+								{
+									label: 'Company',
+									fieldname: 'company',
+									fieldtype: 'Link',
+									//TODO : filter show only Customer with type = company
+									options: 'Customer',
+									reqd: 1
+								},
+								{
+									label: 'Company Commission',
+									fieldname: 'company_commission',
+									fieldtype: 'Float',
+									default: 0,
+								},
+							],
+							size: 'Large', // small, large, extra-large 
+							primary_action_label: 'Submit',
+							primary_action(values) {
+								console.log(values.company);
+								frappe.call({
+									method: "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.execute_on_company",
+									args: {
+										docname: frm.doc.name,
+										company: values.company,
+										company_commission: values.company_commission
+									},
+									callback: function (r) {
+										if (!r.exc) {
+											frappe.show_alert(__('تمت العملية بنجاح'));
+											frm.reload_doc();
+										}
+									}
+								});
+								// Close the dialog
+								selectCompany.hide();
+							},
+							secondary_action_label: 'Cancel',
+							secondary_action() {
+								// Close the dialog
+								frappe.show_alert("تم الإلغاء");
+								selectCompany.hide();
+							}
+						});
+
+						selectCompany.show();
+					});
+				}
+			}
+		);
+
+		
 		//delete_doc_with_linked_js
 		// if (frm.doc.workflow_state == 'ملغية') {
 		// 	frm.add_custom_button(__('مسح'), function () {

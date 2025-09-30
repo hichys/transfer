@@ -253,9 +253,13 @@
   {
    "link_doctype": "Journal Entry",
    "link_fieldname": "cheque_no"
+  },
+  {
+   "link_doctype": "company transfer",
+   "link_fieldname": "transfer_between_branches"
   }
  ],
- "modified": "2025-09-28 04:51:25.308804",
+ "modified": "2025-09-30 01:57:45.073165",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "transfer between branches",

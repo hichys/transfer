@@ -4,6 +4,7 @@
 # import frappe
 from frappe.model.document import Document
 import frappe
+from frappe.utils import flt
 from transfer.transfer.api import (
     get_customer_account,
     create_journal_entry_preview,
@@ -27,7 +28,9 @@ class companytransfer(Document):
         if self.delivery_date and self.posting_date:
             if getdate(self.delivery_date) < getdate(self.posting_date):
                 frappe.throw(_("تاريخ التسليم يجيب ان يكون اكبر من تاريخ الحوالة"))
-
+        if (flt(self.our_profit) + flt(self.other_party_profit)) > flt(self.profit):
+            frappe.throw("Profit exceeds allowed amount")     
+        
     # def after_save(doc, method):
     # 	if doc.docstatus == 1:  # Document is submitted
     # 		frappe.publish_realtime(
@@ -51,8 +54,7 @@ class companytransfer(Document):
             self.status = "ملغية"
 
     def before_insert(self):
-        if self.our_profit + self.other_party_profit > self.profit:
-            frappe.throw("الرجاء التاكد من قيمة العمولة")
+        pass
 
     def before_save(self):
         # if not self.journal_entry:
@@ -210,7 +212,7 @@ def create_journal_entry(self):
                     "credit_in_account_currency": debit + other_party_profit,
                 },
             ]
-        # Add an entry for out_proft if not 0
+        # other party profit goes with amount itself
         if our_profit != 0:
             accounts.append(
                 {
@@ -236,11 +238,11 @@ def create_journal_entry(self):
             {
                 "doctype": "Journal Entry",
                 "voucher_type": "Journal Entry",
-                "posting_date": frappe.utils.nowdate(),
+                "posting_date": self.posting_date,
                 "accounts": accounts,
                 "mode_of_payment": "Cash",
                 "cheque_no": self.name,
-                "cheque_date": frappe.utils.nowdate(),
+                "cheque_date": self.posting_date,
                 "user_remark": self.whatsapp_desc,
             }
         )

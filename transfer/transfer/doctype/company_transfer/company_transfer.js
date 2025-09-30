@@ -149,7 +149,7 @@ frappe.ui.form.on('company transfer', {
             validate = false;
         }
 
-        if (type === 1) { //من شركة الي شركة
+        if (frm.select_external === "شركات") { //من شركة الي شركة
             frappe.call({
                 method: "frappe.client.get_list",
                 args: {
@@ -165,8 +165,8 @@ frappe.ui.form.on('company transfer', {
                 }
             });
         }
-        else {
-            if (type === 2) {
+        else { // فرع الي شركة
+            if (type === "خارجي") {
                 if (frm.doc.branch !== frm.doc.from_company)
                     frappe.throw(('الرجاء التاكد من الفرع'));
             }

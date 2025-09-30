@@ -528,3 +528,34 @@ def delete_current_doc(docname,method="submit"):
 		frappe.log_error(frappe.get_traceback(), "Error Deleting Document")
 		frappe.msgprint(f"Error occurred while deleting the document: {str(e)}")
 		return {"status": "error", "message": str(e)}
+
+
+@frappe.whitelist()
+def execute_on_company(docname,company,company_commission):
+    company_main = frappe.get_cached_doc("Transfer Setting").main_branch
+    transfer_doc = frappe.get_doc("transfer between branches", docname)
+    doc = frappe.new_doc("company transfer")
+    if not transfer_doc:
+        frappe.throw("الرجاء انشاء الحوالة اولا")
+    if transfer_doc.workflow_state == "ملغية":
+        frappe.throw("لا يمكن تنفيذ الحوالة بعد إلغاءها")
+
+    doc.select_external = "خارجي"
+    doc.branch = company_main
+    doc.from_type = "Branch"
+    doc.to_type = "Customer"
+    doc.from_company = company_main
+    doc.to_company = company
+
+    doc.amount = transfer_doc.amount
+    doc.our_profit = transfer_doc.other_party_profit
+    doc.other_party_profit = company_commission
+    doc.profit = transfer_doc.total_profit
+    doc.execution_amount = transfer_doc.amount + transfer_doc.total_profit
+    doc.whatsapp_desc = transfer_doc.whatsapp_desc
+    doc.phone_number = transfer_doc.phone_number
+    doc.transfer_between_branches = transfer_doc.name
+
+    doc.save()
+    frappe.db.commit()
+    return {"status": "success", "message": f"Document {docname} updated successfully."}
