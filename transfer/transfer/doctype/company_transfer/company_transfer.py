@@ -186,8 +186,7 @@ def create_journal_entry(self):
                     "party": to_party_name,
                     # "is_advance":"Yes",
                     "debit_in_account_currency": 0,
-                    "credit_in_account_currency": self.execution_amount
-                    - self.our_profit,
+                    "credit_in_account_currency": self.execution_amount - self.our_profit,
                 },
             ]
         else:

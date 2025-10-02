@@ -165,8 +165,10 @@ doc_events = {
         # "on_update": "transfer.transfer.doctype.transfer_between_branches.on_status_change",
         # "on_cancel": "method",
         # "on_trash": "transfer.transfer.doctype.transfer_between_branches.transfer_between_branches.delete_current_doc",
-    }
+    },
+    "Customer": {"after_insert": "transfer.transfer.api.create_customer_accounts"},
 }
+
 # Scheduled Tasks
 # ---------------
 

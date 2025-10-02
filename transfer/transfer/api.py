@@ -418,3 +418,52 @@ def get_rem_cefa():
     if not bins:
         return 0
     return bins[0].actual_qty
+
+@frappe.whitelist()
+def create_customer_accounts(doc, method):
+    company = frappe.defaults.get_global_default("company")
+
+    # Get parent groups
+    profit_parent = frappe.get_value(
+        "Account", {"account_name": "Customer Profits", "company": company}, "name"
+    )
+    cash_parent = frappe.get_value(
+        "Account", {"account_name": "Customer Cash", "company": company}, "name"
+    )
+
+    if not profit_parent or not cash_parent:
+        frappe.throw(
+            "Please create 'Customer Profits' and 'Customer Cash' parent accounts in Chart of Accounts."
+        )
+
+    # Create Profit Account
+    profit_account = frappe.get_doc(
+        {
+            "doctype": "Account",
+            "account_name": f"{doc.customer_name} - Profit",
+            "parent_account": profit_parent,
+            "company": company,
+            "account_type": "Payable",
+            "is_group": 0,
+        }
+    )
+    profit_account.insert(ignore_permissions=True)
+
+    # Create Cash Account
+    cash_account = frappe.get_doc(
+        {
+            "doctype": "Account",
+            "account_name": f"{doc.customer_name} - Cash",
+            "parent_account": cash_parent,
+            "company": company,
+            "account_type": "Cash",
+            "is_group": 0,
+        }
+    )
+    cash_account.insert(ignore_permissions=True)
+
+    # ✅ Link accounts to Customer (requires custom fields)
+    doc.db_set("custom_cash_account", cash_account.name)
+    doc.db_set("custom_profit_account", profit_account.name)
+
+    frappe.msgprint(f"Accounts created and linked for {doc.customer_name}")

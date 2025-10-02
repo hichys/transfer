@@ -1,0 +1,209 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:ALZ-{YY}{MM}{DD}{#####}",
+ "creation": "2025-10-01 01:12:30.025037",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_qa5s",
+  "from_customer",
+  "to_customer",
+  "amount",
+  "without_profit",
+  "profit_per_thousand",
+  "total_profit",
+  "split_profit",
+  "alzawia_profit",
+  "sender_profit",
+  "receiver_profit",
+  "column_break_tstn",
+  "posting_date",
+  "whatsapp_desc",
+  "phone_number",
+  "is_crossing",
+  "section_break_dvrs",
+  "journal_entry",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_qa5s",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Alzawia Transfer",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "whatsapp_desc",
+   "fieldtype": "Small Text",
+   "in_standard_filter": 1,
+   "label": "Whatsapp Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Phone Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "without_profit",
+   "fieldtype": "Check",
+   "label": "\u0628\u062f\u0648\u0646 \u0639\u0645\u0648\u0644\u0629"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:!doc.without_profit",
+   "fieldname": "profit_per_thousand",
+   "fieldtype": "Currency",
+   "label": "Profit Per Thousand"
+  },
+  {
+   "depends_on": "eval:!doc.without_profit",
+   "fieldname": "total_profit",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Profit",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:!doc.without_profit",
+   "fieldname": "sender_profit",
+   "fieldtype": "Currency",
+   "label": "Sender Profit"
+  },
+  {
+   "fieldname": "column_break_tstn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_dvrs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_standard_filter": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:!doc.without_profit",
+   "fieldname": "split_profit",
+   "fieldtype": "Check",
+   "label": "\u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0645\u0642\u0633\u0648\u0645\u0647 \u0639\u0644\u064a \u0627\u0644\u0641\u0631\u0648\u0639"
+  },
+  {
+   "fieldname": "from_customer",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "From",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_customer",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "To",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:!doc.without_profit",
+   "fieldname": "receiver_profit",
+   "fieldtype": "Currency",
+   "label": "Reciver Profit"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "no_copy": 1,
+   "options": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:!doc.without_profit",
+   "fieldname": "alzawia_profit",
+   "fieldtype": "Currency",
+   "hidden": 1,
+   "label": "Alzawia Profit"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_crossing",
+   "fieldtype": "Check",
+   "label": "Is Crossing",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-10-02 16:17:51.656475",
+ "modified_by": "Administrator",
+ "module": "transfer",
+ "name": "Alzawia Transfer",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "alalmia transfer",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

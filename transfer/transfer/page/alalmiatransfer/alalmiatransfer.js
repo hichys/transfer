@@ -1,7 +1,7 @@
 frappe.pages['alalmiatransfer'].on_page_load = function(wrapper) {
     var page = frappe.ui.make_app_page({
         parent: wrapper,
-        title: 'شركــة العالمــية',
+        title: 'شركــة العالمية الزاوية',
         single_column: true,
     });
 
@@ -9,7 +9,7 @@ frappe.pages['alalmiatransfer'].on_page_load = function(wrapper) {
     $(page.body).html(`
         <div style="text-align: center; margin-top: 20px;">
             <!-- Company Logo -->
-            <img src="/assets/transfer/images/logo.png" alt="شركــة العالمــية" 
+            <img src="/assets/transfer/images/logo.png" alt='شركــة العالمية الزاوية'
                 style="max-width: 200px; margin-bottom: 20px; width: 100%; height: auto;">
             
             <!-- Page Title -->
@@ -26,20 +26,11 @@ frappe.pages['alalmiatransfer'].on_page_load = function(wrapper) {
                 gap: 20px; 
                 padding: 10px;
             ">
-                <a href="/app/internal-transfer" 
+                
+                <a href="/app/alzawia-transfer" 
                     class="btn btn-primary" 
                     style="flex: 1; max-width: 200px; padding: 15px; font-size: 1rem; text-align: center;">
-                    تحويلات داخلية
-                </a>
-                <a href="/app/company-transfer" 
-                    class="btn btn-primary" 
-                    style="flex: 1; max-width: 200px; padding: 15px; font-size: 1rem; text-align: center;">
-                    تحويلات خارجية
-                </a>
-                <a href="/app/transfer-between-branches" 
-                    class="btn btn-primary" 
-                    style="flex: 1; max-width: 200px; padding: 15px; font-size: 1rem; text-align: center;">
-                    تحويلات بين الفروع
+                    تحويلات  
                 </a>
             </div>
         </div>

@@ -8,7 +8,10 @@
   "branch_setting_section",
   "main_branch",
   "commissions_section",
-  "profit_per_thousand"
+  "profit_per_thousand",
+  "section_break_fehf",
+  "internal",
+  "external"
  ],
  "fields": [
   {
@@ -25,19 +28,36 @@
    "fieldname": "main_branch",
    "fieldtype": "Link",
    "label": "Main Branch",
-   "options": "Branch"
+   "options": "Customer"
   },
   {
    "fieldname": "branch_setting_section",
    "fieldtype": "Section Break",
    "label": "Branch Setting"
+  },
+  {
+   "fieldname": "section_break_fehf",
+   "fieldtype": "Section Break",
+   "label": "Customize Internal Vs External"
+  },
+  {
+   "fieldname": "internal",
+   "fieldtype": "Table",
+   "label": "Internal",
+   "options": "Transfer Internal"
+  },
+  {
+   "fieldname": "external",
+   "fieldtype": "Table",
+   "label": "External",
+   "options": "Transfer External"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-09-19 21:04:22.696988",
+ "modified": "2025-10-02 08:55:00.832508",
  "modified_by": "Administrator",
  "module": "transfer",
  "name": "Transfer Setting",
