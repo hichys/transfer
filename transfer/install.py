@@ -4,128 +4,10 @@ from openpyxl import load_workbook
 from frappe import _
 
 
-def import_branches_from_excel(filename="branch.xlsx"):
-    """Import branches from Excel file (only branch names)"""
-
-    file_path = frappe.get_app_path("transfer", "public", "asset", "xlsx", filename)
-
-    if not os.path.exists(file_path):
-        print(f"Branch file not found, skipping: {filename}")
-        return False
-
-    print(f"Importing branches from: {filename}")
-
-    workbook = load_workbook(file_path)
-    sheet = workbook.active
-
-    imported_count = 0
-    skipped_count = 0
-
-    for row_idx, row in enumerate(
-        sheet.iter_rows(min_row=2, values_only=True), start=2
-    ):
-        # Skip empty rows
-        if not any(row) or not row[0]:  # row[0] is branch name
-            continue
-
-        try:
-            branch_name = str(row[0]).strip()
-
-            # Check if branch already exists
-            if not frappe.db.exists("Branch", {"branch": branch_name}):
-                # Create the branch with just the name
-                branch_doc = frappe.get_doc(
-                    {"doctype": "Branch", "branch": branch_name}
-                )
-                branch_doc.insert(ignore_permissions=True)
-                imported_count += 1
-                print(f"✓ Created branch: {branch_name}")
-            else:
-                skipped_count += 1
-                print(f"✓ Branch already exists: {branch_name}")
-
-        except Exception as e:
-            print(f"✗ Error processing row {row_idx}: {str(e)}")
-            frappe.log_error(f"Branch import error row {row_idx}: {str(e)}")
-
-    frappe.db.commit()
-    print(
-        f"Branch import completed: {imported_count} imported, {skipped_count} skipped"
-    )
-    return True
-
-
-def check_and_import_branches():
-    """Check if branches exist, import if needed"""
-
-    # Check if any branches exist in the system
-    existing_branches = frappe.get_all("Branch", limit=1)
-
-    if existing_branches:
-        print("Branches already exist in the system. Skipping import.")
-        return True
-
-    print("No branches found. Importing from Excel...")
-    return import_branches_from_excel("branches.xlsx")
-
-
-def check_and_set_branch_dimension():
-    """Check if Branch accounting dimension is set, otherwise configure it"""
-
-    # Check if Branch dimension exists
-    branch_dimension = frappe.db.exists("Accounting Dimension", "Branch")
-
-    if not branch_dimension:
-        print("Branch accounting dimension not found. Creating it...")
-        create_branch_dimension()
-    else:
-        print("Branch accounting dimension already exists.")
-        # Verify it's properly configured
-        verify_branch_dimension()
-
-
-def create_branch_dimension():
-    """Create Branch accounting dimension"""
-    try:
-        dimension = frappe.get_doc(
-            {
-                "doctype": "Accounting Dimension",
-                "document_type": "Branch",
-                "dimension_name": "Branch",
-                "disabled": 0,
-                "company": "",  # Applies to all companies
-            }
-        )
-        dimension.insert(ignore_permissions=True)
-        frappe.db.commit()
-        print("✓ Branch accounting dimension created successfully")
-
-        # Enable dimension in Company settings
-
-    except Exception as e:
-        print(f"✗ Failed to create Branch dimension: {str(e)}")
-        frappe.log_error(f"Failed to create Branch dimension: {str(e)}")
-
-
-def verify_branch_dimension():
-    """Verify Branch dimension is properly configured"""
-    dimension = frappe.get_doc("Accounting Dimension", "Branch")
-
-    if dimension.disabled:
-        print("Branch dimension is disabled. Enabling it...")
-        dimension.disabled = 0
-        dimension.save(ignore_permissions=True)
-        frappe.db.commit()
-        print("✓ Branch dimension enabled")
-
-    # Check if dimension is enabled in companies
-
 
 def after_install():
     print("Starting account import...")
     # Ensure Branch dimension is set up
-    import_branches_from_excel("branch.xlsx")
-    check_and_set_branch_dimension()
     # Get the default company
     default_company = frappe.db.get_single_value("Global Defaults", "default_company")
     if not default_company:
@@ -138,7 +20,7 @@ def after_install():
 
     # Import accounts
     import_accounts_from_excel(default_company, "roots_accounts.xlsx")
-    import_accounts_from_excel(default_company, "accounts.xlsx")
+    # import_accounts_from_excel(default_company, "accounts.xlsx")
     print("Account import completed successfully!")
 
 
